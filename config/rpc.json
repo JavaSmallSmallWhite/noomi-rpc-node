@@ -1,0 +1,29 @@
+{
+  "port": 8090, // 启动端口号
+  "appName": "NoomiRpcApplication", // 应用名称
+  "servicePrefix": "com.nodejs.Test", // 服务前缀，需要唯一性，主要针对跨语言开发，比如Java
+  "registry": { // 默认zookeeper
+//    "type": "zookeeper", // zookeeper连接配置，具体参考npm zookeeper的连接配置
+//    "connectionConfig": { // zookeeper连接配置
+//      "connectString": "127.0.0.1:2181", // 连接地址
+//      "options": {
+//        "sessionTimeout": 30000,
+//        "spinDelay": 1000,
+//        "retries": 0
+//      },
+//    },
+
+    "type": "nacos",
+    "connectionConfig": { // nacos连接配置，具体参考npm nacos的连接配置，配置中的logger不用管，noomi-rpc自动传console，nacos也只能传console
+      "serverList": "127.0.0.1:8848", // 连接地址
+      "namespace": "public", // 命名空间
+    },
+  },
+  "loadBalancerType": "RoundRobinLoadBalancer", // 负载均衡器类型
+  "serializerType": "json", // 序列化类型
+  "compressorType": "gzip", // 压缩类型
+  "idGenerator": { // id发号器，生成分布式唯一id
+    "dataCenterId": "2", // 数据中心编号
+    "machineId": "4" // 机器号
+  }
+}

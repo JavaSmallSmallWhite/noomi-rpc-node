@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "module":"commonjs",
+    "target": "ES2020",
+    "sourceMap": true,
+//    "strict": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "outDir":"./dist"
+    // "declaration": true,
+    // "declarationDir":"./dist/types",
+    // "noUnusedParameters":false
+  },
+  "include":[
+    "**/*.ts"
+  ],
+  "exclude": [
+    //"./index.ts"
+  ],
+}
