@@ -4,6 +4,8 @@ import {RoundRobinLoadBalancer} from "../loadbalance/impl/RoundRobinLoadBalancer
 import {IdGeneratorUtil} from "../common/utils/IdGeneratorUtil";
 import {Logger} from "../common/logger/Logger";
 import {InterfaceUtil} from "../common/utils/InterfaceUtil";
+import {RateLimiter} from "../protection/ratelimit/RateLimiter";
+import {CircuitBreaker} from "../protection/circuitbreak/CircuitBreaker";
 
 /**
  * 配置管理类
@@ -57,6 +59,18 @@ export class Configuration {
      * @private
      */
     private _idGenerator: IdGeneratorUtil = new IdGeneratorUtil(1n, 2n);
+
+    /**
+     * todo 配置信息 --> 限流器，ip级别的限流，能很好限流，但是效率可能较低，服务级别的限流暂时未做
+     * @private
+     */
+    private _everyIpRateLimiter: Map<string, RateLimiter> = new Map<string, RateLimiter>();
+
+    /**
+     * todo 配置信息 --> 熔断器，ip级别的熔断，做的比较简单，未包含半打开状态half-open
+     * @private
+     */
+    private _everyIpCircuitBreaker: Map<string, CircuitBreaker> = new Map<string, CircuitBreaker>();
 
     /**
      * 加载配置文件，设定配置
@@ -139,5 +153,15 @@ export class Configuration {
     set idGenerator(value: IdGeneratorUtil) {
         Logger.info(`id发号器修改成功，id发号器为${InterfaceUtil.getInterfaceName(value)}。`);
         this._idGenerator = value;
+    }
+
+
+    get everyIpRateLimiter(): Map<string, RateLimiter> {
+        return this._everyIpRateLimiter;
+    }
+
+
+    get everyIpCircuitBreaker(): Map<string, CircuitBreaker> {
+        return this._everyIpCircuitBreaker;
     }
 }

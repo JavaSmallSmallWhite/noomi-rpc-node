@@ -1,5 +1,4 @@
 import {createConnection, Socket} from "net";
-import {NoomiRpcStarter} from "../../NoomiRpcStarter";
 import {RequestPayload} from "../../message/RequestPayload";
 import {NoomiRpcRequest} from "../../message/NoomiRpcRequest";
 import {AddressPort, NetUtil} from "../../common/utils/NetUtil";
@@ -76,7 +75,6 @@ export class NoomiRpcConsumerHandler {
                 return;
             }
         })
-
         if (!isExist) {
             throw new ProxyError(`未设置${originalMethod.name}的方法描述。`);
         }

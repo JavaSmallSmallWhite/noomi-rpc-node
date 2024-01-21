@@ -70,13 +70,13 @@ export class IdGeneratorUtil {
      * 数据中心id
      * @private
      */
-    private dataCenterId: bigint;
+    private readonly dataCenterId: bigint;
 
     /**
      * 机器id
      * @private
      */
-    private machineId: bigint;
+    private readonly machineId: bigint;
 
     /**
      * 序列id
@@ -111,7 +111,7 @@ export class IdGeneratorUtil {
      * 获取分布式id，发生时间回溯直接抛错
      */
     public getId(): bigint {
-        const currentTime: bigint = BigInt(new Date().valueOf());
+        const currentTime: bigint = BigInt(Date.now());
         let timeStamp: bigint = currentTime - IdGeneratorUtil.START_STAMP;
         if (timeStamp < this.lastTimeStamp) {
             throw new DateError("您的服务器进行了时钟回调。");
@@ -138,7 +138,7 @@ export class IdGeneratorUtil {
      * @private
      */
     private getNextTimeStamp(): bigint {
-        let current: bigint = BigInt(new Date().valueOf()) - IdGeneratorUtil.START_STAMP;
+        let current: bigint = BigInt(Date.now()) - IdGeneratorUtil.START_STAMP;
         while (current === this.lastTimeStamp) {
             current = BigInt(new Date().valueOf()) - IdGeneratorUtil.START_STAMP;
         }

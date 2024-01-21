@@ -9,6 +9,9 @@ import {ResponseType} from "../../enumeration/ResponseType";
 import {RequestType} from "../../enumeration/RequestType";
 import {ResponsePayload} from "../../message/ResponsePayload";
 import {GlobalCache} from "../../cache/GlobalCache";
+import {RateLimiter} from "../../protection/ratelimit/RateLimiter";
+import {Starter} from "../../index";
+import {TokenBuketRateLimiter} from "../../protection/ratelimit/TokenBuketRateLimiter";
 
 /**
  * 服务调用处理器
@@ -27,10 +30,24 @@ export class MethodCallInBoundHandler extends InBoundHandler<NoomiRpcRequest, No
         noomiRpcResponse.setSerializeType(noomiRpcRequest.getSerializeType());
         noomiRpcResponse.setCompressType(noomiRpcRequest.getCompressType());
         noomiRpcResponse.setOther(noomiRpcRequest.getOther());
-        // 处理心跳
-        if (noomiRpcRequest.getRequestType() === RequestType.HEART_BEAT_REQUEST) {
+
+        const everyIpRateLimiter: Map<string, RateLimiter> = Starter.getInstance().getConfiguration().everyIpRateLimiter;
+        const address: string = socketChannel.remoteAddress;
+        let rateLimiter: RateLimiter = everyIpRateLimiter.get(address);
+        if (!rateLimiter) {
+            rateLimiter = new TokenBuketRateLimiter(500, 500);
+            everyIpRateLimiter.set(address, rateLimiter);
+        }
+        const allowRequest: boolean = rateLimiter.allowRequest();
+
+        if (!allowRequest) {
+            // 处理限流
+            noomiRpcResponse.setResponseType(ResponseType.RATE_LIMIT);
+        } else if (noomiRpcRequest.getRequestType() === RequestType.HEART_BEAT_REQUEST) {
+            // 处理心跳
             noomiRpcResponse.setResponseType(ResponseType.SUCCESS_HEART_BEAT);
-        } else { // 处理正常调用
+        } else {
+            // 处理正常调用
             const requestPayload: RequestPayload = noomiRpcRequest.getRequestPayload();
             responsePayload.setServiceName(requestPayload.getServiceName());
             responsePayload.setMethodName(requestPayload.getMethodName());

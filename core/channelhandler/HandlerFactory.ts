@@ -10,6 +10,11 @@ import {NoomiRpcRequestDecoder} from "./handler/NoomiRpcRequestDecoder";
 import {HandlerError} from "../common/error/HandlerError";
 import {NetworkError} from "../common/error/NetworkError";
 import {Logger} from "../common/logger/Logger";
+import {CircuitBreaker} from "../protection/circuitbreak/CircuitBreaker";
+import {Starter} from "../index";
+import {SimpleCircuitBreaker} from "../protection/circuitbreak/SimpleCircuitBreaker";
+import {RequestType} from "../enumeration/RequestType";
+import {ProxyError} from "../common/error/ProxyError";
 
 /**
  * handler处理工厂
@@ -60,8 +65,23 @@ export class HandlerFactory {
         }
         let tryTimes: number = 3;
         const intervalTime: number = 2000;
+        let circuitBreaker: CircuitBreaker;
         while (true) {
             try {
+                const everyIpCircuitBreaker: Map<string, CircuitBreaker> = Starter.getInstance().getConfiguration().everyIpCircuitBreaker;
+                const serviceNode: string = socketChannel.remoteAddress + ":" + socketChannel.remotePort;
+                circuitBreaker = everyIpCircuitBreaker.get(serviceNode);
+                if (!circuitBreaker) {
+                    circuitBreaker = new SimpleCircuitBreaker(10);
+                    everyIpCircuitBreaker.set(serviceNode, circuitBreaker);
+                }
+
+                if (!(noomiRpcRequest.getRequestType() === RequestType.HEART_BEAT_REQUEST) && circuitBreaker.isBreak()) {
+                    setTimeout(function () {
+                        Starter.getInstance().getConfiguration().everyIpCircuitBreaker.get(serviceNode).reset();
+                    }, 3000);
+                    throw new ProxyError("当前断路器已经开启，无法发送请求。");
+                }
                 // 发送请求
                 await this.execute(socketChannel, "ConsumerOutBound", noomiRpcRequest);
 
@@ -88,6 +108,7 @@ export class HandlerFactory {
                 return result;
             }catch (error) {
                 tryTimes--;
+                circuitBreaker.recordErrorRequest();
                 new Promise((resolve): void => {
                     setTimeout(function (): void {
                         resolve(null);
