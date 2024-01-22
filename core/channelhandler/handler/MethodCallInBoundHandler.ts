@@ -12,6 +12,7 @@ import {GlobalCache} from "../../cache/GlobalCache";
 import {RateLimiter} from "../../protection/ratelimit/RateLimiter";
 import {Starter} from "../../index";
 import {TokenBuketRateLimiter} from "../../protection/ratelimit/TokenBuketRateLimiter";
+import {ShutdownHolder} from "../../shutdown/ShutdownHolder";
 
 /**
  * 服务调用处理器
@@ -31,6 +32,13 @@ export class MethodCallInBoundHandler extends InBoundHandler<NoomiRpcRequest, No
         noomiRpcResponse.setCompressType(noomiRpcRequest.getCompressType());
         noomiRpcResponse.setOther(noomiRpcRequest.getOther());
 
+        if (ShutdownHolder.BAFFLE) {
+            noomiRpcResponse.setResponseType(ResponseType.BE_CLOSING);
+            return noomiRpcResponse;
+        }
+
+        ShutdownHolder.REQUEST_COUNTER++;
+
         const everyIpRateLimiter: Map<string, RateLimiter> = Starter.getInstance().getConfiguration().everyIpRateLimiter;
         const address: string = socketChannel.remoteAddress;
         let rateLimiter: RateLimiter = everyIpRateLimiter.get(address);
@@ -41,6 +49,7 @@ export class MethodCallInBoundHandler extends InBoundHandler<NoomiRpcRequest, No
         const allowRequest: boolean = rateLimiter.allowRequest();
 
         if (!allowRequest) {
+            Logger.error("服务端被限流。");
             // 处理限流
             noomiRpcResponse.setResponseType(ResponseType.RATE_LIMIT);
         } else if (noomiRpcRequest.getRequestType() === RequestType.HEART_BEAT_REQUEST) {
@@ -62,6 +71,9 @@ export class MethodCallInBoundHandler extends InBoundHandler<NoomiRpcRequest, No
             noomiRpcResponse.setResponseType(ResponseType.SUCCESS_COMMON);
             noomiRpcResponse.setResponseBody(responsePayload);
         }
+
+        ShutdownHolder.REQUEST_COUNTER--;
+
         return noomiRpcResponse;
     }
 

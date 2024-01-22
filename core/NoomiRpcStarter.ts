@@ -11,6 +11,7 @@ import {IdGeneratorUtil} from "./common/utils/IdGeneratorUtil";
 import {HeartBeatDetector} from "./heartbeat/HeartBeatDetector";
 import {GlobalCache} from "./cache/GlobalCache";
 import {Starter} from "./index";
+import {GraceFullyShutdownHook} from "./shutdown/GraceFullyShutdownHook";
 
 /**
  * RPC框架启动类
@@ -118,6 +119,8 @@ export class NoomiRpcStarter {
      * @return          this当前实例
      */
     public async publish(service: ServiceConfig<Object, Object>): Promise<NoomiRpcStarter> {
+        process.on('SIGINT', GraceFullyShutdownHook.run);
+        process.on('SIGTERM', GraceFullyShutdownHook.run);
         await this.configuration.registryConfig.getRegistry().register(service);
         const serviceName: string = InterfaceUtil.combine(this.configuration.servicePrefix, service.interfaceProvider.constructor.name);
         GlobalCache.SERVICES_LIST.set(serviceName, service);

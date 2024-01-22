@@ -3,6 +3,7 @@ import {RegistryConfig} from "../../core/discovery/RegistryConfig";
 import {HelloNoomiRpcDescription} from "../api/description/HelloNoomiRpcDescription";
 import {Starter} from "../../core";
 import {ReferenceConfig} from "../../core/ReferenceConfig";
+import {RoundRobinLoadBalancer} from "../../core/loadbalance/impl/RoundRobinLoadBalancer";
 
 async function main(): Promise<void> {
 
@@ -25,7 +26,7 @@ async function main(): Promise<void> {
         .application("first-noomi-rpc-consumer-application")
         .servicePrefix("com.nodejs.Test")
         .registry(new RegistryConfig("zookeeper"))
-        .loadBalancer("MinimumResponseTimeLoadBalancer")
+        .loadBalancer("RoundRobinLoadBalancer")
         .serializer("fury")
         .compressor("gzip")
         .reference(reference);
@@ -33,7 +34,12 @@ async function main(): Promise<void> {
     const helloNoomiRpc: HelloNoomiRpc = reference.get();
     // 调用方法
     setTimeout(async function () {
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 100; i++) {
+            // await new Promise((resolve, reject) => {
+            //     setTimeout(function () {
+            //         resolve(null);
+            //     }, 1000);
+            // })
             const result1: string = await helloNoomiRpc.sayHi("hello noomi" + i);
             const result2: string = await helloNoomiRpc.sayHi("hello noomi" + i);
             console.log(result1);

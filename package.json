@@ -1,7 +1,7 @@
 {
   "name": "noomi-rpc",
   "version": "1.0.0",
-  "description": "一个基于node的rpc框架，支持注册中心、服务发现注册，负载均衡、协议、心跳检测、序列化、熔断、限流",
+  "description": "一个基于fury的nodejs的rpc框架，支持注册中心、服务发现注册，负载均衡、协议、心跳检测、序列化、熔断、限流",
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf dist"

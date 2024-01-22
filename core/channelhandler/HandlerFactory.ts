@@ -1,5 +1,5 @@
 import {Handler} from "./Handler";
-import {Socket} from "net";
+import {createConnection, Socket} from "net";
 import {NoomiRpcRequest} from "../message/NoomiRpcRequest";
 import {NoomiRpcResponseEncoder} from "./handler/NoomiRpcResponseEncoder";
 import {NoomiRpcRequestEncoder} from "./handler/NoomiRpcRequestEncoder";
@@ -8,13 +8,15 @@ import {ResultInBoundHandler} from "./handler/ResultInBoundHandler";
 import {MethodCallInBoundHandler} from "./handler/MethodCallInBoundHandler";
 import {NoomiRpcRequestDecoder} from "./handler/NoomiRpcRequestDecoder";
 import {HandlerError} from "../common/error/HandlerError";
-import {NetworkError} from "../common/error/NetworkError";
 import {Logger} from "../common/logger/Logger";
 import {CircuitBreaker} from "../protection/circuitbreak/CircuitBreaker";
 import {Starter} from "../index";
 import {SimpleCircuitBreaker} from "../protection/circuitbreak/SimpleCircuitBreaker";
 import {RequestType} from "../enumeration/RequestType";
 import {ProxyError} from "../common/error/ProxyError";
+import {GlobalCache} from "../cache/GlobalCache";
+import {AddressPort, NetUtil} from "../common/utils/NetUtil";
+import {LoadBalancerFactory} from "../loadbalance/LoadBalancerFactory";
 
 /**
  * handler处理工厂
@@ -63,6 +65,19 @@ export class HandlerFactory {
             this.initHandler("consumer");
             this.isInitialHandler = true;
         }
+        if (!socketChannel) {
+            const serviceNode: string = await LoadBalancerFactory
+                .getLoadBalancer(Starter.getInstance().getConfiguration().loadBalancerType)
+                .impl
+                .selectServerAddress(noomiRpcRequest.getRequestPayload().getServiceName());
+            socketChannel = GlobalCache.CHANNEL_CACHE.get(serviceNode);
+            if (!socketChannel) {
+                const [address, port]: AddressPort = NetUtil.parseAddress(serviceNode);
+                socketChannel = createConnection(port, address);
+                socketChannel.setKeepAlive(true);
+                GlobalCache.CHANNEL_CACHE.set(serviceNode, socketChannel);
+            }
+        }
         let tryTimes: number = 3;
         const intervalTime: number = 2000;
         let circuitBreaker: CircuitBreaker;
@@ -77,9 +92,10 @@ export class HandlerFactory {
                 }
 
                 if (!(noomiRpcRequest.getRequestType() === RequestType.HEART_BEAT_REQUEST) && circuitBreaker.isBreak()) {
-                    setTimeout(function () {
+                    setTimeout(function (): void {
                         Starter.getInstance().getConfiguration().everyIpCircuitBreaker.get(serviceNode).reset();
                     }, 3000);
+                    Logger.error("当前断路器已经开启，无法发送请求。");
                     throw new ProxyError("当前断路器已经开启，无法发送请求。");
                 }
                 // 发送请求
@@ -94,13 +110,13 @@ export class HandlerFactory {
                         } catch (error) {
                             reject(error);
                         }
-                    })
+                    });
 
                     socketChannel.on("error", (error: Error): void => {
                         socketChannel.destroy(error);
                         reject(error);
-                    })
-                })
+                    });
+                });
 
                 if (result instanceof Error) {
                     throw result;
@@ -109,13 +125,14 @@ export class HandlerFactory {
             }catch (error) {
                 tryTimes--;
                 circuitBreaker.recordErrorRequest();
-                new Promise((resolve): void => {
+                await new Promise((resolve): void => {
                     setTimeout(function (): void {
                         resolve(null);
                     }, intervalTime);
                 })
                 if (tryTimes < 0) {
                     Logger.error(`对方法${noomiRpcRequest.getRequestPayload().getMethodName()}进行调用时，重试${3 - tryTimes - 1}次，依然不可调用。`);
+                    break;
                 }
                 Logger.error(`在进行第${3 - tryTimes}次重试时发生异常。`);
             }
@@ -137,13 +154,13 @@ export class HandlerFactory {
             try {
                 await this.execute(socketChannel, "ProviderHandler", data);
             } catch (error) {
-                throw error;
+                Logger.error(error.message);
             }
         })
 
         socketChannel.on("error", (error: Error): void => {
             socketChannel.destroy(error);
-            throw new NetworkError(error.message);
+            Logger.error(error.message);
         })
     }
 
