@@ -1,6 +1,4 @@
-import {HelloNoomiRpc} from "../../api/HelloNoomiRpc";
-
-export class HelloNoomiRpcImpl extends HelloNoomiRpc {
+export class HelloNoomiRpcImpl implements HelloNoomiRpc {
     sayHi(msg: string): Promise<string> {
         return Promise.resolve(msg);
     }

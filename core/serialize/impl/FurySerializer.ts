@@ -1,5 +1,5 @@
 import {Serializer} from "../Serializer";
-import Fury, {TypeDescription} from '@furyjs/fury';
+import Fury, {InternalSerializerType, TypeDescription} from '@furyjs/fury';
 import {Logger} from "../../common/logger/Logger";
 import {SerializeError} from "../../common/error/SerializeError";
 import {RequestPayload} from "../../message/RequestPayload";
@@ -71,5 +71,104 @@ export class FurySerializer implements Serializer{
             Logger.error("requestPayload请求体的fury序列化操作失败。");
             throw new SerializeError(error.message);
         }
+    }
+
+    /**
+     * 根据data动态获取描述
+     * @param data 数据
+     * @param tag 标签
+     */
+    private getDataDescription(data: unknown, tag: string): {
+        options?: {
+            inner?: TypeDescription,
+            key?: TypeDescription,
+            value?: TypeDescription,
+            props?: {
+                [key: string]: any;
+            },
+            tag?: string
+        };
+        label: string;
+        type: InternalSerializerType
+    } {
+        if (data === null || data === undefined) {
+            return null;
+        }
+        if (Array.isArray(data)) {
+            const item: TypeDescription = this.getDataDescription(data[0], tag);
+            if (!item) {
+                throw new Error('empty array can\'t convert')
+            }
+            return {
+                type: InternalSerializerType.ARRAY,
+                label: 'array',
+                options: {
+                    inner: item,
+                }
+            }
+        }
+        if (data instanceof Date) {
+            return {
+                type: InternalSerializerType.TIMESTAMP,
+                label: 'timestamp'
+            }
+        }
+        if (typeof data === 'string') {
+            return {
+                type: InternalSerializerType.STRING,
+                label: "string",
+            }
+        }
+        if (data instanceof Set) {
+            return {
+                type: InternalSerializerType.FURY_SET,
+                label: "set",
+                options: {
+                    key: this.getDataDescription([...data.values()][0], tag),
+                }
+            }
+        }
+        if (data instanceof Map) {
+            return {
+                type: InternalSerializerType.MAP,
+                label: "map",
+                options: {
+                    key: this.getDataDescription([...data.keys()][0], tag),
+                    value: this.getDataDescription([...data.values()][0], tag),
+                }
+            }
+        }
+        if (typeof data === 'boolean') {
+            return {
+                type: InternalSerializerType.BOOL,
+                label: "boolean",
+            }
+        }
+        if (typeof data === 'number') {
+            if (data > Number.MAX_SAFE_INTEGER || data < Number.MIN_SAFE_INTEGER) {
+                return {
+                    type: InternalSerializerType.INT64,
+                    label: "int64"
+                }
+            }
+            return {
+                type: InternalSerializerType.INT32,
+                label: "int32"
+            }
+        }
+        if (typeof data === 'object') {
+            return {
+                type: InternalSerializerType.FURY_TYPE_TAG,
+                label: "object",
+                options: {
+                    props: Object.fromEntries(Object.entries(data).map(([key, value]): [string, unknown] => {
+                        return [key, this.getDataDescription(value, `${tag}.${key}`)]
+                    }).filter(([_, v]) => Boolean(v))),
+                    tag
+                }
+
+            }
+        }
+        throw `unknown data type ${typeof data}`
     }
 }

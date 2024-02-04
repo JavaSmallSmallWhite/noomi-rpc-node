@@ -1,6 +1,5 @@
 import {Logger} from "../common/logger/Logger";
 import {NoomiRpcConsumerHandler} from "./handler/NoomiRpcConsumerHandler";
-import {NoomiRpcStarter} from "../NoomiRpcStarter";
 import {InterfaceUtil} from "../common/utils/InterfaceUtil";
 import {Starter} from "../index";
 
