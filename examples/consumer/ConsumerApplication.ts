@@ -31,12 +31,10 @@ async function main(): Promise<void> {
     // 获取HelloNoomiRpc的代理对象，所有的rpc操作都通过代理对象去进行
     const helloNoomiRpc: HelloNoomiRpc = reference.get();
     // 调用方法
-    setTimeout(async function () {
-        const result1: string = await helloNoomiRpc.sayHi("hello noomi1" );
-        const result2: string = await helloNoomiRpc.sayHello("hello noomi2");
-        console.log(result1);
-        console.log(result2);
-    }, 3000)
+    const result1: string = await helloNoomiRpc.sayHi("hello noomi1" );
+    const result2: string = await helloNoomiRpc.sayHello("hello noomi2");
+    console.log(result1);
+    console.log(result2);
 }
 main().then().catch()
 

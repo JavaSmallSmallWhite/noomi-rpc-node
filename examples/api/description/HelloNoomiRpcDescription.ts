@@ -1,4 +1,4 @@
-import {Type, TypeDescription} from "@furyjs/fury";
+import {Type} from "@furyjs/fury";
 import {Description} from "../../../core/ServiceConfig";
 
 /**
