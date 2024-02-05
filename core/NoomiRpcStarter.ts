@@ -119,14 +119,13 @@ export class NoomiRpcStarter {
      * @param service   封装需要发布的服务
      * @return          this当前实例
      */
-    public async publish(service: ServiceConfig<Object, Object>): Promise<NoomiRpcStarter> {
+    public async publish(service: ServiceConfig<Object, Object>): Promise<void> {
         process.on('SIGINT', GraceFullyShutdownHook.run);
         process.on('SIGTERM', GraceFullyShutdownHook.run);
         await this.configuration.registryConfig.getRegistry().register(service);
         const serviceName: string = InterfaceUtil.combine(this.configuration.servicePrefix, service.interfaceProvider.constructor.name);
         GlobalCache.SERVICES_LIST.set(serviceName, service);
         // 服务节点名称
-        return this;
     }
 
     /**
@@ -161,11 +160,10 @@ export class NoomiRpcStarter {
      * 配置代理对象
      * @param reference 代理
      */
-    public async reference(reference: ReferenceConfig<Object, Object>): Promise<NoomiRpcStarter> {
+    public async reference(reference: ReferenceConfig<Object, Object>): Promise<void> {
         const interfaceName: string = InterfaceUtil.getInterfaceName(reference.interfaceRef);
         const serviceName: string = InterfaceUtil.combine(this.configuration.servicePrefix, interfaceName);
         GlobalCache.REFERENCES_LIST.set(serviceName, reference);
         await HeartBeatDetector.detectHeartbeat(serviceName);
-        return this;
     }
 }

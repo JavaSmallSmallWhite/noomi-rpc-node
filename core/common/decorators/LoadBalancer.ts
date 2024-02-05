@@ -8,17 +8,17 @@ import {Starter} from "../../index";
  * 负载均衡装饰器，用于添加自定义的负载均衡器，装饰类
  * @constructor
  */
-export function LoadBalancer(loadBalancerConfig: LoadBalancerOption): (target: Function) => void {
+export function LoadBalancer(loadBalancerOption: LoadBalancerOption): (target: Function) => void {
     return (target: Function): void => {
-        const loadBalancerName: string = loadBalancerConfig["loadBalancerName"] || target.name
+        const loadBalancerName: string = loadBalancerOption["loadBalancerName"] || target.name
         LoadBalancerFactory.addLoadBalancer(
             new ObjectWrapper<LoadBalancer>(
-                loadBalancerConfig["loadBalancerId"],
+                loadBalancerOption["loadBalancerId"],
                 loadBalancerName,
                 Reflect.construct(target, [])
             )
         );
-        if (loadBalancerConfig.isUse) {
+        if (loadBalancerOption.isUse) {
             Starter.getInstance().getConfiguration().loadBalancerType = loadBalancerName;
         }
     }

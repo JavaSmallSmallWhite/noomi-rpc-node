@@ -16,6 +16,10 @@
     "rpc",
     "typescript"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git@https://gitee.com/javafirstfirst/noomi-rpc-node"
+  },
   "dependencies": {
     "@furyjs/fury": "^0.0.18",
     "axios": "^1.6.5",

@@ -1,9 +1,9 @@
 {
   "port": 8090, // 启动端口号
   "appName": "NoomiRpcApplication", // 应用名称
-  "debugLevel": "info", // debug等级
+  "debugLevel": "debug", // debug等级
   "servicePrefix": "com.nodejs.Test", // 服务前缀，需要唯一性，主要针对跨语言开发，比如Java
-  "starterPath": ["/dist/examples/provider/**/*.js"], // 项目启动目录
+  "starterPath": ["/dist/examples/consumer/**/*.js"], // 项目启动目录
   "registry": { // 默认zookeeper
     "type": "zookeeper", // zookeeper连接配置，具体参考npm zookeeper的连接配置
     "connectionConfig": { // zookeeper连接配置

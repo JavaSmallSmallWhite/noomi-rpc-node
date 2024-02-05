@@ -1,7 +1,7 @@
 /**
  * 自定义添加序列化器的选项
  */
-export interface SerializerConfig {
+export interface SerializerOption {
     /**
      * 序列化器id，框架自带1号和2号序列化器，不可与框架自带的序列化器名称重复
      */

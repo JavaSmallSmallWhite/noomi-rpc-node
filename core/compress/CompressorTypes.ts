@@ -1,7 +1,7 @@
 /**
  * 自定义添加压缩器的选项
  */
-export interface CompressorConfig {
+export interface CompressorOption {
     /**
      * 压缩器id，框架自带1号和2号压缩器，不可与框架自带的压缩器名称重复
      */
