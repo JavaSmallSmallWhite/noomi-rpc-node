@@ -1,3 +1,6 @@
+import {Dirent, readdirSync} from "fs";
+import {resolve} from "path"
+
 /**
  * 服务工具类
  */
@@ -42,12 +45,95 @@ export class InterfaceUtil {
     }
 
     /**
-     * 判断该对象是否是某个类的实例
-     * @param obj 对象
-     * @param classConstructor 类
-     * @private
+     * 加载所有的装饰器
+     * @param path 目录路径
      */
-    private static isInstanceOfClass(obj: Object, classConstructor: Function): boolean {
-        return obj instanceof classConstructor || Object.getPrototypeOf(obj) === classConstructor.prototype;
+    public static loadDecorators(path: string | string[]): void {
+        if (Array.isArray(path)) {
+            for (const p of path) {
+                handle(p);
+            }
+        } else {
+            handle(path);
+        }
+
+        /**
+         * 处理instance路径
+         * @param path -  待解析路径
+         */
+        function handle(path: string) {
+            const basePath: string = process.cwd();
+            const pathArr: string[] = path.split('/');
+            const pa: string[] = [basePath];
+            let handled: boolean = false;    // 是否已处理
+            for (let i = 0; i < pathArr.length - 1; i++) {
+                const p: string = pathArr[i];
+                if (p.indexOf('*') === -1 && p !== "") {
+                    pa.push(p);
+                } else if (p === '**') { // 所有子孙目录
+                    handled = true;
+                    if (i < pathArr.length - 2) {
+                        throw new Error('1000');
+                    }
+                    handleDir(pa.join('/'), pathArr[pathArr.length - 1], true);
+                }
+            }
+            if (!handled) {
+                handleDir(pa.join('/'), pathArr[pathArr.length - 1]);
+            }
+
+            /**
+             * 处理子目录
+             * @param dirPath -   目录地址
+             * @param fileExt -   文件后缀
+             * @param deep -      是否深度处理
+             */
+            function handleDir(dirPath: string, fileExt: string, deep?: boolean) {
+                const dir: Dirent[] = readdirSync(dirPath, {withFileTypes: true});
+                const fn: string = fileExt;
+                const reg: RegExp = toReg(fn, 3);
+                for (const dirent of dir) {
+                    if (dirent.isDirectory()) {
+                        if (deep) {
+                            handleDir(resolve(dirPath, dirent.name), fileExt, deep);
+                        }
+                    } else if (dirent.isFile()) {
+                        // @Instance注解方式文件，自动执行instance创建操作
+                        if (reg.test(dirent.name)) {
+                            import(resolve(dirPath, dirent.name));
+                        }
+                    }
+                }
+            }
+
+            /**
+             * 字符串转regexp
+             * @param str -       待处理字符串
+             * @param side -      两端匹配 1前端 2后端 3两端
+             * @returns         转换后的正则表达式
+             */
+            function toReg(str: string, side?: number): RegExp {
+            // 转字符串为正则表达式并加入到数组
+            //替换/为\/
+            str = str.replace(/\//g, '\\/');
+            //替换.为\.
+            str = str.replace(/\./g, '\\.');
+            //替换*为.*
+            str = str.replace(/\*/g, '.*');
+            if (side !== undefined) {
+                switch (side) {
+                    case 1:
+                        str = '^' + str;
+                        break;
+                    case 2:
+                        str = str + '$';
+                        break;
+                    case 3:
+                        str = '^' + str + '$';
+                }
+            }
+            return new RegExp(str);
+            }
+        }
     }
 }

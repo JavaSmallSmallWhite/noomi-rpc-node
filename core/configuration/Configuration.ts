@@ -4,8 +4,8 @@ import {RoundRobinLoadBalancer} from "../loadbalance/impl/RoundRobinLoadBalancer
 import {IdGeneratorUtil} from "../common/utils/IdGeneratorUtil";
 import {Logger} from "../common/logger/Logger";
 import {InterfaceUtil} from "../common/utils/InterfaceUtil";
-import {RateLimiter} from "../protection/ratelimit/RateLimiter";
-import {CircuitBreaker} from "../protection/circuitbreak/CircuitBreaker";
+import {RateLimiter} from "../sentinel/ratelimit/RateLimiter";
+import {CircuitBreaker} from "../sentinel/circuitbreak/CircuitBreaker";
 
 /**
  * 配置管理类
@@ -13,22 +13,34 @@ import {CircuitBreaker} from "../protection/circuitbreak/CircuitBreaker";
 export class Configuration {
 
     /**
-     * 服务端启动端口号
+     * 配置信息 --> 服务端启动端口号
      * @private
      */
     private _port: number = 8808;
 
     /**
-     * 应用名称
+     * 配置信息 --> 应用名称
      * @private
      */
     private _appName: string = "default";
 
     /**
-     * 服务前缀，服务的唯一标识，不可重复
+     * 配置信息 --> 日志等级
+     * @private
+     */
+    private _debugLevel: string = "debug";
+
+    /**
+     * 配置信息 --> 服务前缀，服务的唯一标识，不可重复
      * @private
      */
     private _servicePrefix: string = "com.node.Test";
+
+    /**
+     * 配置信息 --> 项目启动目录
+     * @private
+     */
+    private _starterPath: string | string[] = ["/dist/examples/**/*.js"];
 
     /**
      * 配置信息 --> 注册中心
@@ -101,6 +113,14 @@ export class Configuration {
         this._appName = value;
     }
 
+    get debugLevel(): string {
+        return this._debugLevel;
+    }
+
+    set debugLevel(value: string) {
+        this._debugLevel = value;
+    }
+
     get servicePrefix(): string {
         return this._servicePrefix;
     }
@@ -108,6 +128,14 @@ export class Configuration {
     set servicePrefix(value: string) {
         Logger.info(`服务前缀修改成功，服务前缀为：${value}。`);
         this._servicePrefix = value;
+    }
+
+    get starterPath(): string | string[] {
+        return this._starterPath;
+    }
+
+    set starterPath(value: string | string[]) {
+        this._starterPath = value;
     }
 
     get registryConfig(): RegistryConfig {

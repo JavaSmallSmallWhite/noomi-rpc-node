@@ -25,24 +25,21 @@ export class JsonResolver {
      * 从json文件解析配置
      */
     public loadFromJson(configuration: Configuration): void {
-        Logger.info("开始读取配置文件。")
         const jsonStr: string = fs.readFileSync(path.resolve("config", "rpc.json"), "utf-8");
         if (jsonStr === null) {
-            Logger.error("rpc.json配置文件未设置或者rpc.json配置文件没有内容.");
             throw new ConfigError("读取rpc.json配置文件失败。");
         }
-        Logger.info("读取配置文件成功。")
-        Logger.info("开始解析配置对象。")
         let configObject: object = null;
         try {
             configObject = json.parse(jsonStr);
         } catch (error) {
-            Logger.error("rpc.json配置解析错误。")
             throw new ConfigError("解析rpc.json文件内容的配置对象失败。")
         }
-        Logger.info("解析配置对象成功。")
-        Logger.info("开始设置具体配置。")
         try {
+            // 配置debug等级
+            configuration.debugLevel = configObject["debugLevel"];
+            Logger.logger.level = configuration.debugLevel;
+            Logger.info(`日志等级设置成功，日志等级为：${configuration.debugLevel}。`);
             // 配置端口
             configuration.port = configObject["port"];
             Logger.info(`端口设置成功，端口为：${configuration.port}。`);
@@ -52,6 +49,9 @@ export class JsonResolver {
             // 配置服务前缀
             configuration.servicePrefix = configObject["servicePrefix"];
             Logger.info(`服务前缀设置成功，服务前缀为：${configuration.servicePrefix}。`);
+            // 配置项目启动目录
+            configuration.starterPath = configObject["starterPath"];
+            Logger.info(`启动目录设置成功，服务前缀为：${configuration.starterPath}。`);
             // 配置注册中心
             configuration.registryConfig = new RegistryConfig(configObject["registry"]["type"], configObject["registry"]["connectionConfig"]);
             GlobalCache.serviceConfiguration = configObject["registry"]["serviceConfig"];

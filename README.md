@@ -2,6 +2,7 @@
 一款基于fury序列化的node.js轻量rpc框架。
 
 ## 使用
+**代码参考examples中的例子**
 1. 安装zookeeper注册中心，zookeeper官网下载地址：[https://dlcdn.apache.org/zookeeper/](https://dlcdn.apache.org/zookeeper/)
 2. 配置config目录中的rpc.json文件。
 3. 编写接口：
@@ -161,5 +162,7 @@ main().then().catch()
 ```
 8. tsc整个项目。
 9. 运行服务端代码。
-10. 运行客户端代码。输出hello noomi1和hello noomi2
+10. 运行客户端代码。输出hello noomi1和hello noomi2。
+
+**注意运行客户端时修改rpc.json文件的startPath。服务端改为："starterPath": ["/dist/examples/provider/**/*.js"] 客户端改为"starterPath": ["/dist/examples/consumer/**/*.js"]**
 

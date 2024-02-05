@@ -1,6 +1,6 @@
-import {HelloNoomiRpcDescription} from "../api/description/HelloNoomiRpcDescription";
 import {Starter} from "../../core";
 import {ReferenceConfig} from "../../core/ReferenceConfig";
+import {HelloNoomiRpcDescription} from "./api/description/HelloNoomiRpcDescription";
 
 async function main(): Promise<void> {
 

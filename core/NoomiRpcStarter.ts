@@ -1,12 +1,12 @@
 import {RegistryConfig} from "./discovery/RegistryConfig";
 import {ServiceConfig} from "./ServiceConfig";
 import {ReferenceConfig} from "./ReferenceConfig";
-import {Configuration} from "./config/Configuration";
+import {Configuration} from "./configuration/Configuration";
 import {InterfaceUtil} from "./common/utils/InterfaceUtil";
 import {createServer, Server, Socket} from "net";
 import {Logger} from "./common/logger/Logger";
 import {NetUtil} from "./common/utils/NetUtil";
-import {HandlerFactory} from "./channelhandler/HandlerFactory";
+import {HandlerFactory} from "./sockethandler/HandlerFactory";
 import {IdGeneratorUtil} from "./common/utils/IdGeneratorUtil";
 import {HeartBeatDetector} from "./heartbeat/HeartBeatDetector";
 import {GlobalCache} from "./cache/GlobalCache";
@@ -31,6 +31,7 @@ export class NoomiRpcStarter {
     private constructor() {
         // 构造启动引导程序时需要初始化配置
         this.configuration = new Configuration();
+        InterfaceUtil.loadDecorators(this.configuration.starterPath);
     }
 
     /**

@@ -1,4 +1,4 @@
-import {ObjectWrapper} from "../config/ObjectWrapper";
+import {ObjectWrapper} from "../configuration/ObjectWrapper";
 import {LoadBalancer} from "./LoadBalancer";
 import {RoundRobinLoadBalancer} from "./impl/RoundRobinLoadBalancer";
 import {Logger} from "../common/logger/Logger";

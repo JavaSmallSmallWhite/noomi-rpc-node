@@ -1,5 +1,5 @@
 import {Type} from "@furyjs/fury";
-import {Description} from "../../../core/ServiceConfig";
+import {Description} from "../../../../core/ServiceConfig";
 
 /**
  * HelloNoomiRpc的接口描述

@@ -1,5 +1,5 @@
 import {Serializer} from "./Serializer";
-import {ObjectWrapper} from "../config/ObjectWrapper";
+import {ObjectWrapper} from "../configuration/ObjectWrapper";
 import {JsonSerializer} from "./impl/JsonSerializer";
 import {Logger} from "../common/logger/Logger";
 import {FurySerializer} from "./impl/FurySerializer";
@@ -71,12 +71,18 @@ export class SerializerFactory {
      * @param serializerObjectWrapper 序列化wrapper
      */
     public static addLoadBalancer(serializerObjectWrapper: ObjectWrapper<Serializer>): void {
+        if (this.SERIALIZER_CACHE_CODE.has(serializerObjectWrapper.code) ) {
+            throw new SerializeError(`编号为${serializerObjectWrapper.code}的序列化器已存在，请使用其他编号。`);
+        }
+        if (this.SERIALIZER_CACHE.has(serializerObjectWrapper.name) ) {
+            throw new SerializeError(`序列化名称为${serializerObjectWrapper.name}的序列化器已存在，请使用其他名称。`);
+        }
         this.SERIALIZER_CACHE.set(serializerObjectWrapper.name, serializerObjectWrapper);
         this.SERIALIZER_CACHE_CODE.set(serializerObjectWrapper.code, serializerObjectWrapper);
     }
 
     /**
-     * 获取consumer端的序列化解释
+     * 获取consumer端的序列化描述
      * @param descriptionId 描述id
      * @param argumentsOrReturnValueDescription 参数解释或者返回值解释
      */
@@ -104,7 +110,7 @@ export class SerializerFactory {
     }
 
     /**
-     * 获取provider的序列化解释
+     * 获取provider的序列化描述
      * @param descriptionId 描述id
      * @param argumentsOrReturnValueDescription 两个类别，参数解释或者返回值解释
      */

@@ -1,8 +1,8 @@
 import {ServiceConfig} from "../../core/ServiceConfig";
 import {HelloNoomiRpcImpl} from "./impl/HelloNoomiRpcImpl";
 import {NoomiRpcStarter} from "../../core/NoomiRpcStarter";
-import {HelloNoomiRpcDescription} from "../api/description/HelloNoomiRpcDescription";
 import {Starter} from "../../core";
+import {HelloNoomiRpcDescription} from "./api/description/HelloNoomiRpcDescription";
 
 
 async function main(): Promise<void> {

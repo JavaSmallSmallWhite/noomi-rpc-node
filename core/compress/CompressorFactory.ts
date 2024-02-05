@@ -1,4 +1,4 @@
-import {ObjectWrapper} from "../config/ObjectWrapper";
+import {ObjectWrapper} from "../configuration/ObjectWrapper";
 import {Logger} from "../common/logger/Logger";
 import {Compressor} from "./Compressor";
 import {GzipCompressor} from "./impl/GzipCompressor";
@@ -59,7 +59,7 @@ export class CompressorFactory {
      * 新增一个压缩器
      * @param compressorObjectWrapper 压缩wrapper
      */
-    public static addLoadBalancer(compressorObjectWrapper: ObjectWrapper<Compressor>): void {
+    public static addCompressor(compressorObjectWrapper: ObjectWrapper<Compressor>): void {
         this.COMPRESSOR_CACHE.set(compressorObjectWrapper.name, compressorObjectWrapper);
         this.COMPRESSOR_CACHE_CODE.set(compressorObjectWrapper.code, compressorObjectWrapper);
     }

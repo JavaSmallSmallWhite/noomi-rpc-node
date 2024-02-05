@@ -5,13 +5,13 @@ import {ServiceConfig} from "../../ServiceConfig";
 import {InBoundHandler} from "../InBoundHandler";
 import {NoomiRpcResponse} from "../../message/NoomiRpcResponse";
 import {Logger} from "../../common/logger/Logger";
-import {ResponseType} from "../../enumeration/ResponseType";
-import {RequestType} from "../../enumeration/RequestType";
+import {ResponseType} from "../../code/ResponseType";
+import {RequestType} from "../../code/RequestType";
 import {ResponsePayload} from "../../message/ResponsePayload";
 import {GlobalCache} from "../../cache/GlobalCache";
-import {RateLimiter} from "../../protection/ratelimit/RateLimiter";
+import {RateLimiter} from "../../sentinel/ratelimit/RateLimiter";
 import {Starter} from "../../index";
-import {TokenBuketRateLimiter} from "../../protection/ratelimit/TokenBuketRateLimiter";
+import {TokenBuketRateLimiter} from "../../sentinel/ratelimit/TokenBuketRateLimiter";
 import {ShutdownHolder} from "../../shutdown/ShutdownHolder";
 
 /**
