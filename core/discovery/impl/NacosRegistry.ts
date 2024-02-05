@@ -1,6 +1,5 @@
 import {AbstractRegistry} from "../AbstractRegistry";
 import {DescriptionType, ServiceConfig} from "../../ServiceConfig";
-import {NoomiRpcStarter} from "../../NoomiRpcStarter";
 import {NetUtil} from "../../common/utils/NetUtil";
 import {Host, NacosNamingClient} from "nacos";
 import {NacosUtils} from "../../common/utils/nacos/NacosUtils";
@@ -9,6 +8,7 @@ import {IdGeneratorUtil} from "../../common/utils/IdGeneratorUtil";
 import {InterfaceUtil} from "../../common/utils/InterfaceUtil";
 import {GlobalCache} from "../../cache/GlobalCache";
 import {Starter} from "../../index";
+import {Constant} from "../../common/utils/Constant";
 
 /**
  * nacos注册中心的服务注册与发现类
@@ -52,10 +52,23 @@ export class NacosRegistry extends AbstractRegistry {
                 serviceName: serviceName
             }
             GlobalCache.DESCRIPTION_LIST.set(methodDescription.methodId1, methodDescription);
-            interfaceDescription.push(methodDescription)
+            interfaceDescription.push(methodDescription);
         });
-        const nacosServiceInstance: NacosServiceInstance = {ip: ip, port: port, metadata: {description: JSON.stringify(interfaceDescription)}};
-        await NacosUtils.registerInstance(this.nacos, serviceName, nacosServiceInstance);
+        const nacosServiceInstance: NacosServiceInstance = {
+            ip: ip,
+            port: port,
+            metadata: {description: JSON.stringify(interfaceDescription)},
+            healthy: GlobalCache.serviceConfiguration["healthy"] || Constant.HEALTHY,
+            enabled: GlobalCache.serviceConfiguration["enabled"] || Constant.ENABLED,
+            weight: GlobalCache.serviceConfiguration["weight"] || Constant.WEIGHT,
+            ephemeral: GlobalCache.serviceConfiguration["ephemeral"] || Constant.EPHEMERAL,
+            clusterName: GlobalCache.serviceConfiguration["clusterName"] || Constant.CLUSTER_NAME
+        };
+        let groupName: string = GlobalCache.serviceConfiguration["groupName"];
+        if (!groupName) {
+            groupName = Constant.GROUP_NAME;
+        }
+        await NacosUtils.registerInstance(this.nacos, serviceName, nacosServiceInstance, groupName);
     }
 
     /**

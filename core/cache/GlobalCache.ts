@@ -8,6 +8,11 @@ import {Socket} from "net";
  * 全局缓存
  */
 export class GlobalCache {
+
+    /**
+     * 注册中心配置
+     */
+    public static serviceConfiguration: unknown;
     /**
      * 异步线程存储器
      */

@@ -34,13 +34,15 @@ export class NacosUtils {
             }
             return this.createNacosRegistryCenter(connectConfig);
         } else {
-            if (!nacosRegistryConnectConfig.logger) {
-                nacosRegistryConnectConfig.logger = console;
-            }
             if (!nacosRegistryConnectConfig.serverList) {
                 Logger.error("连接nacos注册中心的配置未配置连接地址。");
                 throw new NacosError("连接nacos注册中心的配置未配置连接地址。");
             }
+            nacosRegistryConnectConfig.logger ||= console;
+            nacosRegistryConnectConfig.namespace ||= Constant.NAMESPACE;
+            nacosRegistryConnectConfig.endpoint ||= Constant.ENDPOINT;
+            nacosRegistryConnectConfig.vipSrvRefInterMillis ||= Constant.VIP_SRV_REF_INTER_MILLIS;
+            nacosRegistryConnectConfig.ssl ||= Constant.SSL;
             try {
                 const client: NacosNamingClient = new NacosNamingClient(<NacosNamingClientConfig>nacosRegistryConnectConfig);
                 Logger.debug("客户端已经连接nacos注册中心成功。");
@@ -57,14 +59,15 @@ export class NacosUtils {
      * @param nacos nacos注册中心
      * @param serviceName 服务名称
      * @param nacosServiceInstance nacos服务节点实例配置
+     * @param groupName 组名
      */
-    public static async registerInstance(nacos: NacosNamingClient, serviceName: string, nacosServiceInstance: NacosServiceInstance): Promise<void> {
+    public static async registerInstance(nacos: NacosNamingClient, serviceName: string, nacosServiceInstance: NacosServiceInstance, groupName: string = Constant.GROUP_NAME): Promise<void> {
         try {
             if (!this.clientIsReady) {
                 await nacos.ready();
                 this.clientIsReady = true;
             }
-            await nacos.registerInstance(serviceName, <Instance>nacosServiceInstance);
+            await nacos.registerInstance(serviceName, <Instance>nacosServiceInstance, groupName);
             Logger.debug(`${serviceName}服务的${nacosServiceInstance.ip}:${nacosServiceInstance.port}节点注册成功。`);
         } catch (error) {
             Logger.error(`${serviceName}服务的${nacosServiceInstance.ip}:${nacosServiceInstance.port}节点注册失败。`);

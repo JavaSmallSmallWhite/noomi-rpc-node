@@ -34,10 +34,10 @@ export interface NacosServiceInstance {
      */
     port: number,
     metadata: unknown,
-    instanceId?: string,
+    instanceId?: string
+    serviceName?: string
     healthy?: boolean,
     enabled?: boolean,
-    serviceName?: string,
     weight?: number,
     ephemeral?: boolean,
     clusterName?: string

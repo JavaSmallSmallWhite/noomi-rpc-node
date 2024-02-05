@@ -14,6 +14,7 @@ import {Compressor} from "../compress/Compressor";
 import {CompressorFactory} from "../compress/CompressorFactory";
 import {IdGeneratorUtil} from "../common/utils/IdGeneratorUtil";
 import {InterfaceUtil} from "../common/utils/InterfaceUtil";
+import {GlobalCache} from "../cache/GlobalCache";
 
 /**
  * Json解析器
@@ -53,6 +54,7 @@ export class JsonResolver {
             Logger.info(`服务前缀设置成功，服务前缀为：${configuration.servicePrefix}。`);
             // 配置注册中心
             configuration.registryConfig = new RegistryConfig(configObject["registry"]["type"], configObject["registry"]["connectionConfig"]);
+            GlobalCache.serviceConfiguration = configObject["registry"]["serviceConfig"];
             Logger.info(`注册中心设置成功，注册中心为：${configuration.registryConfig.registryName}。`);
             // 配置负载均衡
             const loadBalanceWrapper: ObjectWrapper<LoadBalancer> = LoadBalancerFactory.getLoadBalancer(configObject["loadBalancerType"]);
@@ -70,7 +72,6 @@ export class JsonResolver {
             configuration.idGenerator = new IdGeneratorUtil(BigInt(configObject["idGenerator"]["dataCenterId"]), BigInt(configObject["idGenerator"]["machineId"]));
             Logger.info(`id发号器配置成功，id发号器为${InterfaceUtil.getInterfaceName(InterfaceUtil.getInterfaceName(configuration.idGenerator))}`);
             // 新增的标签，往下修改
-
 
             Logger.info("具体配置解析成功。")
         } catch (error) {
