@@ -1,6 +1,5 @@
 import {LoadBalancer} from "./LoadBalancer";
 import {Selector} from "./Selector";
-import {NoomiRpcStarter} from "../NoomiRpcStarter";
 import {Starter} from "../index";
 
 /**

@@ -33,7 +33,7 @@ async function main(): Promise<void> {
     // const helloNoomiRpc: HelloNoomiRpc = reference.get();
     // 调用方法
     const service = new Service();
-    service.sayHi();
+    await service.sayHi();
     // const result2: string = await helloNoomiRpc.sayHello("hello noomi2");
     // console.log(result1);
     // console.log(result2);

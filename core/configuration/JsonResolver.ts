@@ -37,9 +37,9 @@ export class JsonResolver {
         }
         try {
             // 配置debug等级
-            configuration.debugLevel = configObject["debugLevel"];
-            Logger.logger.level = configuration.debugLevel;
-            Logger.info(`日志等级设置成功，日志等级为：${configuration.debugLevel}。`);
+            configuration.log4jsConfiguration = configObject["log4js"];
+            Logger.configLog4js(configuration.log4jsConfiguration.configuration, configuration.log4jsConfiguration.use);
+            Logger.info(`日志信息设置成功，使用的日志信息为：${configuration.log4jsConfiguration.use}。`);
             // 配置端口
             configuration.port = configObject["port"];
             Logger.info(`端口设置成功，端口为：${configuration.port}。`);

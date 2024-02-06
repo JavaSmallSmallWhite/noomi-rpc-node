@@ -1,9 +1,25 @@
 {
   "port": 8090, // 启动端口号
   "appName": "NoomiRpcApplication", // 应用名称
-  "debugLevel": "debug", // debug等级
   "servicePrefix": "com.nodejs.Test", // 服务前缀，需要唯一性，主要针对跨语言开发，比如Java
   "starterPath": ["/dist/examples/consumer/**/*.js"], // 项目启动目录
+  "log4js": { // 日志配置，具体参照npm log4js
+    "configuration": {
+      "appenders": {
+        "stdout": { "type": "stdout", "layout": {
+          "type": "pattern",
+          "pattern": "%[[%d] [%p] [%c] - %]%m%n"
+        }}
+      },
+      "categories": {
+        "default": {
+          "appenders": ["stdout"],
+          "level": "debug"
+        }
+      }
+    },
+    use: "stdout" // 使用的appender名称
+  },
   "registry": { // 默认zookeeper
     "type": "zookeeper", // zookeeper连接配置，具体参考npm zookeeper的连接配置
     "connectionConfig": { // zookeeper连接配置
@@ -15,7 +31,6 @@
       },
     },
     "serviceConfig": {},
-
 
 //    "type": "nacos",
 //    "connectionConfig": { // nacos连接配置，具体参考npm nacos的连接配置，配置中的logger不用管，noomi-rpc自动传console，nacos也只能传console

@@ -1,6 +1,6 @@
 {
   "name": "noomi-rpc-node",
-  "version": "0.0.1",
+  "version": "0.0.5",
   "description": "一个基于fury的nodejs的rpc框架，支持注册中心、服务发现注册，负载均衡、协议、心跳检测、序列化、熔断、限流",
   "scripts": {
     "build": "tsc",
@@ -18,8 +18,9 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git@https://gitee.com/javafirstfirst/noomi-rpc-node"
+    "url": "git+https://github.com/JavaSmallSmallWhite/noomi-rpc-node"
   },
+  "homepage": "https://gitee.com/javafirstfirst/noomi-rpc-node#readme",
   "dependencies": {
     "@furyjs/fury": "^0.0.18",
     "axios": "^1.6.5",

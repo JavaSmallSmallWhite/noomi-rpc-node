@@ -6,6 +6,7 @@ import {Logger} from "../common/logger/Logger";
 import {InterfaceUtil} from "../common/utils/InterfaceUtil";
 import {RateLimiter} from "../sentinel/ratelimit/RateLimiter";
 import {CircuitBreaker} from "../sentinel/circuitbreak/CircuitBreaker";
+import {Configuration as Config} from "log4js";
 
 /**
  * 配置管理类
@@ -25,10 +26,28 @@ export class Configuration {
     private _appName: string = "default";
 
     /**
-     * 配置信息 --> 日志等级
+     * 配置信息 --> 日志
      * @private
      */
-    private _debugLevel: string = "debug";
+    private _log4jsConfiguration: {configuration: Config, use: string} = {
+        configuration: {
+            appenders: {
+                stdout: {
+                    type: "stdout", layout: {
+                        type: "pattern",
+                        pattern: "%d [%p] [%c] - %m%n"
+                    }
+                }
+            },
+            categories: {
+                default: {
+                    appenders: ["stdout"],
+                    level: "debug"
+                }
+            }
+        },
+        use: "stdout"
+    };
 
     /**
      * 配置信息 --> 服务前缀，服务的唯一标识，不可重复
@@ -113,12 +132,12 @@ export class Configuration {
         this._appName = value;
     }
 
-    get debugLevel(): string {
-        return this._debugLevel;
+    get log4jsConfiguration(): {configuration: Config, use: string} {
+        return this._log4jsConfiguration;
     }
 
-    set debugLevel(value: string) {
-        this._debugLevel = value;
+    set log4jsConfiguration(value: {configuration: Config, use: string}) {
+        this._log4jsConfiguration = value;
     }
 
     get servicePrefix(): string {

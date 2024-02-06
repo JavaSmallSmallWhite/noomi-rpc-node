@@ -3,6 +3,7 @@ import {NoomiRpcRequest} from "../message/NoomiRpcRequest";
 import {DescriptionType, ServiceConfig} from "../ServiceConfig";
 import {ReferenceConfig} from "../ReferenceConfig";
 import {Socket} from "net";
+import {Registry} from "../discovery/Registry";
 
 /**
  * 全局缓存
@@ -10,9 +11,16 @@ import {Socket} from "net";
 export class GlobalCache {
 
     /**
-     * 注册中心配置
+     * 注册中心服务配置
      */
     public static serviceConfiguration: unknown;
+
+    /**
+     * 注册中心缓存器
+     * @private
+     */
+    public static readonly REGISTRY_CACHE: Map<string, Registry> = new Map<string, Registry>();
+
     /**
      * 异步线程存储器
      */

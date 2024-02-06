@@ -1,18 +1,18 @@
 import {NoomiReference} from "../../../core/common/decorators/NoomiReference";
 import {HelloNoomiRpcDescription} from "../api/description/HelloNoomiRpcDescription";
+import {HelloNoomiRpc} from "../api/HelloNoomiRpc";
+import {Registry} from "../../../core/common/decorators/Registry";
 
+@Registry({
+    registryName: "aaa",
+    registryConnectConfig: {},
+    isUse: true,
+    serviceConfiguration: {}
+})
 export class Service {
 
     @NoomiReference<HelloNoomiRpc, HelloNoomiRpcDescription>({
-        interfaceProvider: new class HelloNoomiRpc implements HelloNoomiRpc {
-            sayHello(msg: string): Promise<string> {
-                return Promise.resolve("");
-            }
-
-            sayHi(msg: string): Promise<string> {
-                return Promise.resolve("");
-            }
-        },
+        interfaceProvider: new HelloNoomiRpc(),
         interfaceDescription: new HelloNoomiRpcDescription()
     })
     private helloNoomiRpc: HelloNoomiRpc;
