@@ -8,7 +8,7 @@ import {Starter} from "../../index";
  * 序列化装饰器，用于添加自定义的序列化器，装饰类
  * @constructor
  */
-export function Serializer(serializerOption: SerializerOption): (target: Function) => void {
+export function CustomSerializer(serializerOption: SerializerOption): (target: Function) => void {
     return (target: Function): void => {
         const serializerName: string = serializerOption["serializerName"] || target.name
         SerializerFactory.addLoadBalancer(

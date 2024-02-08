@@ -12,11 +12,10 @@
 /test/
 /doc/
 /.idea
-noomi-rpc.iml
+noomi-rpc-node.iml
 npminstall-debug.log
 .gitignore
 .npmignore
 LICENSE
 package-lock.json
-package.json
 tsconfig.json

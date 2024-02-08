@@ -42,6 +42,12 @@ export class ServiceConfig<T, V extends Object> {
     private _ref: unknown;
 
     /**
+     * 服务前缀
+     * @private
+     */
+    private _servicePrefix: string
+
+    /**
      * -------------------以下为成员变量的getter和setter------------------------------------
      */
 
@@ -67,5 +73,13 @@ export class ServiceConfig<T, V extends Object> {
 
     public set ref(value: unknown) {
         this._ref = value;
+    }
+
+    get servicePrefix(): string {
+        return this._servicePrefix;
+    }
+
+    set servicePrefix(value: string) {
+        this._servicePrefix = value;
     }
 }

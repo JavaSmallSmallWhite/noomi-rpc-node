@@ -8,7 +8,7 @@ import {Compressor} from "../../compress/Compressor";
  * 压缩装饰器，用于添加自定义的压缩器，装饰类
  * @constructor
  */
-export function Compressor(compressorOption: CompressorOption): (target: Function) => void {
+export function CustomCompressor(compressorOption: CompressorOption): (target: Function) => void {
     return (target: Function): void => {
         const compressorName: string = compressorOption["compressorName"] || target.name
         CompressorFactory.addCompressor(

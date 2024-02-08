@@ -32,6 +32,11 @@ interface ServiceOption<T, V extends Object> {
     interfaceDescription: V;
 
     /**
+     * 服务前缀
+     */
+    servicePrefix?: string
+
+    /**
      * 服务配置
      */
     serviceConfiguration?: ServiceConfiguration;
@@ -47,6 +52,9 @@ export function NoomiService<T, V extends Object>(serviceOption: ServiceOption<T
         service.interfaceProvider = serviceOption.interfaceProvider;
         service.interfaceDescription = serviceOption.interfaceDescription;
         service.ref = Reflect.construct(target, []);
+        if (serviceOption["servicePrefix"]) {
+            service.servicePrefix = serviceOption["servicePrefix"]
+        }
         if (serviceOption.serviceConfiguration) {
             GlobalCache.serviceConfiguration = serviceOption.serviceConfiguration
         }

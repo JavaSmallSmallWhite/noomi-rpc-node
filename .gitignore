@@ -39,7 +39,8 @@ build/
 node_modules
 dist
 pdf
-noomi-rpc.iml
+noomi-rpc-node.iml
 npminstall-debug.log
 test
 doc
+index.ts

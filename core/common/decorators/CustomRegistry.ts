@@ -31,7 +31,7 @@ interface RegistryOption {
  * 注册中心装饰器，用于添加自定义的注册中心，装饰类
  * @constructor
  */
-export function Registry(registryOption: RegistryOption) {
+export function CustomRegistry(registryOption: RegistryOption) {
     return (target: Function): void => {
         const registryConfig: RegistryConfig = new RegistryConfig(registryOption.registryName, registryOption.registryConnectConfig);
         GlobalCache.REGISTRY_CACHE.set(target.name, Reflect.construct(target, [registryOption.registryConnectConfig]))

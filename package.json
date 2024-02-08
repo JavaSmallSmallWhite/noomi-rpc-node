@@ -1,6 +1,6 @@
 {
   "name": "noomi-rpc-node",
-  "version": "0.0.5",
+  "version": "0.0.10",
   "description": "一个基于fury的nodejs的rpc框架，支持注册中心、服务发现注册，负载均衡、协议、心跳检测、序列化、熔断、限流",
   "scripts": {
     "build": "tsc",
@@ -9,8 +9,15 @@
   "engines": {
     "node": ">=18.12.0"
   },
-  "main": "dist/core/index.js",
+  "main": "dist/index.js",
+  "types": "dist/types/index.d.ts",
   "license": "MIT",
+  "files": [
+    "dist/index.js",
+    "dist/types/index.d.ts",
+    "dist/core/**/*.js",
+    "dist/types/core/**/*.d.ts"
+  ],
   "keywords": [
     "noomi",
     "rpc",
@@ -28,6 +35,7 @@
     "log4js": "^6.9.1",
     "nacos": "^2.6.0",
     "node-zookeeper-client": "^1.1.3",
+    "noomi-rpc-node": "^0.0.7",
     "zookeeper": "^6.0.0"
   },
   "devDependencies": {

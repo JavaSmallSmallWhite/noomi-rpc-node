@@ -8,7 +8,7 @@ import {Starter} from "../../index";
  * 负载均衡装饰器，用于添加自定义的负载均衡器，装饰类
  * @constructor
  */
-export function LoadBalancer(loadBalancerOption: LoadBalancerOption): (target: Function) => void {
+export function CustomLoadBalancer(loadBalancerOption: LoadBalancerOption): (target: Function) => void {
     return (target: Function): void => {
         const loadBalancerName: string = loadBalancerOption["loadBalancerName"] || target.name
         LoadBalancerFactory.addLoadBalancer(

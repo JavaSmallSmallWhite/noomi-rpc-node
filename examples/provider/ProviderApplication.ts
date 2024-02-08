@@ -1,26 +1,24 @@
 import {Starter} from "../../core";
+import {ServiceConfig} from "../../core/ServiceConfig";
+import {HelloNoomiRpc} from "./api/HelloNoomiRpc";
+import {HelloNoomiRpcDescription} from "./api/description/HelloNoomiRpcDescription";
+import {HelloNoomiRpcImpl} from "./impl/HelloNoomiRpcImpl";
+import {NoomiRpcStarter} from "../../core/NoomiRpcStarter";
 
 
-function main(): void {
+async function main(): Promise<void> {
 
-    // // 获取服务配置
-    // const service: ServiceConfig<HelloNoomiRpc, HelloNoomiRpcDescription> = new ServiceConfig<HelloNoomiRpc, HelloNoomiRpcDescription>();
-    // // 设置接口
-    // service.interfaceProvider = new class HelloNoomiRpc implements HelloNoomiRpc {
-    //     sayHello(msg: string): Promise<string> {
-    //         return Promise.resolve("");
-    //     }
-    //
-    //     sayHi(msg: string): Promise<string> {
-    //         return Promise.resolve("");
-    //     }
-    // };
-    // // 设置具体实现
-    // service.ref = new HelloNoomiRpcImpl();
-    // // 设置接口描述
-    // service.interfaceDescription = new HelloNoomiRpcDescription();
+    // 获取服务配置
+    const service: ServiceConfig<HelloNoomiRpc, HelloNoomiRpcDescription> = new ServiceConfig<HelloNoomiRpc, HelloNoomiRpcDescription>();
+    // 设置接口
+    service.interfaceProvider = new HelloNoomiRpc();
+    // 设置具体实现
+    service.ref = new HelloNoomiRpcImpl();
+    // 设置接口描述
+    service.interfaceDescription = new HelloNoomiRpcDescription();
     // 配置NoomiRpcStarter的信息
-    Starter.getInstance().start()
+    const starter: NoomiRpcStarter = Starter.getInstance()
+    // 下面这些自行配置，不配置，使用默认的，默认的参考core目录下的Configuration文件
         // .application("first-noomi-rpc-provider-application")
         // .servicePrefix("com.nodejs.Test")
         // .registry(new RegistryConfig( "zookeeper"))
@@ -28,8 +26,9 @@ function main(): void {
         // .compressor("gzip")
 
     // 发布服务
-    // await starter.publish(service)
+    await starter.publish(service)
     // 启动starter监听请求
+    starter.start();
 }
 
-main()
+main().then()

@@ -7,10 +7,10 @@
 //    "strict": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "outDir":"./dist"
-    // "declaration": true,
-    // "declarationDir":"./dist/types",
-    // "noUnusedParameters":false
+    "outDir":"./dist",
+     "declaration": true,
+     "declarationDir":"./dist/types",
+     "noUnusedParameters":false
   },
   "include":[
     "**/*.ts"

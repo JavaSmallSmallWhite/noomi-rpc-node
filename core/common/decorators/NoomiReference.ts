@@ -14,6 +14,11 @@ interface ReferenceOption<T, V extends Object> {
      * 接口描述
      */
     interfaceDescription: V;
+
+    /**
+     * 服务前缀
+     */
+    servicePrefix?: string
 }
 
 /**
@@ -26,8 +31,10 @@ export function NoomiReference<T, V extends Object>(referenceOption: ReferenceOp
         reference.interfaceRef = referenceOption.interfaceProvider;
         // 设置接口描述
         reference.interfaceDescription = referenceOption.interfaceDescription;
+        if (referenceOption.servicePrefix) {
+            reference.servicePrefix = referenceOption.servicePrefix;
+        }
         Starter.getInstance().reference(reference).then();
-
         Object.defineProperty(target, propertyKey, {
             get: () => reference.get(),
             enumerable: true,

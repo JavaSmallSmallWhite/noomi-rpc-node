@@ -90,15 +90,13 @@ export class InterfaceUtil {
              */
             function handleDir(dirPath: string, fileExt: string, deep?: boolean) {
                 const dir: Dirent[] = readdirSync(dirPath, {withFileTypes: true});
-                const fn: string = fileExt;
-                const reg: RegExp = toReg(fn, 3);
+                const reg: RegExp = toReg(fileExt, 3);
                 for (const dirent of dir) {
                     if (dirent.isDirectory()) {
                         if (deep) {
                             handleDir(resolve(dirPath, dirent.name), fileExt, deep);
                         }
                     } else if (dirent.isFile()) {
-                        // @Instance注解方式文件，自动执行instance创建操作
                         if (reg.test(dirent.name)) {
                             import(resolve(dirPath, dirent.name));
                         }

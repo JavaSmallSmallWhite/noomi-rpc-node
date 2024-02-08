@@ -122,8 +122,9 @@ export class NoomiRpcStarter {
     public async publish(service: ServiceConfig<Object, Object>): Promise<void> {
         process.on('SIGINT', GraceFullyShutdownHook.run);
         process.on('SIGTERM', GraceFullyShutdownHook.run);
-        await this.configuration.registryConfig.getRegistry().register(service);
-        const serviceName: string = InterfaceUtil.combine(this.configuration.servicePrefix, service.interfaceProvider.constructor.name);
+        this.configuration.registryConfig.getRegistry().register(service);
+        const servicePrefix: string = service.servicePrefix || this.configuration.servicePrefix
+        const serviceName: string = InterfaceUtil.combine(servicePrefix, service.interfaceProvider.constructor.name);
         GlobalCache.SERVICES_LIST.set(serviceName, service);
         // 服务节点名称
     }
@@ -135,9 +136,6 @@ export class NoomiRpcStarter {
         const port: number = Starter.getInstance().getConfiguration().port;
         const address: string = NetUtil.getIpv4Address();
         const server: Server = createServer();
-        server.on("listening", function (): void {
-            Logger.info("监听开始。")
-        })
         server.on("close", function (): void {
             Logger.info("tcp服务器关闭。");
         })
@@ -162,8 +160,9 @@ export class NoomiRpcStarter {
      */
     public async reference(reference: ReferenceConfig<Object, Object>): Promise<void> {
         const interfaceName: string = InterfaceUtil.getInterfaceName(reference.interfaceRef);
-        const serviceName: string = InterfaceUtil.combine(this.configuration.servicePrefix, interfaceName);
+        const servicePrefix: string = reference.servicePrefix || this.configuration.servicePrefix;
+        const serviceName: string = InterfaceUtil.combine(servicePrefix, interfaceName);
         GlobalCache.REFERENCES_LIST.set(serviceName, reference);
-        await HeartBeatDetector.detectHeartbeat(serviceName);
+        HeartBeatDetector.detectHeartbeat(serviceName).then();
     }
 }

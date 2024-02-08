@@ -35,7 +35,7 @@ export class NacosRegistry extends AbstractRegistry {
      * @param service 服务配置
      */
     public async register(service: ServiceConfig<Object, Object>): Promise<void> {
-        const servicePrefix: string = Starter.getInstance().getConfiguration().servicePrefix;
+        const servicePrefix: string = service.servicePrefix || Starter.getInstance().getConfiguration().servicePrefix;
         const interfaceName: string = service.interfaceProvider.constructor.name;
         const serviceName: string = servicePrefix + "." + interfaceName;
         const ip: string = NetUtil.getIpv4Address();

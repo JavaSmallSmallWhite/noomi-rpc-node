@@ -1,8 +1,8 @@
 {
-  "port": 8090, // 启动端口号
+  "port": 8091, // 启动端口号
   "appName": "NoomiRpcApplication", // 应用名称
   "servicePrefix": "com.nodejs.Test", // 服务前缀，需要唯一性，主要针对跨语言开发，比如Java
-  "starterPath": ["/dist/examples/consumer/**/*.js"], // 项目启动目录
+  "starterPath": ["/dist/consumer/**/*.js"], // 项目启动目录
   "log4js": { // 日志配置，具体参照npm log4js
     "configuration": {
       "appenders": {
@@ -14,7 +14,7 @@
       "categories": {
         "default": {
           "appenders": ["stdout"],
-          "level": "debug"
+          "level": "error"
         }
       }
     },
@@ -32,24 +32,24 @@
     },
     "serviceConfig": {},
 
-//    "type": "nacos",
-//    "connectionConfig": { // nacos连接配置，具体参考npm nacos的连接配置，配置中的logger不用管，noomi-rpc自动传console，nacos也只能传console
-//      "serverList": "127.0.0.1:8848", // 连接地址
-//      "namespace": "public", // 命名空间
-//      "username": "nacos",
-//      "password": "nacos",
-//      "endpoint": null,
-//      "vipSrvRefInterMillis": 30000,
-//      "ssl": false
-//    },
-//    "serviceConfig": {
-//      "healthy": true,
-//      "enabled": true,
-//      "weight": 1,
-//      "ephemeral": true,
-//      "clusterName": "DEFAULT",
-//      "groupName": "DEFAULT_GROUP"
-//    }
+    //    "type": "nacos",
+    //    "connectionConfig": { // nacos连接配置，具体参考npm nacos的连接配置，配置中的logger不用管，noomi-rpc自动传console，nacos也只能传console
+    //      "serverList": "127.0.0.1:8848", // 连接地址
+    //      "namespace": "public", // 命名空间
+    //      "username": "nacos",
+    //      "password": "nacos",
+    //      "endpoint": null,
+    //      "vipSrvRefInterMillis": 30000,
+    //      "ssl": false
+    //    },
+    //    "serviceConfig": {
+    //      "healthy": true,
+    //      "enabled": true,
+    //      "weight": 1,
+    //      "ephemeral": true,
+    //      "clusterName": "DEFAULT",
+    //      "groupName": "DEFAULT_GROUP"
+    //    }
   },
   "loadBalancerType": "RoundRobinLoadBalancer", // 负载均衡器类型
   "serializerType": "json", // 序列化类型
