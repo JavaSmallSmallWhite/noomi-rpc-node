@@ -33,7 +33,7 @@ export interface NacosServiceInstance {
      * instance实例端口
      */
     port: number,
-    metadata: unknown,
+    metadata?: unknown,
     instanceId?: string
     serviceName?: string
     healthy?: boolean,

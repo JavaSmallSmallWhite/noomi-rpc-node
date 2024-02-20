@@ -1,15 +1,15 @@
 import {ZookeeperRegistry} from "./impl/ZookeeperRegistry";
 import {NacosRegistry} from "./impl/NacosRegistry";
-import {ZookeeperConnectConfig} from "../common/utils/zookeeper/ZookeeperConfig";
 import {NacosRegistryConnectConfig} from "../common/utils/nacos/NacosConfig";
 import {Registry} from "./Registry";
 import {GlobalCache} from "../cache/GlobalCache";
 import {RegistryError} from "../common/error/RegistryError";
+import {ZookeeperConnectConfig} from "../common/utils/zookeeper/ZookeeperConfig";
 
 /**
  * 连接配置类型
  */
-export type RegistryConnectConfig = ZookeeperConnectConfig | NacosRegistryConnectConfig
+type RegistryConnectConfig = ZookeeperConnectConfig | NacosRegistryConnectConfig
 
 /**
  * 注册中心配置
@@ -26,7 +26,7 @@ export class RegistryConfig {
      * 注册中心名称
      * @private
      */
-    private readonly _registryName: string
+    private readonly _registryName: string;
 
     /**
      * 构造器，用于配置注册中心
@@ -43,14 +43,14 @@ export class RegistryConfig {
      */
     public getRegistry(): Registry {
         if (this._registryName === "zookeeper") {
-            return new ZookeeperRegistry(<ZookeeperConnectConfig>this.registryConnectConfig)
+            return new ZookeeperRegistry(<ZookeeperConnectConfig>this.registryConnectConfig);
         } else if (this._registryName == "nacos") {
-            return new NacosRegistry(<NacosRegistryConnectConfig>this.registryConnectConfig)
+            return new NacosRegistry(<NacosRegistryConnectConfig>this.registryConnectConfig);
         } else {
             if (GlobalCache.REGISTRY_CACHE.has(this._registryName)) {
-                return GlobalCache.REGISTRY_CACHE.get(this._registryName)
+                return GlobalCache.REGISTRY_CACHE.get(this._registryName);
             }
-            throw new RegistryError(`注册中心缓存池不存在${this._registryName}注册中心。`)
+            throw new RegistryError(`注册中心缓存池不存在${this._registryName}注册中心。`);
         }
     }
 

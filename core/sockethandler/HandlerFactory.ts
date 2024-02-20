@@ -10,13 +10,13 @@ import {NoomiRpcRequestDecoder} from "./handler/NoomiRpcRequestDecoder";
 import {HandlerError} from "../common/error/HandlerError";
 import {Logger} from "../common/logger/Logger";
 import {CircuitBreaker} from "../sentinel/circuitbreak/CircuitBreaker";
-import {Starter} from "../index";
 import {SimpleCircuitBreaker} from "../sentinel/circuitbreak/SimpleCircuitBreaker";
 import {RequestType} from "../code/RequestType";
 import {ProxyError} from "../common/error/ProxyError";
 import {GlobalCache} from "../cache/GlobalCache";
 import {AddressPort, NetUtil} from "../common/utils/NetUtil";
 import {LoadBalancerFactory} from "../loadbalance/LoadBalancerFactory";
+import {NoomiRpcStarter} from "../NoomiRpcStarter";
 
 /**
  * handler处理工厂
@@ -40,7 +40,7 @@ export class HandlerFactory {
      * @param category handler类别
      * @param handler 处理器
      */
-    public static addHandler(category: string, handler: Handler): void {
+    private static addHandler(category: string, handler: Handler): void {
         if (!category) {
             throw new HandlerError("handler处理器类别不合法");
         }
@@ -67,7 +67,7 @@ export class HandlerFactory {
         }
         if (!socketChannel) {
             const serviceNode: string = await LoadBalancerFactory
-                .getLoadBalancer(Starter.getInstance().getConfiguration().loadBalancerType)
+                .getLoadBalancer(NoomiRpcStarter.getInstance().getConfiguration().loadBalancerType)
                 .impl
                 .selectServerAddress(noomiRpcRequest.getRequestPayload().getServiceName());
             socketChannel = GlobalCache.CHANNEL_CACHE.get(serviceNode);
@@ -83,7 +83,7 @@ export class HandlerFactory {
         let circuitBreaker: CircuitBreaker;
         while (true) {
             try {
-                const everyIpCircuitBreaker: Map<string, CircuitBreaker> = Starter.getInstance().getConfiguration().everyIpCircuitBreaker;
+                const everyIpCircuitBreaker: Map<string, CircuitBreaker> = NoomiRpcStarter.getInstance().getConfiguration().everyIpCircuitBreaker;
                 const serviceNode: string = socketChannel.remoteAddress + ":" + socketChannel.remotePort;
                 circuitBreaker = everyIpCircuitBreaker.get(serviceNode);
                 if (!circuitBreaker) {
@@ -93,7 +93,7 @@ export class HandlerFactory {
 
                 if (!(noomiRpcRequest.getRequestType() === RequestType.HEART_BEAT_REQUEST) && circuitBreaker.isBreak()) {
                     setTimeout(function (): void {
-                        Starter.getInstance().getConfiguration().everyIpCircuitBreaker.get(serviceNode).reset();
+                        NoomiRpcStarter.getInstance().getConfiguration().everyIpCircuitBreaker.get(serviceNode).reset();
                     }, 3000);
                     Logger.error("当前断路器已经开启，无法发送请求。");
                     throw new ProxyError("当前断路器已经开启，无法发送请求。");

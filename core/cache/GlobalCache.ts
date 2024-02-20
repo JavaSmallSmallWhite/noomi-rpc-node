@@ -1,9 +1,9 @@
 import {AsyncLocalStorage} from "async_hooks";
 import {NoomiRpcRequest} from "../message/NoomiRpcRequest";
-import {DescriptionType, ServiceConfig} from "../ServiceConfig";
+import {ServiceConfig} from "../ServiceConfig";
 import {ReferenceConfig} from "../ReferenceConfig";
 import {Socket} from "net";
-import {Registry} from "../discovery/Registry";
+import {Registry} from "../registry/Registry";
 
 /**
  * 全局缓存
@@ -13,7 +13,7 @@ export class GlobalCache {
     /**
      * 注册中心服务配置
      */
-    public static serviceConfiguration: unknown;
+    public static serviceConfiguration: unknown = {};
 
     /**
      * 注册中心缓存器
@@ -29,12 +29,12 @@ export class GlobalCache {
     /**
      * 维护已经发布且暴露的服务列表 key -> 服务名 value -> ServiceConfig
      */
-    public static readonly SERVICES_LIST: Map<string, ServiceConfig<Object, Object>> = new Map<string, ServiceConfig<Object, Object>>();
+    public static readonly SERVICES_LIST: Map<string, ServiceConfig<Object>> = new Map<string, ServiceConfig<Object>>();
 
     /**
-     * 维护fury接口描述 key -> 方法参数id value -> 接口描述对象
+     * 维护fury接口描述 key -> 服务+方法+类型 value -> id
      */
-    public static readonly DESCRIPTION_LIST: Map<string, DescriptionType> = new Map<string, DescriptionType>();
+    public static readonly DESCRIPTION_LIST: Map<string, string> = new Map<string, string>();
 
     /**
      * 维护fury序列化方法 key -> 方法参数id或者方法返回值id value -> 序列化方法
@@ -44,7 +44,7 @@ export class GlobalCache {
     /**
      * 维护已经配置好的代理对象 key -> 服务名 value -> ReferenceConfig
      */
-    public static readonly REFERENCES_LIST: Map<string, ReferenceConfig<Object, Object>> = new Map<string, ReferenceConfig<Object, Object>>();
+    public static readonly REFERENCES_LIST: Map<string, ReferenceConfig<Object>> = new Map<string, ReferenceConfig<Object>>();
 
     /**
      * 连接的缓存 服务节点的地址端口 -> channel

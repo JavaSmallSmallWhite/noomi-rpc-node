@@ -24,10 +24,10 @@ export class NoomiRpcResponse {
     private serializeType: number;
 
     /**
-     * 时间戳 8个字节
+     * description id 8个字节
      * @private
      */
-    private other: bigint;
+    private descriptionId: bigint;
 
     /**
      * 响应码 1 成功  2 异常
@@ -69,12 +69,12 @@ export class NoomiRpcResponse {
         return this.serializeType;
     }
 
-    public setOther(other: bigint): void {
-        this.other = other;
+    public setDescriptionId(descriptionId: bigint): void {
+        this.descriptionId = descriptionId;
     }
 
-    public getOther(): bigint {
-        return this.other;
+    public getDescriptionId(): bigint {
+        return this.descriptionId;
     }
 
     public setResponseType(responseType: number): void {

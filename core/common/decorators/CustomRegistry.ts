@@ -1,6 +1,6 @@
-import {Starter} from "../../index";
-import {RegistryConfig} from "../../discovery/RegistryConfig";
+import {RegistryConfig} from "../../registry/RegistryConfig";
 import {GlobalCache} from "../../cache/GlobalCache";
+import {NoomiRpcStarter} from "../../NoomiRpcStarter";
 
 /**
  * 注册中心选项
@@ -36,7 +36,7 @@ export function CustomRegistry(registryOption: RegistryOption) {
         const registryConfig: RegistryConfig = new RegistryConfig(registryOption.registryName, registryOption.registryConnectConfig);
         GlobalCache.REGISTRY_CACHE.set(target.name, Reflect.construct(target, [registryOption.registryConnectConfig]))
         if (registryOption.isUse) {
-            Starter.getInstance().getConfiguration().registryConfig = registryConfig;
+            NoomiRpcStarter.getInstance().getConfiguration().registryConfig = registryConfig;
             if (registryOption.serviceConfiguration) {
                 GlobalCache.serviceConfiguration = registryOption.serviceConfiguration
             }

@@ -1,5 +1,5 @@
 import {AbstractRegistry} from "../AbstractRegistry";
-import {DescriptionType, ServiceConfig} from "../../ServiceConfig";
+import {ServiceConfig} from "../../ServiceConfig";
 import {ZookeeperUtils} from "../../common/utils/zookeeper/ZookeeperUtils";
 import {Constant} from "../../common/utils/Constant";
 import {ZookeeperNode} from "../../common/utils/zookeeper/ZookeeperNode";
@@ -8,10 +8,7 @@ import {Logger} from "../../common/logger/Logger";
 import {ZookeeperConnectConfig} from "../../common/utils/zookeeper/ZookeeperConfig";
 import {ZookeeperUpAndDownWatcher} from "../../watch/ZookeeperUpAndDownWatcher";
 import {Client as Zookeeper, CreateMode} from "node-zookeeper-client";
-import {IdGeneratorUtil} from "../../common/utils/IdGeneratorUtil";
-import {InterfaceUtil} from "../../common/utils/InterfaceUtil";
-import {GlobalCache} from "../../cache/GlobalCache";
-import {Starter} from "../../index";
+import {NoomiRpcStarter} from "../../NoomiRpcStarter";
 
 /**
  * zookeeper注册中心的服务注册与发现类
@@ -37,9 +34,9 @@ export class ZookeeperRegistry extends AbstractRegistry {
      * 服务注册
      * @param service 服务
      */
-    public async register(service: ServiceConfig<Object, Object>): Promise<void> {
+    public async register(service: ServiceConfig<Object>): Promise<void> {
         const baseProviderPath: string = Constant.BASE_PROVIDERS_PATH;
-        const servicePrefix: string = service.servicePrefix || Starter.getInstance().getConfiguration().servicePrefix;
+        const servicePrefix: string = service.servicePrefix || NoomiRpcStarter.getInstance().getConfiguration().servicePrefix;
         const interfaceName: string = service.interfaceProvider.constructor.name;
         const serviceName: string = servicePrefix + "." + interfaceName;
         // 服务名称节点
@@ -50,26 +47,19 @@ export class ZookeeperRegistry extends AbstractRegistry {
             await ZookeeperUtils.createNode(this.zookeeper, zookeeperNode, null, CreateMode.PERSISTENT);
         }
         const nodeAddress: string = NetUtil.getIpv4Address();
-        const nodePort: number = Starter.getInstance().getConfiguration().port;
+        const nodePort: number = NoomiRpcStarter.getInstance().getConfiguration().port;
         // 创建服务节点
         const nodePath: string = parentNode + "/" + nodeAddress + ":" + nodePort;
         // 发布服务
         if (!await ZookeeperUtils.exist(this.zookeeper, nodePath, null)) {
-            const idGenerator: IdGeneratorUtil = Starter.getInstance().getConfiguration().idGenerator;
-            let interfaceDescription: Array<DescriptionType> = [];
-            InterfaceUtil.getInterfaceMethodsName(service.interfaceDescription, true).forEach(methodName => {
-                const methodId1: string = String(idGenerator.getId());
-                const methodId2: string = String(idGenerator.getId());
-                const methodDescription: DescriptionType = {
-                    methodId1: methodId1,
-                    methodId2: methodId2,
-                    methodName: methodName,
-                    serviceName: serviceName
-                }
-                GlobalCache.DESCRIPTION_LIST.set(methodDescription.methodId1, methodDescription);
-                interfaceDescription.push(methodDescription)
-            });
-            const zookeeperNode: ZookeeperNode = new ZookeeperNode(nodePath, Buffer.from(JSON.stringify(interfaceDescription)));
+            // const idGenerator: IdGeneratorUtil = NoomiRpcStarter.getInstance().getConfiguration().idGenerator;
+            // let interfaceDescription: Array<DescriptionType> = [];
+            // InterfaceUtil.getInterfaceMethodsName(service.interfaceProvider).forEach(methodName => {
+            //     const methodId: string = String(idGenerator.getId());
+            //     GlobalCache.DESCRIPTION_LIST.set(methodId, methodDescription);
+            //     interfaceDescription.push(methodDescription)
+            // });
+            const zookeeperNode: ZookeeperNode = new ZookeeperNode(nodePath, /*Buffer.from(JSON.stringify(interfaceDescription))*/null);
             await ZookeeperUtils.createNode(this.zookeeper, zookeeperNode, null, CreateMode.EPHEMERAL);
         }
         Logger.debug(`服务${parentNode}，已经被注册。`)
@@ -81,14 +71,13 @@ export class ZookeeperRegistry extends AbstractRegistry {
      */
     public async lookup(serviceName: string): Promise<Array<string>> {
         const serviceNode: string = Constant.BASE_PROVIDERS_PATH + "/" +serviceName;
-        const children: string[] = await ZookeeperUtils.getChildren(this.zookeeper, serviceNode, ZookeeperUpAndDownWatcher.process);
-        for (const child of children) {
-            const nodeData: Buffer = await ZookeeperUtils.getNodeData(this.zookeeper, serviceNode + "/" + child);
-            const nodeArray: Array<DescriptionType> = JSON.parse(nodeData.toString());
-            nodeArray.forEach(item => {
-                GlobalCache.DESCRIPTION_LIST.set(item.methodId1, item);
-            })
-        }
-        return children;
+        return  await ZookeeperUtils.getChildren(this.zookeeper, serviceNode, ZookeeperUpAndDownWatcher.process);
+        // for (const child of children) {
+        //     const nodeData: Buffer = await ZookeeperUtils.getNodeData(this.zookeeper, serviceNode + "/" + child);
+        //     const nodeArray: Array<DescriptionType> = JSON.parse(nodeData.toString());
+        //     nodeArray.forEach(item => {
+        //         GlobalCache.DESCRIPTION_LIST.set(item.methodId1, item);
+        //     })
+        // }
     }
 }

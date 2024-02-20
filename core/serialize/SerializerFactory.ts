@@ -3,12 +3,8 @@ import {ObjectWrapper} from "../configuration/ObjectWrapper";
 import {JsonSerializer} from "./impl/JsonSerializer";
 import {Logger} from "../common/logger/Logger";
 import {FurySerializer} from "./impl/FurySerializer";
-import {Type, TypeDescription} from "@furyjs/fury";
+import {InternalSerializerType, TypeDescription} from "@furyjs/fury";
 import {SerializeError} from "../common/error/SerializeError";
-import {DescriptionType, ServiceConfig} from "../ServiceConfig";
-import {ReferenceConfig} from "../ReferenceConfig";
-import {GlobalCache} from "../cache/GlobalCache";
-import {Starter} from "../index";
 
 /**
  * 序列化工厂
@@ -82,58 +78,101 @@ export class SerializerFactory {
     }
 
     /**
-     * 获取consumer端的序列化描述
-     * @param descriptionId 描述id
-     * @param argumentsOrReturnValueDescription 参数解释或者返回值解释
+     * 根据data动态获取描述
+     * @param data 数据
+     * @param tag 标签
      */
-    public static getReferenceSerializeDescription(descriptionId: bigint, argumentsOrReturnValueDescription: string): TypeDescription {
-        if (Starter.getInstance().getConfiguration().serializerType === "fury") {
-            const interfaceDescription: DescriptionType = GlobalCache.DESCRIPTION_LIST
-                .get(String(descriptionId));
-            const referenceConfig: ReferenceConfig<Object, Object> = GlobalCache.REFERENCES_LIST
-                .get(interfaceDescription.serviceName);
-            const furyType: TypeDescription = referenceConfig
-                .interfaceDescription[interfaceDescription.methodName]()[argumentsOrReturnValueDescription];
-            if (!furyType) {
-                throw new SerializeError("未配置fury的参数序列化类型或者返回值序列化类型。");
-            }
-            return argumentsOrReturnValueDescription === "argumentsDescription" ? Type.object(String(descriptionId), {
-                serviceName: Type.string(),
-                methodName: Type.string(),
-                argumentsList: furyType
-            }): Type.object(String(interfaceDescription.methodId2), {
-                serviceName: Type.string(),
-                methodName: Type.string(),
-                returnValue: furyType
-            })
+    public static getDataDescription(data: unknown, tag: string): {
+        options?: {
+            inner?: TypeDescription,
+            key?: TypeDescription,
+            value?: TypeDescription,
+            props?: {
+                [key: string]: any;
+            },
+            tag?: string
+        };
+        label: string;
+        type: InternalSerializerType
+    } {
+        if (data === null || data === undefined) {
+            return null;
         }
-    }
+        if (Array.isArray(data)) {
+            const item: TypeDescription = this.getDataDescription(data[0], tag);
+            if (!item) {
+                throw new Error('empty array can\'t convert')
+            }
+            return {
+                type: InternalSerializerType.ARRAY,
+                label: 'array',
+                options: {
+                    inner: item,
+                }
+            }
+        }
+        if (data instanceof Date) {
+            return {
+                type: InternalSerializerType.TIMESTAMP,
+                label: 'timestamp'
+            }
+        }
+        if (typeof data === 'string') {
+            return {
+                type: InternalSerializerType.STRING,
+                label: "string",
+            }
+        }
+        if (data instanceof Set) {
+            return {
+                type: InternalSerializerType.FURY_SET,
+                label: "set",
+                options: {
+                    key: this.getDataDescription([...data.values()][0], tag),
+                }
+            }
+        }
+        if (data instanceof Map) {
+            return {
+                type: InternalSerializerType.MAP,
+                label: "map",
+                options: {
+                    key: this.getDataDescription([...data.keys()][0], tag),
+                    value: this.getDataDescription([...data.values()][0], tag),
+                }
+            }
+        }
+        if (typeof data === 'boolean') {
+            return {
+                type: InternalSerializerType.BOOL,
+                label: "boolean",
+            }
+        }
+        if (typeof data === 'number') {
+            if (data > Number.MAX_SAFE_INTEGER || data < Number.MIN_SAFE_INTEGER) {
+                return {
+                    type: InternalSerializerType.INT64,
+                    label: "int64"
+                }
+            }
+            return {
+                type: InternalSerializerType.INT32,
+                label: "int32"
+            }
+        }
+        if (typeof data === 'object') {
+            return {
+                type: InternalSerializerType.FURY_TYPE_TAG,
+                label: "object",
+                options: {
+                    props: Object.fromEntries(Object.entries(data).map(([key, value]): [string, unknown] => {
+                        return [key, this.getDataDescription(value, `${tag}.${key}`)]
+                    }).filter(([_, v]) => Boolean(v))),
+                    tag
+                }
 
-    /**
-     * 获取provider的序列化描述
-     * @param descriptionId 描述id
-     * @param argumentsOrReturnValueDescription 两个类别，参数解释或者返回值解释
-     */
-    public static getServiceSerializeDescription(descriptionId: bigint, argumentsOrReturnValueDescription: string): TypeDescription {
-        if (Starter.getInstance().getConfiguration().serializerType === "fury") {
-            const interfaceDescription: DescriptionType = GlobalCache.DESCRIPTION_LIST
-                .get(String(descriptionId));
-            const serviceConfig: ServiceConfig<Object, Object> = GlobalCache.SERVICES_LIST
-                .get(interfaceDescription.serviceName);
-            const furyType: TypeDescription = serviceConfig.interfaceDescription[interfaceDescription.methodName]()[argumentsOrReturnValueDescription];
-            if (!furyType) {
-                throw new SerializeError("未配置fury的参数序列化类型或者返回值序列化类型。");
             }
-            return argumentsOrReturnValueDescription === "argumentsDescription" ?
-                Type.object(String(interfaceDescription.methodId2), {
-                serviceName: Type.string(),
-                methodName: Type.string(),
-                argumentsList: furyType
-            }): Type.object(String(descriptionId), {
-                serviceName: Type.string(),
-                methodName: Type.string(),
-                returnValue: furyType
-            })
         }
+        throw `unknown data type ${typeof data}`
     }
 }

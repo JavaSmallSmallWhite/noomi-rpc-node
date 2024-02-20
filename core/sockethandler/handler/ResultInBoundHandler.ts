@@ -4,11 +4,11 @@ import {Socket} from "net";
 import {ResponseType} from "../../code/ResponseType";
 import {Logger} from "../../common/logger/Logger";
 import {CircuitBreaker} from "../../sentinel/circuitbreak/CircuitBreaker";
-import {Starter} from "../../index";
 import {ResponseError} from "../../common/error/ResponseError";
 import {GlobalCache} from "../../cache/GlobalCache";
 import {LoadBalancerFactory} from "../../loadbalance/LoadBalancerFactory";
 import {LoadBalancer} from "../../loadbalance/LoadBalancer";
+import {NoomiRpcStarter} from "../../NoomiRpcStarter";
 
 /**
  * 结果处理器
@@ -23,7 +23,7 @@ export class ResultInBoundHandler extends InBoundHandler<NoomiRpcResponse, unkno
      */
     protected handle(socketChannel: Socket, noomiRpcResponse: NoomiRpcResponse): Promise<unknown> {
         const responseType: number = noomiRpcResponse.getResponseType();
-        const everyIpCircuitBreaker: Map<string, CircuitBreaker> = Starter.getInstance().getConfiguration().everyIpCircuitBreaker;
+        const everyIpCircuitBreaker: Map<string, CircuitBreaker> = NoomiRpcStarter.getInstance().getConfiguration().everyIpCircuitBreaker;
         const serviceNode: string = socketChannel.remoteAddress + ":" + socketChannel.remotePort;
         const circuitBreaker: CircuitBreaker = everyIpCircuitBreaker.get(serviceNode);
 
@@ -47,7 +47,7 @@ export class ResultInBoundHandler extends InBoundHandler<NoomiRpcResponse, unkno
         }else if (responseType === ResponseType.BE_CLOSING) {
             Logger.error(`当前id为${noomiRpcResponse.getRequestId()}的请求，访问被拒绝，目标服务器正处于关闭中，响应码${noomiRpcResponse.getResponseType()}。`);
             GlobalCache.CHANNEL_CACHE.delete(serviceNode);
-            const loadBalancer: LoadBalancer = LoadBalancerFactory.getLoadBalancer(Starter.getInstance().getConfiguration().loadBalancerType).impl;
+            const loadBalancer: LoadBalancer = LoadBalancerFactory.getLoadBalancer(NoomiRpcStarter.getInstance().getConfiguration().loadBalancerType).impl;
             loadBalancer.reLoadBalance(noomiRpcResponse.getResponseBody().getServiceName(), [...GlobalCache.CHANNEL_CACHE.keys()])
             throw new ResponseError(responseType, ResponseType.BE_CLOSING_DESCRIPTION);
         }

@@ -1,14 +1,12 @@
 import {AbstractRegistry} from "../AbstractRegistry";
-import {DescriptionType, ServiceConfig} from "../../ServiceConfig";
+import {ServiceConfig} from "../../ServiceConfig";
 import {NetUtil} from "../../common/utils/NetUtil";
 import {Host, NacosNamingClient} from "nacos";
 import {NacosUtils} from "../../common/utils/nacos/NacosUtils";
 import {NacosRegistryConnectConfig, NacosServiceInstance} from "../../common/utils/nacos/NacosConfig";
-import {IdGeneratorUtil} from "../../common/utils/IdGeneratorUtil";
-import {InterfaceUtil} from "../../common/utils/InterfaceUtil";
 import {GlobalCache} from "../../cache/GlobalCache";
-import {Starter} from "../../index";
 import {Constant} from "../../common/utils/Constant";
+import {NoomiRpcStarter} from "../../NoomiRpcStarter";
 
 /**
  * nacos注册中心的服务注册与发现类
@@ -34,30 +32,29 @@ export class NacosRegistry extends AbstractRegistry {
      * 服务注册
      * @param service 服务配置
      */
-    public async register(service: ServiceConfig<Object, Object>): Promise<void> {
-        const servicePrefix: string = service.servicePrefix || Starter.getInstance().getConfiguration().servicePrefix;
+    public async register(service: ServiceConfig<Object>): Promise<void> {
+        const servicePrefix: string = service.servicePrefix || NoomiRpcStarter.getInstance().getConfiguration().servicePrefix;
         const interfaceName: string = service.interfaceProvider.constructor.name;
         const serviceName: string = servicePrefix + "." + interfaceName;
         const ip: string = NetUtil.getIpv4Address();
-        const port: number = Starter.getInstance().getConfiguration().port;
-        const idGenerator: IdGeneratorUtil = Starter.getInstance().getConfiguration().idGenerator;
-        let interfaceDescription: Array<DescriptionType> = [];
-        InterfaceUtil.getInterfaceMethodsName(service.interfaceDescription, true).forEach(methodName => {
-            const methodId1: string = String(idGenerator.getId());
-            const methodId2: string = String(idGenerator.getId());
-            const methodDescription: DescriptionType = {
-                methodId1: methodId1,
-                methodId2: methodId2,
-                methodName: methodName,
-                serviceName: serviceName
-            }
-            GlobalCache.DESCRIPTION_LIST.set(methodDescription.methodId1, methodDescription);
-            interfaceDescription.push(methodDescription);
-        });
+        const port: number = NoomiRpcStarter.getInstance().getConfiguration().port;
+        // const idGenerator: IdGeneratorUtil = NoomiRpcStarter.getInstance().getConfiguration().idGenerator;
+        // let interfaceDescription: Array<DescriptionType> = [];
+        // InterfaceUtil.getInterfaceMethodsName(service.interfaceDescription, true).forEach(methodName => {
+        //     const methodId1: string = String(idGenerator.getId());
+        //     const methodId2: string = String(idGenerator.getId());
+        //     const methodDescription: DescriptionType = {
+        //         methodId1: methodId1,
+        //         methodId2: methodId2,
+        //         methodName: methodName,
+        //         serviceName: serviceName
+        //     }
+        //     GlobalCache.DESCRIPTION_LIST.set(methodDescription.methodId1, methodDescription);
+        //     interfaceDescription.push(methodDescription);
+        // });
         const nacosServiceInstance: NacosServiceInstance = {
             ip: ip,
             port: port,
-            metadata: {description: JSON.stringify(interfaceDescription)},
             healthy: GlobalCache.serviceConfiguration["healthy"] || Constant.HEALTHY,
             enabled: GlobalCache.serviceConfiguration["enabled"] || Constant.ENABLED,
             weight: GlobalCache.serviceConfiguration["weight"] || Constant.WEIGHT,
@@ -81,10 +78,6 @@ export class NacosRegistry extends AbstractRegistry {
         for (const serviceInstance of serviceInstances) {
             const ip: string = serviceInstance.ip;
             const port: number = serviceInstance.port;
-            const metadata: Array<DescriptionType> = JSON.parse(serviceInstance.metadata["description"]);
-            for (const item of metadata) {
-                GlobalCache.DESCRIPTION_LIST.set(item.methodId1, item);
-            }
             serviceNodeNames.push(ip + ":" + port);
         }
         return serviceNodeNames;

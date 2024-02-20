@@ -5,7 +5,7 @@ export interface Registry {
      * 注册服务
      * @param serviceConfig 服务的配置内容
      */
-    register(serviceConfig: ServiceConfig<Object, Object> ): void;
+    register(serviceConfig: ServiceConfig<Object> ): void;
 
     /**
      * 从注册中心拉取服务列表

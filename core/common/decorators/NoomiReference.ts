@@ -1,19 +1,14 @@
-import {Starter} from "../../index";
 import {ReferenceConfig} from "../../ReferenceConfig";
+import {NoomiRpcStarter} from "../../NoomiRpcStarter";
 
 /**
  * 代理选项
  */
-interface ReferenceOption<T, V extends Object> {
+interface ReferenceOption<T extends Object> {
     /**
      * 服务提供接口
      */
     interfaceProvider: T;
-
-    /**
-     * 接口描述
-     */
-    interfaceDescription: V;
 
     /**
      * 服务前缀
@@ -25,16 +20,14 @@ interface ReferenceOption<T, V extends Object> {
  * 代理装饰器，装饰属性
  * @constructor
  */
-export function NoomiReference<T, V extends Object>(referenceOption: ReferenceOption<T, V>): (target: Object, propertyKey: string | symbol) => void {
+export function NoomiReference<T extends Object>(referenceOption: ReferenceOption<T>): (target: Object, propertyKey: string | symbol) => void {
     return async (target: Object, propertyKey: string | symbol): Promise<void> => {
-        const reference: ReferenceConfig<T, V> = new ReferenceConfig<T, V>();
+        const reference: ReferenceConfig<T> = new ReferenceConfig<T>();
         reference.interfaceRef = referenceOption.interfaceProvider;
-        // 设置接口描述
-        reference.interfaceDescription = referenceOption.interfaceDescription;
         if (referenceOption.servicePrefix) {
             reference.servicePrefix = referenceOption.servicePrefix;
         }
-        Starter.getInstance().reference(reference).then();
+        NoomiRpcStarter.getInstance().reference(reference).then();
         Object.defineProperty(target, propertyKey, {
             get: () => reference.get(),
             enumerable: true,

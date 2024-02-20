@@ -1,4 +1,4 @@
-import {RegistryConfig} from "./discovery/RegistryConfig";
+import {RegistryConfig} from "./registry/RegistryConfig";
 import {ServiceConfig} from "./ServiceConfig";
 import {ReferenceConfig} from "./ReferenceConfig";
 import {Configuration} from "./configuration/Configuration";
@@ -10,7 +10,6 @@ import {HandlerFactory} from "./sockethandler/HandlerFactory";
 import {IdGeneratorUtil} from "./common/utils/IdGeneratorUtil";
 import {HeartBeatDetector} from "./heartbeat/HeartBeatDetector";
 import {GlobalCache} from "./cache/GlobalCache";
-import {Starter} from "./index";
 import {GraceFullyShutdownHook} from "./shutdown/GraceFullyShutdownHook";
 
 /**
@@ -25,13 +24,29 @@ export class NoomiRpcStarter {
     private readonly configuration: Configuration;
 
     /**
+     * 单例模式的懒汉式创建启动对象
+     * @private
+     */
+    private static noomiRpcBootstrap: NoomiRpcStarter;
+
+    /**
      * 启动器的构造器一被加载则加载所有的配置
      * @private
      */
     private constructor() {
-        // 构造启动引导程序时需要初始化配置
         this.configuration = new Configuration();
         InterfaceUtil.loadDecorators(this.configuration.starterPath);
+    }
+
+    /**
+     * 获取启动器的实例
+     */
+    public static getInstance(): NoomiRpcStarter {
+        if (this.noomiRpcBootstrap) {
+            return this.noomiRpcBootstrap;
+        }
+        this.noomiRpcBootstrap = new NoomiRpcStarter();
+        return this.noomiRpcBootstrap;
     }
 
     /**
@@ -119,7 +134,7 @@ export class NoomiRpcStarter {
      * @param service   封装需要发布的服务
      * @return          this当前实例
      */
-    public async publish(service: ServiceConfig<Object, Object>): Promise<void> {
+    public async publish(service: ServiceConfig<Object>): Promise<void> {
         process.on('SIGINT', GraceFullyShutdownHook.run);
         process.on('SIGTERM', GraceFullyShutdownHook.run);
         this.configuration.registryConfig.getRegistry().register(service);
@@ -133,7 +148,7 @@ export class NoomiRpcStarter {
      * 启动tcp服务
      */
     public start(): void {
-        const port: number = Starter.getInstance().getConfiguration().port;
+        const port: number = NoomiRpcStarter.getInstance().getConfiguration().port;
         const address: string = NetUtil.getIpv4Address();
         const server: Server = createServer();
         server.on("close", function (): void {
@@ -158,11 +173,11 @@ export class NoomiRpcStarter {
      * 配置代理对象
      * @param reference 代理
      */
-    public async reference(reference: ReferenceConfig<Object, Object>): Promise<void> {
+    public async reference(reference: ReferenceConfig<Object>): Promise<void> {
         const interfaceName: string = InterfaceUtil.getInterfaceName(reference.interfaceRef);
         const servicePrefix: string = reference.servicePrefix || this.configuration.servicePrefix;
         const serviceName: string = InterfaceUtil.combine(servicePrefix, interfaceName);
         GlobalCache.REFERENCES_LIST.set(serviceName, reference);
-        HeartBeatDetector.detectHeartbeat(serviceName).then();
+        // HeartBeatDetector.detectHeartbeat(serviceName).then();
     }
 }

@@ -40,10 +40,10 @@ export class NoomiRpcRequest {
     private serializeType: number;
 
     /**
-     * 其他 8个字节
+     * description id 8个字节
      * @private
      */
-    private other: bigint;
+    private descriptionId: bigint;
 
     /**
      * 请求体
@@ -93,12 +93,12 @@ export class NoomiRpcRequest {
         return this.serializeType;
     }
 
-    public setOther(other: bigint): void {
-        this.other = other;
+    public setDescriptionId(descriptionId: bigint): void {
+        this.descriptionId = descriptionId;
     }
 
-    public getOther(): bigint {
-        return this.other;
+    public getDescriptionId(): bigint {
+        return this.descriptionId;
     }
 
     public setRequestPayload(requestPayload: RequestPayload): void {

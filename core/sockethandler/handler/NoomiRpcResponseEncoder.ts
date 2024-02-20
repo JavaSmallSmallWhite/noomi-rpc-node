@@ -10,6 +10,8 @@ import {Logger} from "../../common/logger/Logger";
 import {BufferUtil} from "../../common/utils/BufferUtil";
 import {TypeDescription} from "@furyjs/fury";
 import {ResponsePayload} from "../../message/ResponsePayload";
+import {GlobalCache} from "../../cache/GlobalCache";
+import {NoomiRpcStarter} from "../../NoomiRpcStarter";
 
 /**
  * 响应编码编码器
@@ -62,9 +64,9 @@ export class NoomiRpcResponseEncoder extends MessageToBufferEncoderHandler<Noomi
         headerBuffer.writeBigUInt64BE(noomiRpcResponse.getRequestId(), this.index);
         this.index += MessageConstant.REQUEST_ID_FIELD_LENGTH;
 
-        // 写入时间戳---> 8个字节
-        headerBuffer.writeBigUInt64BE(noomiRpcResponse.getOther(), this.index);
-        this.index += MessageConstant.OTHER_FIELD_LENGTH;
+        // 写入description id---> 8个字节
+        headerBuffer.writeBigUInt64BE(noomiRpcResponse.getDescriptionId(), this.index);
+        this.index += MessageConstant.DESCRIPTION_ID_FIELD_LENGTH;
 
         // 响应体的封装
         const responseBody: ResponsePayload = noomiRpcResponse.getResponseBody();
@@ -72,11 +74,22 @@ export class NoomiRpcResponseEncoder extends MessageToBufferEncoderHandler<Noomi
 
         if (responseBody) {
             // 序列化响应体
+            // 获取序列化器
             const serializer: Serializer = SerializerFactory.getSerializer(noomiRpcResponse.getSerializeType()).impl;
-            const serializeDescription: TypeDescription = SerializerFactory
-                .getServiceSerializeDescription(BigInt(noomiRpcResponse.getOther()), "returnValueDescription");
-            responseBodyBuffer = serializer.serialize(responseBody, serializeDescription);
-
+            if (NoomiRpcStarter.getInstance().getConfiguration().serializerType === "fury") {
+                // 获取responseBody的description
+                const serializeDescription: TypeDescription = SerializerFactory.getDataDescription(responseBody, String(noomiRpcResponse.getDescriptionId()))
+                // fury序列化responseBody的description
+                const serializeDescriptionString: string = JSON.stringify(serializeDescription);
+                const descriptionBuffer: Uint8Array = serializer.serialize(serializeDescriptionString);
+                // 写入description size占用的字节---> 8个字节
+                headerBuffer.writeBigUInt64BE(BigInt(descriptionBuffer.length), this.index);
+                this.index += MessageConstant.DESCRIPTION_SIZE_FIELD_LENGTH;
+                // 序列化响应体
+                responseBodyBuffer = Buffer.concat([descriptionBuffer, serializer.serialize(responseBody, serializeDescription)]);
+            } else {
+                responseBodyBuffer = serializer.serialize(responseBody);
+            }
             // 压缩响应体
             const compressor: Compressor = CompressorFactory.getCompressor(noomiRpcResponse.getCompressType()).impl;
             responseBodyBuffer = await compressor.compress(responseBodyBuffer);
@@ -84,24 +97,18 @@ export class NoomiRpcResponseEncoder extends MessageToBufferEncoderHandler<Noomi
 
         let responseBuffer: Buffer;
         if (responseBodyBuffer) {
-
             // 写入响应体---> responseBodyBuffer.length个字节
             responseBuffer = Buffer.concat([headerBuffer, responseBodyBuffer]);
-
             // 将偏移量指针移到总长度位置
             this.index = MessageConstant.MAGIC_FIELD_LENGTH + MessageConstant.VERSION_FIELD_LENGTH + MessageConstant.HEADER_FIELD_LENGTH;
-
             // 写入总长度---> 4个字节
             responseBuffer.writeUint32BE(MessageConstant.HEADER_LENGTH + responseBodyBuffer.length, this.index);
-
             // 写完后，将指针归0
             this.index = 0;
         } else {
             responseBuffer = headerBuffer;
-
             // 将偏移量指针移到总长度位置
             this.index = MessageConstant.MAGIC_FIELD_LENGTH + MessageConstant.VERSION_FIELD_LENGTH + MessageConstant.HEADER_FIELD_LENGTH;
-
             // 写入总长度---> 4个字节
             responseBuffer.writeUint32BE(MessageConstant.HEADER_LENGTH, this.index);
             this.index = 0;

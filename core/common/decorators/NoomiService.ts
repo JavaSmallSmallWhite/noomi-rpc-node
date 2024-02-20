@@ -1,6 +1,6 @@
 import {ServiceConfig} from "../../ServiceConfig";
-import {Starter} from "../../index";
 import {GlobalCache} from "../../cache/GlobalCache";
+import {NoomiRpcStarter} from "../../NoomiRpcStarter";
 
 /**
  * 服务配置，具体参考npm nacos的相关选项
@@ -20,16 +20,11 @@ interface ServiceConfiguration {
 /**
  * 服务选项
  */
-interface ServiceOption<T, V extends Object> {
+interface ServiceOption<T extends Object> {
     /**
      * 服务提供接口
      */
     interfaceProvider: T;
-
-    /**
-     * 接口描述
-     */
-    interfaceDescription: V;
 
     /**
      * 服务前缀
@@ -46,11 +41,10 @@ interface ServiceOption<T, V extends Object> {
  * 服务装饰器，装饰类
  * @constructor
  */
-export function NoomiService<T, V extends Object>(serviceOption: ServiceOption<T, V>): (target: Function) => void {
+export function NoomiService<T extends Object>(serviceOption: ServiceOption<T>): (target: Function) => void {
     return async (target: Function): Promise<void> => {
-        const service: ServiceConfig<T, V> = new ServiceConfig<T, V>();
+        const service: ServiceConfig<T> = new ServiceConfig<T>();
         service.interfaceProvider = serviceOption.interfaceProvider;
-        service.interfaceDescription = serviceOption.interfaceDescription;
         service.ref = Reflect.construct(target, []);
         if (serviceOption["servicePrefix"]) {
             service.servicePrefix = serviceOption["servicePrefix"]
@@ -58,6 +52,6 @@ export function NoomiService<T, V extends Object>(serviceOption: ServiceOption<T
         if (serviceOption.serviceConfiguration) {
             GlobalCache.serviceConfiguration = serviceOption.serviceConfiguration
         }
-        await Starter.getInstance().publish(service);
+        await NoomiRpcStarter.getInstance().publish(service);
     }
 }

@@ -20,7 +20,7 @@ export class MessageConstant {
     /**
      * 头部长度字节
      */
-    public static readonly HEADER_LENGTH: number = (this.MAGIC_FIELD_LENGTH + 1 + 2 + 4 + 1 + 1 + 1 + 8 + 8);
+    public static readonly HEADER_LENGTH: number = (this.MAGIC_FIELD_LENGTH + 1 + 2 + 4 + 1 + 1 + 1 + 8 + 8 + 8);
 
     /**
      * 头部长度占用字节
@@ -58,9 +58,14 @@ export class MessageConstant {
     public static readonly REQUEST_ID_FIELD_LENGTH: number = 8;
 
     /**
-     * 时间戳字段占用字节
+     * description id字段占用字节
      */
-    public static readonly OTHER_FIELD_LENGTH: number = 8;
+    public static readonly DESCRIPTION_ID_FIELD_LENGTH: number = 8;
+
+    /**
+     * description size字段占用字节
+     */
+    public static readonly DESCRIPTION_SIZE_FIELD_LENGTH: number = 8;
 
     /**
      * 响应类型占用长度字节

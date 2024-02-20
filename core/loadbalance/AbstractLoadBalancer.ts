@@ -1,6 +1,6 @@
 import {LoadBalancer} from "./LoadBalancer";
 import {Selector} from "./Selector";
-import {Starter} from "../index";
+import {NoomiRpcStarter} from "../NoomiRpcStarter";
 
 /**
  * 抽象的负载均衡器管理类
@@ -32,7 +32,7 @@ export abstract class AbstractLoadBalancer implements LoadBalancer {
         // 先从缓存中拿负载均衡选择器
         let selector: Selector = this.cache.get(serviceName);
         if (!selector) {
-            const children: string[] = await Starter
+            const children: string[] = await NoomiRpcStarter
                 .getInstance()
                 .getConfiguration()
                 .registryConfig

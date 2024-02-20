@@ -6,7 +6,6 @@ import {LoadBalancerFactory} from "../loadbalance/LoadBalancerFactory";
 import {Logger} from "../common/logger/Logger";
 import {SubscribeInfo} from "nacos-naming";
 import {GlobalCache} from "../cache/GlobalCache";
-import {Starter} from "../index";
 
 /**
  * nacos注册中心服务节点的动态上下限监控
@@ -42,7 +41,7 @@ export class NacosUpAndDownWatcher {
 
         // 重新负载均衡
         LoadBalancerFactory
-            .getLoadBalancer(Starter.getInstance().getConfiguration().loadBalancerType)
+            .getLoadBalancer(NoomiRpcStarter.getInstance().getConfiguration().loadBalancerType)
             .impl
             .reLoadBalance(<string>serviceName, serviceNodes);
 

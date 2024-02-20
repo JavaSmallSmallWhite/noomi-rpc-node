@@ -1,12 +1,11 @@
 import {Event} from "node-zookeeper-client";
 import {Logger} from "../common/logger/Logger";
-import {Registry} from "../discovery/Registry";
+import {Registry} from "../registry/Registry";
 import {NoomiRpcStarter} from "../NoomiRpcStarter";
 import {AddressPort, NetUtil} from "../common/utils/NetUtil";
 import {createConnection, Socket} from "net";
 import {LoadBalancerFactory} from "../loadbalance/LoadBalancerFactory";
 import {GlobalCache} from "../cache/GlobalCache";
-import {Starter} from "../index";
 
 /**
  * zookeeper注册中心服务节点的动态上下限监控
@@ -21,7 +20,7 @@ export class ZookeeperUpAndDownWatcher {
         if (event.getType() === Event.NODE_CHILDREN_CHANGED) {
             Logger.debug(`检测到服务${event.getPath()}有节点上/下线，将重新拉取服务列表...`);
             const serviceName: string = getServiceName(event.getPath());
-            const registry: Registry = Starter.getInstance().getConfiguration().registryConfig.getRegistry();
+            const registry: Registry = NoomiRpcStarter.getInstance().getConfiguration().registryConfig.getRegistry();
             const serviceNodes: string[] = await registry.lookup(serviceName);
             // 处理新增的节点
             for (const serviceNode of serviceNodes) {
@@ -40,7 +39,7 @@ export class ZookeeperUpAndDownWatcher {
             }
             // 重新负载均衡
             LoadBalancerFactory
-                .getLoadBalancer(Starter.getInstance().getConfiguration().loadBalancerType)
+                .getLoadBalancer(NoomiRpcStarter.getInstance().getConfiguration().loadBalancerType)
                 .impl
                 .reLoadBalance(serviceName, serviceNodes);
         }

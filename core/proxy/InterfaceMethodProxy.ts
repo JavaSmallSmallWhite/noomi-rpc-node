@@ -1,7 +1,6 @@
 import {Logger} from "../common/logger/Logger";
 import {NoomiRpcConsumerHandler} from "./handler/NoomiRpcConsumerHandler";
 import {InterfaceUtil} from "../common/utils/InterfaceUtil";
-import {Starter} from "../index";
 
 /**
  *  接口的代理

@@ -7,10 +7,8 @@ import {RequestType} from "../../code/RequestType";
 import {SerializerFactory} from "../../serialize/SerializerFactory";
 import {CompressorFactory} from "../../compress/CompressorFactory";
 import {LoadBalancerFactory} from "../../loadbalance/LoadBalancerFactory";
-import {DescriptionType} from "../../ServiceConfig";
-import {ProxyError} from "../../common/error/ProxyError";
 import {GlobalCache} from "../../cache/GlobalCache";
-import {Starter} from "../../index";
+import {NoomiRpcStarter} from "../../NoomiRpcStarter";
 
 /**
  * Rpc请求处理器
@@ -55,29 +53,18 @@ export class NoomiRpcConsumerHandler {
         requestPayload.setArgumentsList(argumentsList);
 
         const noomiRpcRequest: NoomiRpcRequest = new NoomiRpcRequest();
-        noomiRpcRequest.setRequestId(Starter.getInstance().getConfiguration().idGenerator.getId());
+        noomiRpcRequest.setRequestId(NoomiRpcStarter.getInstance().getConfiguration().idGenerator.getId());
         noomiRpcRequest.setRequestType(RequestType.COMMON_REQUEST);
-        noomiRpcRequest.setSerializeType(SerializerFactory.getSerializer(Starter.getInstance().getConfiguration().serializerType).code);
-        noomiRpcRequest.setCompressType(CompressorFactory.getCompressor(Starter.getInstance().getConfiguration().compressorType).code);
+        noomiRpcRequest.setSerializeType(SerializerFactory.getSerializer(NoomiRpcStarter.getInstance().getConfiguration().serializerType).code);
+        noomiRpcRequest.setCompressType(CompressorFactory.getCompressor(NoomiRpcStarter.getInstance().getConfiguration().compressorType).code);
+        noomiRpcRequest.setDescriptionId(NoomiRpcStarter.getInstance().getConfiguration().idGenerator.getId());
         noomiRpcRequest.setRequestPayload(requestPayload);
 
         // 2. 发现可用的服务
         const serviceNode: string = await LoadBalancerFactory
-            .getLoadBalancer(Starter.getInstance().getConfiguration().loadBalancerType)
+            .getLoadBalancer(NoomiRpcStarter.getInstance().getConfiguration().loadBalancerType)
             .impl
             .selectServerAddress(this.serviceName);
-
-        let isExist: boolean = false;
-        GlobalCache.DESCRIPTION_LIST.forEach((value: DescriptionType) => {
-            if (value.methodName === originalMethod.name + "Description") {
-                noomiRpcRequest.setOther(BigInt(value.methodId1));
-                isExist = true;
-                return;
-            }
-        })
-        if (!isExist) {
-            throw new ProxyError(`未设置${originalMethod.name}的方法描述。`);
-        }
 
         GlobalCache.localStorage.enterWith(noomiRpcRequest);
 

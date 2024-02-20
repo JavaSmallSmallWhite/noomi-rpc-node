@@ -57,4 +57,9 @@ export class Constant {
     public static readonly CLUSTER_NAME: string = "DEFAULT";
 
     public static readonly GROUP_NAME: string = "DEFAULT_GROUP";
+
+    /**
+     * --------------------心跳检测相关配置常量--------------------------------
+     */
+    public static readonly HEART_BEAT_CHECK_INTERVAL: number = 2000;
 }

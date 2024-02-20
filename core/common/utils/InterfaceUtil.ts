@@ -31,15 +31,10 @@ export class InterfaceUtil {
     /**
      * 获取接口对象上所有的定义的方法名
      * @param interfaceObj 接口对象
-     * @param description 是否接口描述类
      */
-    public static getInterfaceMethodsName(interfaceObj: Object, description?: boolean): Array<string> {
+    public static getInterfaceMethodsName(interfaceObj: Object): Array<string> {
         const interfacePrototype: ObjectConstructor = Object.getPrototypeOf(interfaceObj);
         const propertyNames: Array<string> = Object.getOwnPropertyNames(interfacePrototype);
-        if (description) {
-            return propertyNames.filter(methodName => methodName.endsWith("Description")
-                && typeof interfaceObj[methodName] === "function");
-        }
         return propertyNames.filter(methodName => methodName !== "constructor"
             && typeof interfaceObj[methodName] === "function");
     }
@@ -61,7 +56,7 @@ export class InterfaceUtil {
          * 处理instance路径
          * @param path -  待解析路径
          */
-        function handle(path: string) {
+        function handle(path: string): void {
             const basePath: string = process.cwd();
             const pathArr: string[] = path.split('/');
             const pa: string[] = [basePath];
@@ -111,12 +106,11 @@ export class InterfaceUtil {
              * @returns         转换后的正则表达式
              */
             function toReg(str: string, side?: number): RegExp {
-            // 转字符串为正则表达式并加入到数组
-            //替换/为\/
+            // 替换/为\/
             str = str.replace(/\//g, '\\/');
-            //替换.为\.
+            // 替换.为\.
             str = str.replace(/\./g, '\\.');
-            //替换*为.*
+            // 替换*为.*
             str = str.replace(/\*/g, '.*');
             if (side !== undefined) {
                 switch (side) {

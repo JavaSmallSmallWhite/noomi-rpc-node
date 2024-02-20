@@ -7,7 +7,7 @@ export abstract class AbstractRegistry implements Registry {
      * 服务注册
      * @param serviceConfig 服务配置
      */
-    abstract register(serviceConfig: ServiceConfig<Object, Object>): void;
+    abstract register(serviceConfig: ServiceConfig<Object>): void;
 
     /**
      * 服务发现

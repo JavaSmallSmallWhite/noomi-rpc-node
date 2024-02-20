@@ -1,5 +1,4 @@
-import * as os from "os";
-import {NetworkInterfaceInfo} from "os";
+import {NetworkInterfaceInfo, networkInterfaces} from "os";
 import {NetworkError} from "../error/NetworkError";
 import {Logger} from "../logger/Logger";
 
@@ -17,7 +16,7 @@ export class NetUtil {
      */
     public static getIpv4Address(): string {
         try {
-            const interfaces: NodeJS.Dict<NetworkInterfaceInfo[]> = os.networkInterfaces();
+            const interfaces: NodeJS.Dict<NetworkInterfaceInfo[]> = networkInterfaces();
             for (let devName in interfaces) {
                 const iface: NetworkInterfaceInfo[] = interfaces[devName];
                 for (let i = 0; i < iface.length; i++) {

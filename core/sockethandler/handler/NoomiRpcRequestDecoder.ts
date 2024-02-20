@@ -10,6 +10,7 @@ import {CompressorFactory} from "../../compress/CompressorFactory";
 import {BufferToMessageDecoderHandler} from "../BufferToMessageDecoderHandler";
 import {Socket} from "net";
 import {TypeDescription} from "@furyjs/fury";
+import {NoomiRpcStarter} from "../../NoomiRpcStarter";
 
 /**
  * 请求解码器
@@ -68,8 +69,12 @@ export class NoomiRpcRequestDecoder extends BufferToMessageDecoderHandler<NoomiR
         const requestId: bigint = noomiRpcRequestBuffer.readBigInt64BE(this.index);
         this.index += MessageConstant.REQUEST_ID_FIELD_LENGTH;
 
-        // 解析其他
-        const other: bigint = noomiRpcRequestBuffer.readBigInt64BE(this.index);
+        // 解析description id
+        const descriptionId: bigint = noomiRpcRequestBuffer.readBigInt64BE(this.index);
+        this.index += MessageConstant.DESCRIPTION_ID_FIELD_LENGTH;
+
+        // 解析description size
+        const descriptionSize: bigint = noomiRpcRequestBuffer.readBigInt64BE(this.index);
         this.index = headLength;
 
         // 从buffer中封装请求
@@ -78,10 +83,9 @@ export class NoomiRpcRequestDecoder extends BufferToMessageDecoderHandler<NoomiR
         noomiRpcRequest.setRequestType(requestType);
         noomiRpcRequest.setSerializeType(serializeType);
         noomiRpcRequest.setCompressType(compressType);
-        noomiRpcRequest.setOther(other);
+        noomiRpcRequest.setDescriptionId(descriptionId);
 
-        let requestPayload: RequestPayload = new RequestPayload();
-
+        const requestPayload: RequestPayload = new RequestPayload();
         let payloadBuffer: Uint8Array = noomiRpcRequestBuffer.subarray(this.index, fullLength);
         this.index = 0;
         if (payloadBuffer !== null && payloadBuffer.length !== 0) {
@@ -90,9 +94,23 @@ export class NoomiRpcRequestDecoder extends BufferToMessageDecoderHandler<NoomiR
             payloadBuffer = await compressor.decompress(payloadBuffer);
 
             // 反序列化
+            // 获取序列化器
             const serializer: Serializer = SerializerFactory.getSerializer(serializeType).impl;
-            const serializeDescription: TypeDescription = SerializerFactory.getServiceSerializeDescription(other, "argumentsDescription");
-            const result: RequestPayload = <RequestPayload>serializer.deserialize(payloadBuffer, serializeDescription);
+            let result: RequestPayload;
+            if (NoomiRpcStarter.getInstance().getConfiguration().serializerType === "fury") {
+                // 截取description buffer
+                const descriptionBuffer: Uint8Array = payloadBuffer.subarray(0, Number(descriptionSize));
+                // 反序列化description buffer
+                const serializeDescriptionString: string = <string>serializer.deserialize(descriptionBuffer);
+                // 生成description
+                const serializeDescription: TypeDescription = JSON.parse(serializeDescriptionString);
+                // 截取请求体的buffer
+                payloadBuffer = payloadBuffer.subarray(Number(descriptionSize));
+                // 反序列化请求体
+                result = <RequestPayload>serializer.deserialize(payloadBuffer, serializeDescription);
+            } else {
+                result = <RequestPayload>serializer.deserialize(payloadBuffer);
+            }
             Object.assign(requestPayload, result);
             Logger.debug(`请求id为${requestId}的请求反序列化成功。`);
             noomiRpcRequest.setRequestPayload(requestPayload);

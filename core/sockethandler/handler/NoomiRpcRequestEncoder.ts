@@ -10,6 +10,7 @@ import {BufferUtil} from "../../common/utils/BufferUtil";
 import {MessageToBufferEncoderHandler} from "../MessageToBufferEncoderHandler";
 import {Socket} from "net";
 import {TypeDescription} from "@furyjs/fury";
+import {NoomiRpcStarter} from "../../NoomiRpcStarter";
 
 /**
  * 请求编码器
@@ -63,45 +64,52 @@ export class NoomiRpcRequestEncoder extends MessageToBufferEncoderHandler<NoomiR
         headerBuffer.writeBigUInt64BE(noomiRpcRequest.getRequestId(), this.index);
         this.index += MessageConstant.REQUEST_ID_FIELD_LENGTH;
 
-        // 写入其他---> 8个字节
-        headerBuffer.writeBigUInt64BE(noomiRpcRequest.getOther(), this.index);
-        this.index += MessageConstant.OTHER_FIELD_LENGTH;
+        // 写入description id---> 8个字节
+        headerBuffer.writeBigUInt64BE(noomiRpcRequest.getDescriptionId(), this.index);
+        this.index += MessageConstant.DESCRIPTION_ID_FIELD_LENGTH;
 
         // 请求体的封装
         const requestPayload: RequestPayload = noomiRpcRequest.getRequestPayload();
         let requestPayloadBuffer: Uint8Array;
         if (requestPayload) {
             // 序列化请求体
+            // 获取序列化器
             const serializer: Serializer = SerializerFactory.getSerializer(noomiRpcRequest.getSerializeType()).impl;
-            const serializeDescription: TypeDescription = SerializerFactory.getReferenceSerializeDescription(noomiRpcRequest.getOther(), "argumentsDescription");
-            requestPayloadBuffer = serializer.serialize(requestPayload, serializeDescription);
-
+            if (NoomiRpcStarter.getInstance().getConfiguration().serializerType === "fury") {
+                // 获取requestPayload的description
+                const serializeDescription: TypeDescription = SerializerFactory.getDataDescription(requestPayload, String(noomiRpcRequest.getDescriptionId()));
+                // fury序列化requestPayload的description
+                const serializeDescriptionString: string = JSON.stringify(serializeDescription);
+                const descriptionBuffer: Uint8Array = serializer.serialize(serializeDescriptionString);
+                // 写入description size占用的字节---> 8个字节
+                headerBuffer.writeBigUInt64BE(BigInt(descriptionBuffer.length), this.index);
+                this.index += MessageConstant.DESCRIPTION_SIZE_FIELD_LENGTH;
+                // 序列化请求体
+                requestPayloadBuffer = Buffer.concat([descriptionBuffer, serializer.serialize(requestPayload, serializeDescription)]);
+            } else {
+                requestPayloadBuffer = serializer.serialize(requestPayload);
+            }
             // 压缩请求体
             const compressor: Compressor = CompressorFactory.getCompressor(noomiRpcRequest.getCompressType()).impl;
             requestPayloadBuffer = await compressor.compress(requestPayloadBuffer);
         }
         let requestBuffer: Buffer;
         if (requestPayloadBuffer) {
-
             // 写入请求体---> requestPayloadBuffer.length个字节
             requestBuffer = Buffer.concat([headerBuffer, requestPayloadBuffer]);
-
             // 将偏移量指针移到总长度位置
             this.index = MessageConstant.MAGIC_FIELD_LENGTH + MessageConstant.VERSION_FIELD_LENGTH + MessageConstant.HEADER_FIELD_LENGTH;
-
             // 写入总长度---> 4个字节
             requestBuffer.writeUint32BE(MessageConstant.HEADER_LENGTH + requestPayloadBuffer.length, this.index);
-
             // 写完后，将指针归0
             this.index = 0;
         } else {
-
             requestBuffer = Buffer.concat([headerBuffer]);
             // 将偏移量指针移到总长度位置
             this.index = MessageConstant.MAGIC_FIELD_LENGTH + MessageConstant.VERSION_FIELD_LENGTH + MessageConstant.HEADER_FIELD_LENGTH;
-
             // 写入总长度---> 4个字节
             requestBuffer.writeUint32BE(MessageConstant.HEADER_LENGTH, this.index);
+            // 写完后，将指针归0
             this.index = 0;
         }
         Logger.debug(`请求报文封装成功，请求报文如下：${BufferUtil.formatBuffer(requestBuffer)}`);

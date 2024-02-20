@@ -1,5 +1,5 @@
 import {NoomiRpcStarter} from "../NoomiRpcStarter";
-import {Registry} from "../discovery/Registry";
+import {Registry} from "../registry/Registry";
 import {createConnection, Socket} from "net";
 import {AddressPort, NetUtil} from "../common/utils/NetUtil";
 import {NoomiRpcRequest} from "../message/NoomiRpcRequest";
@@ -9,7 +9,7 @@ import {CompressorFactory} from "../compress/CompressorFactory";
 import {HandlerFactory} from "../sockethandler/HandlerFactory";
 import {Logger} from "../common/logger/Logger";
 import {GlobalCache} from "../cache/GlobalCache";
-import {Starter} from "../index";
+import {Constant} from "../common/utils/Constant";
 
 /**
  * 心跳检测
@@ -31,12 +31,12 @@ export class HeartBeatDetector {
                 const startTime: bigint = BigInt(new Date().valueOf());
                 // 构建心跳请求
                 const noomiRpcRequest: NoomiRpcRequest = new NoomiRpcRequest();
-                const requestId: bigint = Starter.getInstance().getConfiguration().idGenerator.getId();
+                const requestId: bigint = NoomiRpcStarter.getInstance().getConfiguration().idGenerator.getId();
                 noomiRpcRequest.setRequestId(requestId);
                 noomiRpcRequest.setRequestType(RequestType.HEART_BEAT_REQUEST);
-                noomiRpcRequest.setSerializeType(SerializerFactory.getSerializer(Starter.getInstance().getConfiguration().serializerType).code);
-                noomiRpcRequest.setCompressType(CompressorFactory.getCompressor(Starter.getInstance().getConfiguration().compressorType).code);
-                noomiRpcRequest.setOther(requestId);
+                noomiRpcRequest.setSerializeType(SerializerFactory.getSerializer(NoomiRpcStarter.getInstance().getConfiguration().serializerType).code);
+                noomiRpcRequest.setCompressType(CompressorFactory.getCompressor(NoomiRpcStarter.getInstance().getConfiguration().compressorType).code);
+                noomiRpcRequest.setDescriptionId(requestId);
                 let endTime: bigint = 0n;
                 try {
                     await HandlerFactory.handleConsumerRequestAndResponse(socketChannel, noomiRpcRequest);
@@ -75,7 +75,7 @@ export class HeartBeatDetector {
      * @param serviceName 服务名称
      */
     public static async detectHeartbeat(serviceName: string): Promise<void> {
-        const registry: Registry = Starter.getInstance().getConfiguration().registryConfig.getRegistry();
+        const registry: Registry = NoomiRpcStarter.getInstance().getConfiguration().registryConfig.getRegistry();
         const serviceNodes: Array<string> = await registry.lookup(serviceName)
         for (const serviceNode of serviceNodes) {
             if (!GlobalCache.CHANNEL_CACHE.has(serviceNode)) {
@@ -86,6 +86,6 @@ export class HeartBeatDetector {
             }
         }
 
-        setInterval(this.timerTask, 2000);
+        setInterval(this.timerTask, Constant.HEART_BEAT_CHECK_INTERVAL);
     }
 }
