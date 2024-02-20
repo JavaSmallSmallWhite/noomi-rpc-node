@@ -108,44 +108,8 @@ export class HelloNoomiRpc {
 }
 
 ```
-4. 在api目录下新建description目录，在description目录新建HelloNoomiRpcDescription.ts文件。内容如下：
-```typescript
-// HelloNoomiRpcDescription.ts
-import {Type} from "@furyjs/fury";
-import {Description} from "noomi-rpc-node";
 
-/**
- * HelloNoomiRpc的接口描述
- */
-export class HelloNoomiRpcDescription {
-
-    /**
-     * sayHi方法的描述
-     * 方法描述必须以的函数名必须以Description结尾
-     */
-    public sayHiDescription(): Description {
-        return {
-            // 参数描述，用Type.array()报告每个参数类型
-            argumentsDescription: Type.array(Type.string()),
-            // 返回值描述
-            returnValueDescription: Type.string()
-        };
-    }
-
-    /**
-     * sayHi方法的描述
-     * 方法描述必须以的函数名必须以Description结尾
-     */
-    public sayHelloDescription(): Description {
-        return {
-            argumentsDescription: Type.array(Type.string()),
-            returnValueDescription: Type.string()
-        };
-    }
-}
-```
-
-5. 在provider目录下新建impl目录，在impl目录中新建HelloNoomiRpcImpl.ts文件。内容如下：
+4. 在provider目录下新建impl目录，在impl目录中新建HelloNoomiRpcImpl.ts文件。内容如下：
 ```typescript
 // HelloNoomiRpcImpl.ts
 /**
@@ -161,27 +125,24 @@ export class HelloNoomiRpcImpl extends HelloNoomiRpc {
     }
 }
 ```
-6. 在provider目录下新建ProviderApplication.ts文件。内容如下：
+5. 在provider目录下新建ProviderApplication.ts文件。内容如下：
 ```typescript
 // ProviderApplication.ts
 import {HelloNoomiRpc} from "./api/HelloNoomiRpc";
-import {HelloNoomiRpcDescription} from "./api/description/HelloNoomiRpcDescription";
 import {HelloNoomiRpcImpl} from "./impl/HelloNoomiRpcImpl";
-import {NoomiRpcStarter, ServiceConfig, Starter} from "noomi-rpc-node";
+import {NoomiRpcStarter, ServiceConfig, NoomiRpcStarter} from "noomi-rpc-node";
 
 
 async function main(): Promise<void> {
 
     // 获取服务配置
-    const service: ServiceConfig<HelloNoomiRpc, HelloNoomiRpcDescription> = new ServiceConfig<HelloNoomiRpc, HelloNoomiRpcDescription>();
+    const service: ServiceConfig<HelloNoomiRpc> = new ServiceConfig<HelloNoomiRpc>();
     // 设置接口
     service.interfaceProvider = new HelloNoomiRpc();
     // 设置具体实现
     service.ref = new HelloNoomiRpcImpl();
-    // 设置接口描述
-    service.interfaceDescription = new HelloNoomiRpcDescription();
     // 配置NoomiRpcStarter的信息
-    const starter: NoomiRpcStarter = Starter.getInstance()
+    const starter: NoomiRpcStarter = NoomiRpcStarter.getInstance()
     // 下面这些自行配置，不配置，使用默认的，默认的参考core目录下的Configuration文件
     // .application("first-noomi-rpc-provider-application")
     // .servicePrefix("com.nodejs.Test")
@@ -196,48 +157,6 @@ async function main(): Promise<void> {
 }
 
 main().then()
-```
-7. tsc编译该项目并node .\dist\provider\ProviderApplication.js运行。
-```typescript
-import {HelloNoomiRpcDescription} from "../api/description/HelloNoomiRpcDescription";
-import {Starter} from "../../core";
-import {ReferenceConfig} from "../../core/ReferenceConfig";
-
-async function main(): Promise<void> {
-
-    // 配置需要调用的接口对象
-    const reference: ReferenceConfig<HelloNoomiRpc, HelloNoomiRpcDescription> = new ReferenceConfig<HelloNoomiRpc, HelloNoomiRpcDescription>();
-    // 创造一个虚拟对象，ts没有为接口或者抽象类创建代理对象的机制，原型上也不会绑定抽象方法，因此必须创建一个虚拟无名的实现类作为代理对象。
-    // 后续用proto序列化时，采用proto作为公共约定。
-    reference.interfaceRef = new class HelloNoomiRpc implements HelloNoomiRpc {
-        sayHello(msg: string): Promise<string> {
-            return Promise.resolve("");
-        }
-        sayHi(msg: string): Promise<string> {
-            return Promise.resolve("");
-        }
-    };
-    // 设置接口描述
-    reference.interfaceDescription = new HelloNoomiRpcDescription();
-    // 配置NoomiRpcStarter的信息
-    await Starter.getInstance()
-        // .application("first-noomi-rpc-consumer-application")
-        // .servicePrefix("com.nodejs.Test")
-        // .registry(new RegistryConfig("zookeeper"))
-        // .loadBalancer("RoundRobinLoadBalancer")
-        // .serializer("fury")
-        // .compressor("gzip")
-        .reference(reference);
-
-    // 获取HelloNoomiRpc的代理对象，所有的rpc操作都通过代理对象去进行
-    const helloNoomiRpc: HelloNoomiRpc = reference.get();
-    // 调用方法
-    const result1: string = await helloNoomiRpc.sayHi("hello noomi1" );
-    const result2: string = await helloNoomiRpc.sayHello("hello noomi2");
-    console.log(result1);
-    console.log(result2);
-}
-main().then().catch()
 ```
 ### 针对客户端 ###
 1. npm i noomi-rpc-node安装。并创建一个空项目，以下均在该项目中操作。
@@ -336,59 +255,21 @@ export class HelloNoomiRpc {
 }
 
 ```
-4. 在api目录下新建description目录，在description目录新建HelloNoomiRpcDescription.ts文件。内容如下：
-```typescript
-// HelloNoomiRpcDescription.ts
-import {Type} from "@furyjs/fury";
-import {Description} from "noomi-rpc-node";
-
-/**
- * HelloNoomiRpc的接口描述
- */
-export class HelloNoomiRpcDescription {
-
-    /**
-     * sayHi方法的描述
-     * 方法描述必须以的函数名必须以Description结尾
-     */
-    public sayHiDescription(): Description {
-        return {
-            // 参数描述，用Type.array()报告每个参数类型
-            argumentsDescription: Type.array(Type.string()),
-            // 返回值描述
-            returnValueDescription: Type.string()
-        };
-    }
-
-    /**
-     * sayHi方法的描述
-     * 方法描述必须以的函数名必须以Description结尾
-     */
-    public sayHelloDescription(): Description {
-        return {
-            argumentsDescription: Type.array(Type.string()),
-            returnValueDescription: Type.string()
-        };
-    }
-}
-```
-5. 在consumer目录下新建ConsumerApplication.ts文件。内容如下：
+4. 在consumer目录下新建ConsumerApplication.ts文件。内容如下：
 ```typescript
 // ConsumerApplication.ts
 import {HelloNoomiRpc} from "./api/HelloNoomiRpc";
 import {HelloNoomiRpcDescription} from "./api/description/HelloNoomiRpcDescription";
-import {ReferenceConfig, Starter} from "noomi-rpc-node";
+import {ReferenceConfig, NoomiRpcStarter} from "noomi-rpc-node";
 
 async function main(): Promise<void> {
 
     // 配置需要调用的接口对象
-    const reference: ReferenceConfig<HelloNoomiRpc, HelloNoomiRpcDescription> = new ReferenceConfig<HelloNoomiRpc, HelloNoomiRpcDescription>();
+    const reference: ReferenceConfig<HelloNoomiRpc> = new ReferenceConfig<HelloNoomiRpc>();
     // 创造一个虚拟对象，ts没有为接口或者抽象类创建代理对象的机制，原型上也不会绑定抽象方法，因此必须创建一个虚拟无名的实现类作为代理对象。
     reference.interfaceRef = new HelloNoomiRpc();
-    // 设置接口描述
-    reference.interfaceDescription = new HelloNoomiRpcDescription();
     // 配置NoomiRpcStarter的信息
-    await Starter.getInstance() // 下面这些自行配置，不配置，使用默认的，默认的参考core目录下的Configuration文件
+    await NoomiRpcStarter.getInstance() // 下面这些自行配置，不配置，使用默认的，默认的参考core目录下的Configuration文件
         // .application("first-noomi-rpc-consumer-application")
         // .servicePrefix("com.nodejs.Test")
         // .registry(new RegistryConfig("zookeeper"))
@@ -504,54 +385,17 @@ export class HelloNoomiRpc {
     }
 }
 ```
-5. 在api目录下新建description目录，在description目录新建HelloNoomiRpcDescription.ts文件。内容如下：
-```typescript
-// HelloNoomiRpcDescription.ts
-import {Type} from "@furyjs/fury";
-import {Description} from "noomi-rpc-node";
-/**
- * HelloNoomiRpc的接口描述
- */
-export class HelloNoomiRpcDescription {
-
-    /**
-     * sayHi方法的描述
-     * 方法描述必须以的函数名必须以Description结尾
-     */
-    public sayHiDescription(): Description {
-        return {
-            // 参数描述，用Type.array()报告每个参数类型
-            argumentsDescription: Type.array(Type.string()),
-            // 返回值描述
-            returnValueDescription: Type.string()
-        };
-    }
-
-    /**
-     * sayHi方法的描述
-     * 方法描述必须以的函数名必须以Description结尾
-     */
-    public sayHelloDescription(): Description {
-        return {
-            argumentsDescription: Type.array(Type.string()),
-            returnValueDescription: Type.string()
-        };
-    }
-}
-```
-6. 回到module目录的provider目录中，新建impl目录，在impl目录中新建HelloNoomiRpcImpl.ts文件，内容如下：
+5. 回到module目录的provider目录中，新建impl目录，在impl目录中新建HelloNoomiRpcImpl.ts文件，内容如下：
 ```typescript
 // HelloNoomiRpcImpl.ts
-import {HelloNoomiRpcDescription} from "../api/description/HelloNoomiRpcDescription";
 import {HelloNoomiRpc} from "../api/HelloNoomiRpc";
 import {NoomiService} from "noomi-rpc-node";
 
 /**
  * 使用NoomiService进行服务注册
  */
-@NoomiService<HelloNoomiRpc, HelloNoomiRpcDescription>({
+@NoomiService<HelloNoomiRpc>({
     interfaceProvider: new HelloNoomiRpc(),
-    interfaceDescription: new HelloNoomiRpcDescription(),
 })
 export class HelloNoomiRpcImpl extends HelloNoomiRpc {
     sayHi(msg: string): Promise<string> {
@@ -563,12 +407,12 @@ export class HelloNoomiRpcImpl extends HelloNoomiRpc {
     }
 }
 ```
-7. 在项目根目录中新建provider.ts文件，内容如下：
+6. 在项目根目录中新建provider.ts文件，内容如下：
 ```typescript
-import {Starter} from "noomi-rpc-node";
+import {NoomiRpcStarter} from "noomi-rpc-node";
 
 // 启动noomi服务端
-Starter.getInstance().start();
+NoomiRpcStarter.getInstance().start();
 ```
 8. tsc项目，node ./dist/provider.js即可。
 
@@ -666,42 +510,7 @@ export class HelloNoomiRpc {
     }
 }
 ```
-4. 在api目录下新建description目录，在description目录新建HelloNoomiRpcDescription.ts文件。内容如下：
-```typescript
-// HelloNoomiRpcDescription.ts
-import {Type} from "@furyjs/fury";
-import {Description} from "noomi-rpc-node";
-/**
- * HelloNoomiRpc的接口描述
- */
-export class HelloNoomiRpcDescription {
-
-    /**
-     * sayHi方法的描述
-     * 方法描述必须以的函数名必须以Description结尾
-     */
-    public sayHiDescription(): Description {
-        return {
-            // 参数描述，用Type.array()报告每个参数类型
-            argumentsDescription: Type.array(Type.string()),
-            // 返回值描述
-            returnValueDescription: Type.string()
-        };
-    }
-
-    /**
-     * sayHi方法的描述
-     * 方法描述必须以的函数名必须以Description结尾
-     */
-    public sayHelloDescription(): Description {
-        return {
-            argumentsDescription: Type.array(Type.string()),
-            returnValueDescription: Type.string()
-        };
-    }
-}
-```
-5. 修改router目录下的hello.route.ts文件，内容如下：
+4. 修改router目录下的hello.route.ts文件，内容如下：
 ```typescript
 import {Router, Route, Inject} from "noomi";
 import {HelloService} from '../service/hello.service';
@@ -724,7 +533,7 @@ export class HelloRoute {
     }
 }
 ```
-6. 修改service目录下的hello.service.ts文件，内容如下：
+5. 修改service目录下的hello.service.ts文件，内容如下：
 ```typescript
 /**
  * 业务层
@@ -736,14 +545,13 @@ export interface HelloService {
     sayHi(): Promise<string>;
 }
 ```
-7. 修改/serviceImpl目录下的hello.serviceImpl.ts文件，内容如下：
+6. 修改/serviceImpl目录下的hello.serviceImpl.ts文件，内容如下：
 ```typescript
 import {Inject, Instance} from "noomi";
 import {HelloService} from "../hello.service";
 import {HelloDaoImpl} from "../../dao/daoImpl/hello.daoImpl";
 import {HelloNoomiRpc} from "../../api/HelloNoomiRpc";
 import {NoomiReference} from "noomi-rpc-node";
-import {HelloNoomiRpcDescription} from "../../api/description/HelloNoomiRpcDescription";
 
 /**
  * 业务层实现类
@@ -756,7 +564,6 @@ export class HelloServiceImpl implements HelloService{
 
     @NoomiReference({
         interfaceProvider: new HelloNoomiRpc(),
-        interfaceDescription: new HelloNoomiRpcDescription()
     })
     private helloNoomiRpc: HelloNoomiRpc
 
@@ -769,8 +576,8 @@ export class HelloServiceImpl implements HelloService{
     }
 }
 ```
-8. tsc项目，node ./dist/app.js即可。
-9. 打开浏览器，输入地址http://localhost:3000/hello，输出{"result":"hello,sayHi"}即可。
+7. tsc项目，node ./dist/app.js即可。
+8. 打开浏览器，输入地址http://localhost:3000/hello，输出{"result":"hello,sayHi"}即可。
 
 ### 针对跨语言
 **针对跨语言，目前noomi-rpc-java正在开发中，敬请期待....其他语言敬请不期待了。**

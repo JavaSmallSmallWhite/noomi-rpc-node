@@ -8,9 +8,9 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "outDir":"./dist",
-//     "declaration": true,
-//     "declarationDir":"./dist/types",
-//     "noUnusedParameters":false
+     "declaration": true,
+     "declarationDir":"./dist/types",
+     "noUnusedParameters":false
   },
   "include":[
     "**/*.ts"
