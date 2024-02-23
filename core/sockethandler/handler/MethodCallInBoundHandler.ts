@@ -13,7 +13,6 @@ import {RateLimiter} from "../../sentinel/ratelimit/RateLimiter";
 import {TokenBuketRateLimiter} from "../../sentinel/ratelimit/TokenBuketRateLimiter";
 import {ShutdownHolder} from "../../shutdown/ShutdownHolder";
 import {NoomiRpcStarter} from "../../NoomiRpcStarter";
-import {NoomiRpcResponseEncoder} from "./NoomiRpcResponseEncoder";
 
 /**
  * 服务调用处理器
@@ -31,14 +30,13 @@ export class MethodCallInBoundHandler extends InBoundHandler<NoomiRpcRequest, No
         noomiRpcResponse.setRequestId(noomiRpcRequest.getRequestId());
         noomiRpcResponse.setSerializeType(noomiRpcRequest.getSerializeType());
         noomiRpcResponse.setCompressType(noomiRpcRequest.getCompressType());
-        noomiRpcResponse.setDescriptionId(NoomiRpcStarter.getInstance().getConfiguration().idGenerator.getId());
+        const descriptionId: string = noomiRpcRequest.getDescriptionId().toString();
+        noomiRpcResponse.setDescriptionId(BigInt(descriptionId));
         if (ShutdownHolder.BAFFLE) {
             noomiRpcResponse.setResponseType(ResponseType.BE_CLOSING);
             return noomiRpcResponse;
         }
-
         ShutdownHolder.REQUEST_COUNTER++;
-
         const everyIpRateLimiter: Map<string, RateLimiter> = NoomiRpcStarter.getInstance().getConfiguration().everyIpRateLimiter;
         const address: string = socketChannel.remoteAddress;
         let rateLimiter: RateLimiter = everyIpRateLimiter.get(address);
@@ -57,6 +55,16 @@ export class MethodCallInBoundHandler extends InBoundHandler<NoomiRpcRequest, No
             noomiRpcResponse.setResponseType(ResponseType.SUCCESS_HEART_BEAT);
         } else {
             // 处理正常调用
+            const descriptionMethodKey: string = noomiRpcRequest.getRequestPayload().getServiceName()
+                + "+" + noomiRpcRequest.getRequestPayload().getMethodName() + "+return";
+            if (GlobalCache.DESCRIPTION_LIST.has(descriptionMethodKey)) {
+                const descriptionIds: string[] = GlobalCache.DESCRIPTION_LIST.get(descriptionMethodKey);
+                noomiRpcResponse.setDescriptionId(BigInt(descriptionIds[0]));
+            } else {
+                const descriptionId: string = NoomiRpcStarter.getInstance().getConfiguration().idGenerator.getId().toString();
+                GlobalCache.DESCRIPTION_LIST.set(descriptionMethodKey, [descriptionId]);
+                noomiRpcResponse.setDescriptionId(BigInt(descriptionId));
+            }
             const requestPayload: RequestPayload = noomiRpcRequest.getRequestPayload();
             responsePayload.setServiceName(requestPayload.getServiceName());
             responsePayload.setMethodName(requestPayload.getMethodName());
@@ -72,7 +80,6 @@ export class MethodCallInBoundHandler extends InBoundHandler<NoomiRpcRequest, No
             }
         }
         ShutdownHolder.REQUEST_COUNTER--;
-
         return noomiRpcResponse;
     }
 
@@ -83,11 +90,12 @@ export class MethodCallInBoundHandler extends InBoundHandler<NoomiRpcRequest, No
     private async callMethod(requestPayload: RequestPayload): Promise<unknown> {
         const serviceName: string = requestPayload.getServiceName();
         const methodName: string = requestPayload.getMethodName();
-        const argumentsList: Array<unknown> = requestPayload.getArgumentsList();
+        const argumentsList: object = requestPayload.getArgumentsList();
         const service: ServiceConfig<Object> = GlobalCache.SERVICES_LIST.get(serviceName);
         let returnValue: unknown;
         try {
-            returnValue = await Promise.resolve(service.ref[methodName](...argumentsList));
+            const values: Array<unknown> = Object.values(argumentsList);
+            returnValue = await Promise.resolve(service.ref[methodName](...values));
         } catch (error) {
             Logger.error(`调用服务${serviceName}的方法${methodName}时发生了异常`);
             throw new Error(error.message);

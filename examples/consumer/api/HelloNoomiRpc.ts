@@ -8,7 +8,7 @@ export class HelloNoomiRpc {
      * @param msg 具体的消息
      * @return 返回的结果
      */
-    sayHi(msg: string): Promise<string> {
+    sayHi(msg: string, msg1?: number): Promise<string | number> {
         return Promise.resolve(null);
     }
 

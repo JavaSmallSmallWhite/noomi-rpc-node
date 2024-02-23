@@ -50,14 +50,28 @@ export class NoomiRpcConsumerHandler {
         const requestPayload: RequestPayload = new RequestPayload();
         requestPayload.setServiceName(this.serviceName);
         requestPayload.setMethodName(originalMethod.name);
-        requestPayload.setArgumentsList(argumentsList);
+
+        // 一个很大的问题，出现这种情况，比如一个数组，["aaaa", 10, true]，每个元素类型不一，强类型语言可能无法反序列化这种
+        let argumentsObject: object = {};
+        for (let i = 0; i < argumentsList.length; i++) {
+            argumentsObject[i + ""] = argumentsList[i];
+        }
+        requestPayload.setArgumentsList(argumentsObject);
 
         const noomiRpcRequest: NoomiRpcRequest = new NoomiRpcRequest();
         noomiRpcRequest.setRequestId(NoomiRpcStarter.getInstance().getConfiguration().idGenerator.getId());
         noomiRpcRequest.setRequestType(RequestType.COMMON_REQUEST);
         noomiRpcRequest.setSerializeType(SerializerFactory.getSerializer(NoomiRpcStarter.getInstance().getConfiguration().serializerType).code);
         noomiRpcRequest.setCompressType(CompressorFactory.getCompressor(NoomiRpcStarter.getInstance().getConfiguration().compressorType).code);
-        noomiRpcRequest.setDescriptionId(NoomiRpcStarter.getInstance().getConfiguration().idGenerator.getId());
+        const descriptionMethodKey: string = this.serviceName + "+" + originalMethod.name + "+argument";
+        if (GlobalCache.DESCRIPTION_LIST.has(descriptionMethodKey)) {
+            const descriptionIds: string[] = GlobalCache.DESCRIPTION_LIST.get(descriptionMethodKey);
+            noomiRpcRequest.setDescriptionId(BigInt(descriptionIds[0]));
+        } else {
+            const descriptionId: string = NoomiRpcStarter.getInstance().getConfiguration().idGenerator.getId().toString();
+            GlobalCache.DESCRIPTION_LIST.set(descriptionMethodKey, [descriptionId]);
+            noomiRpcRequest.setDescriptionId(BigInt(descriptionId));
+        }
         noomiRpcRequest.setRequestPayload(requestPayload);
 
         // 2. 发现可用的服务

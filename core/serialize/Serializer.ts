@@ -19,3 +19,18 @@ export interface Serializer {
      */
     deserialize(buffer: Uint8Array, serializeDescription?: unknown): RequestPayload | ResponsePayload | string;
 }
+
+/**
+ * description
+ */
+export interface Description {
+    /**
+     * description字符串
+     */
+    descriptionString: string,
+
+    /**
+     * 序列化方法
+     */
+    serializerFunction: Function
+}

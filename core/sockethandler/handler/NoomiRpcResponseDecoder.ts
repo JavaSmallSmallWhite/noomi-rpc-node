@@ -6,11 +6,12 @@ import {MessageConstant} from "../../message/MessageConstant";
 import {PacketError} from "../../common/error/PacketError";
 import {Compressor} from "../../compress/Compressor";
 import {CompressorFactory} from "../../compress/CompressorFactory";
-import {Serializer} from "../../serialize/Serializer";
+import {Description, Serializer} from "../../serialize/Serializer";
 import {SerializerFactory} from "../../serialize/SerializerFactory";
 import {ResponsePayload} from "../../message/ResponsePayload";
 import {TypeDescription} from "@furyjs/fury";
 import {NoomiRpcStarter} from "../../NoomiRpcStarter";
+import {GlobalCache} from "../../cache/GlobalCache";
 
 /**
  * 响应解码器
@@ -103,6 +104,15 @@ export class NoomiRpcResponseDecoder extends BufferToMessageDecoderHandler<Noomi
                 const serializeDescriptionString: string = <string>serializer.deserialize(descriptionBuffer);
                 // 生成description
                 const serializeDescription: TypeDescription = JSON.parse(serializeDescriptionString);
+                // 不存在则绑定到description集合中
+                if (!GlobalCache.DESCRIPTION_SERIALIZER_LIST.has(serializeDescription["options"]["tag"])) {
+                    let description: Description = {
+                        descriptionString: serializeDescriptionString,
+                        serializerFunction: null,
+                    }
+                    GlobalCache.DESCRIPTION_SERIALIZER_LIST.set(serializeDescription["options"]["tag"], description);
+
+                }
                 // 截取响应体的buffer
                 bodyBuffer = bodyBuffer.subarray(Number(descriptionSize));
                 // 反序列化响应体buffer

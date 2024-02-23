@@ -178,6 +178,6 @@ export class NoomiRpcStarter {
         const servicePrefix: string = reference.servicePrefix || this.configuration.servicePrefix;
         const serviceName: string = InterfaceUtil.combine(servicePrefix, interfaceName);
         GlobalCache.REFERENCES_LIST.set(serviceName, reference);
-        // HeartBeatDetector.detectHeartbeat(serviceName).then();
+        HeartBeatDetector.detectHeartbeat(serviceName).then();
     }
 }
