@@ -59,7 +59,6 @@ export class NoomiRpcStarter {
     /**
      * 用来定义当前应用的名字
      * @param appName 应用的名字
-     * @return this当前实例
      */
     public application(appName: string): NoomiRpcStarter {
         this.configuration.appName = appName;
@@ -78,7 +77,6 @@ export class NoomiRpcStarter {
     /**
      * 用来配置一个注册中心
      * @param registryConfig 注册中心
-     * @return this当前实例
      */
     public registry(registryConfig: RegistryConfig): NoomiRpcStarter {
         this.configuration.registryConfig = registryConfig;
@@ -88,7 +86,6 @@ export class NoomiRpcStarter {
     /**
      * 配置负载均衡器
      * @param loadBalancerType 负载均衡器类型
-     * @return this当前实例
      */
     public loadBalancer(loadBalancerType: string): NoomiRpcStarter {
         this.configuration.loadBalancerType = loadBalancerType;
@@ -98,7 +95,6 @@ export class NoomiRpcStarter {
     /**
      * 配置序列化器
      * @param serializerType 序列化器类型
-     * @return this当前实例
      */
     public serializer(serializerType: string): NoomiRpcStarter {
        this.configuration.serializerType = serializerType;
@@ -132,7 +128,6 @@ export class NoomiRpcStarter {
     /**
      * 发布服务，将接口 -> 实现，注册到服务中心
      * @param service   封装需要发布的服务
-     * @return          this当前实例
      */
     public async publish(service: ServiceConfig<Object>): Promise<void> {
         process.on('SIGINT', GraceFullyShutdownHook.run);

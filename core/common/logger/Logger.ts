@@ -49,4 +49,11 @@ export class Logger {
         configure(configuration);
         this.logger = getLogger(use);
     }
+
+    /**
+     * 获取logger
+     */
+    public static getLogger(): Log {
+        return this.logger;
+    }
 }

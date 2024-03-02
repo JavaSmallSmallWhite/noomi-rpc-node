@@ -114,7 +114,9 @@ export class NoomiRpcRequestEncoder extends MessageToBufferEncoderHandler<NoomiR
             // 写完后，将指针归0
             this.index = 0;
         }
-        Logger.debug(`请求报文封装成功，请求报文如下：${BufferUtil.formatBuffer(requestBuffer)}`);
+        if (Logger.getLogger().isDebugEnabled()) {
+            Logger.debug(`请求报文封装成功，请求报文如下：${BufferUtil.formatBuffer(requestBuffer)}`);
+        }
         return requestBuffer;
     }
 }

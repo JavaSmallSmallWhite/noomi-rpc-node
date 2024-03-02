@@ -280,7 +280,7 @@ class JsonResolver {
             Logger.info(`id发号器配置成功，id发号器为${InterfaceUtil.getInterfaceName(InterfaceUtil.getInterfaceName(configuration.idGenerator))}`);
             // 新增的标签，往下修改
 
-            Logger.info("具体配置解析成功。")
+            Logger.info("具体配置解析成功。");
         } catch (error) {
             Logger.error(`具体配置设置异常：${error.message}`);
             throw new ConfigError(error.message);

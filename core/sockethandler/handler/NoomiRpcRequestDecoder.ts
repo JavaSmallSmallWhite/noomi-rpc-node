@@ -108,6 +108,7 @@ export class NoomiRpcRequestDecoder extends BufferToMessageDecoderHandler<NoomiR
                 // 反序列化请求体
                 result = <RequestPayload>serializer.deserialize(payloadBuffer, serializeDescription);
             } else {
+                // 反序列化请求体
                 result = <RequestPayload>serializer.deserialize(payloadBuffer);
             }
             Object.assign(requestPayload, result);

@@ -51,7 +51,8 @@ export class NoomiRpcConsumerHandler {
         requestPayload.setServiceName(this.serviceName);
         requestPayload.setMethodName(originalMethod.name);
 
-        // todo 一个很大的问题，出现这种情况，比如一个数组为元组，["aaaa", 10, true]，每个元素类型不一，动态获取序列化描述会有困难
+        // todo 一个很大的问题，数组会有两种情况，一种数组为元组，["aaaa", 10, true]，每个元素类型不一，
+        // todo 一种为单一类型的数组，两种生成的序列化描述完全不一，暂时全部当作元组处理，效率很低。
         requestPayload.setArgumentsList(argumentsList);
 
         const noomiRpcRequest: NoomiRpcRequest = new NoomiRpcRequest();

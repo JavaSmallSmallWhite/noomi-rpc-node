@@ -26,7 +26,6 @@ export abstract class AbstractLoadBalancer implements LoadBalancer {
     /**
      * 根据服务名获取一个可用的服务
      * @param serviceName 服务名称
-     * @return 服务地址
      */
     public async selectServerAddress(serviceName: string): Promise<string> {
         // 先从缓存中拿负载均衡选择器
@@ -48,7 +47,6 @@ export abstract class AbstractLoadBalancer implements LoadBalancer {
      * 由子类进行扩展
      * @param serviceList 服务列表
      * @protected
-     * @return 负载均衡算法选择器
      */
     protected abstract getSelector(serviceList: Array<string>): Selector;
 }

@@ -38,20 +38,6 @@ export class NacosRegistry extends AbstractRegistry {
         const serviceName: string = servicePrefix + "." + interfaceName;
         const ip: string = NetUtil.getIpv4Address();
         const port: number = NoomiRpcStarter.getInstance().getConfiguration().port;
-        // const idGenerator: IdGeneratorUtil = NoomiRpcStarter.getInstance().getConfiguration().idGenerator;
-        // let interfaceDescription: Array<DescriptionType> = [];
-        // InterfaceUtil.getInterfaceMethodsName(service.interfaceDescription, true).forEach(methodName => {
-        //     const methodId1: string = String(idGenerator.getId());
-        //     const methodId2: string = String(idGenerator.getId());
-        //     const methodDescription: DescriptionType = {
-        //         methodId1: methodId1,
-        //         methodId2: methodId2,
-        //         methodName: methodName,
-        //         serviceName: serviceName
-        //     }
-        //     GlobalCache.DESCRIPTION_LIST.set(methodDescription.methodId1, methodDescription);
-        //     interfaceDescription.push(methodDescription);
-        // });
         const nacosServiceInstance: NacosServiceInstance = {
             ip: ip,
             port: port,

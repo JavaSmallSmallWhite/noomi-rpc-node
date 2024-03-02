@@ -41,7 +41,6 @@ export class LoadBalancerFactory {
     /**
      * 使用工厂方法获取一个LoadBalancerWrapper
      * @param loadBalancerTypeOrCode 负载均衡类型或负载均衡码
-     * @return SerializerWrapper
      */
     public static getLoadBalancer(loadBalancerTypeOrCode: string | number): ObjectWrapper<LoadBalancer> {
         if (typeof loadBalancerTypeOrCode === "string") {

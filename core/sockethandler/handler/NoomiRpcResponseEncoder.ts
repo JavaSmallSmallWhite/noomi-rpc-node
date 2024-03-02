@@ -114,7 +114,9 @@ export class NoomiRpcResponseEncoder extends MessageToBufferEncoderHandler<Noomi
             responseBuffer.writeUint32BE(MessageConstant.HEADER_LENGTH, this.index);
             this.index = 0;
         }
-        Logger.debug(`请求报文封装成功，请求报文如下：${BufferUtil.formatBuffer(responseBuffer)}`);
+        if (Logger.getLogger().isDebugEnabled()) {
+            Logger.debug(`请求报文封装成功，请求报文如下：${BufferUtil.formatBuffer(responseBuffer)}`);
+        }
         return responseBuffer;
     }
 }

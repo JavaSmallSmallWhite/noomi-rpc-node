@@ -52,13 +52,6 @@ export class ZookeeperRegistry extends AbstractRegistry {
         const nodePath: string = parentNode + "/" + nodeAddress + ":" + nodePort;
         // 发布服务
         if (!await ZookeeperUtils.exist(this.zookeeper, nodePath, null)) {
-            // const idGenerator: IdGeneratorUtil = NoomiRpcStarter.getInstance().getConfiguration().idGenerator;
-            // let interfaceDescription: Array<DescriptionType> = [];
-            // InterfaceUtil.getInterfaceMethodsName(service.interfaceProvider).forEach(methodName => {
-            //     const methodId: string = String(idGenerator.getId());
-            //     GlobalCache.DESCRIPTION_LIST.set(methodId, methodDescription);
-            //     interfaceDescription.push(methodDescription)
-            // });
             const zookeeperNode: ZookeeperNode = new ZookeeperNode(nodePath, /*Buffer.from(JSON.stringify(interfaceDescription))*/null);
             await ZookeeperUtils.createNode(this.zookeeper, zookeeperNode, null, CreateMode.EPHEMERAL);
         }
@@ -72,12 +65,5 @@ export class ZookeeperRegistry extends AbstractRegistry {
     public async lookup(serviceName: string): Promise<Array<string>> {
         const serviceNode: string = Constant.BASE_PROVIDERS_PATH + "/" +serviceName;
         return  await ZookeeperUtils.getChildren(this.zookeeper, serviceNode, ZookeeperUpAndDownWatcher.process);
-        // for (const child of children) {
-        //     const nodeData: Buffer = await ZookeeperUtils.getNodeData(this.zookeeper, serviceNode + "/" + child);
-        //     const nodeArray: Array<DescriptionType> = JSON.parse(nodeData.toString());
-        //     nodeArray.forEach(item => {
-        //         GlobalCache.DESCRIPTION_LIST.set(item.methodId1, item);
-        //     })
-        // }
     }
 }
