@@ -1,11 +1,11 @@
-import {Description, Serializer} from "../Serializer";
+import {Serializer} from "../Serializer";
 import Fury, {TypeDescription} from '@furyjs/fury';
 import {Logger} from "../../common/logger/Logger";
 import {SerializeError} from "../../common/error/SerializeError";
 import {RequestPayload} from "../../message/RequestPayload";
 import {ResponsePayload} from "../../message/ResponsePayload";
-import {GlobalCache} from "../../cache/GlobalCache";
-const hps = null;
+import {Hps} from "@furyjs/fury/dist/lib/type";
+const hps: Hps = null;
 /**
  * fury序列化器
  */
@@ -32,16 +32,9 @@ export class FurySerializer implements Serializer{
                 Logger.debug("description反序列化操作完成。");
                 return descriptionString;
             }
-            const descriptionId: string = serializeDescription["options"]["tag"];
             let body: RequestPayload | ResponsePayload;
-            let description: Description = GlobalCache.DESCRIPTION_SERIALIZER_LIST.get(descriptionId);
-            if (description.serializerFunction) {
-                body = description.serializerFunction(buffer);
-            } else {
-                const {deserialize} = this.fury.registerSerializer(serializeDescription);
-                body = <RequestPayload | ResponsePayload>deserialize(buffer);
-                description.serializerFunction = deserialize;
-            }
+            const {deserialize} = this.fury.registerSerializer(serializeDescription);
+            body = <RequestPayload | ResponsePayload>deserialize(buffer);
             Logger.debug("请求体反序列化操作完成。");
             return body;
         } catch (error) {
@@ -67,15 +60,8 @@ export class FurySerializer implements Serializer{
                 Logger.debug(`requestPayload或者responseBody的description已经完成了序列化操作，序列化后的字节数位${bodyBuffer.length}`);
                 return bodyBuffer;
             }
-            const descriptionId = serializeDescription["options"]["tag"];
-            let description: Description = GlobalCache.DESCRIPTION_SERIALIZER_LIST.get(descriptionId);
-            if (description.serializerFunction) {
-                bodyBuffer = description.serializerFunction(body);
-            } else {
-                const {serialize} = this.fury.registerSerializer(serializeDescription);
-                bodyBuffer = serialize(body);
-                description.serializerFunction = serialize;
-            }
+            const {serialize} = this.fury.registerSerializer(serializeDescription);
+            bodyBuffer = serialize(body);
             Logger.debug(`requestPayload或者responseBody请求体已经完成了序列化操作，序列化后的字节数位${bodyBuffer.length}`);
             return bodyBuffer;
         } catch (error) {

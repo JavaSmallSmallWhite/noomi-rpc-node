@@ -7,7 +7,6 @@ import {NoomiRpcStarter} from "./NoomiRpcStarter";
  * 代理对象管理类
  */
 export class ReferenceConfig<T extends Object> {
-
     /**
      * 接口对象
      * @private
@@ -43,8 +42,8 @@ export class ReferenceConfig<T extends Object> {
         return this._interfaceRef;
     }
 
-    set interfaceRef(value: T) {
-        this._interfaceRef = value;
+    set interfaceRef(value: Function) {
+        this._interfaceRef = Reflect.construct(value, []);
     }
 
     get servicePrefix(): string {

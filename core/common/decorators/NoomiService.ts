@@ -24,7 +24,7 @@ interface ServiceOption<T extends Object> {
     /**
      * 服务提供接口
      */
-    interfaceProvider: T;
+    interfaceProvider: Function;
 
     /**
      * 服务前缀
@@ -45,7 +45,7 @@ export function NoomiService<T extends Object>(serviceOption: ServiceOption<T>):
     return async (target: Function): Promise<void> => {
         const service: ServiceConfig<T> = new ServiceConfig<T>();
         service.interfaceProvider = serviceOption.interfaceProvider;
-        service.ref = Reflect.construct(target, []);
+        service.ref = target;
         if (serviceOption["servicePrefix"]) {
             service.servicePrefix = serviceOption["servicePrefix"]
         }

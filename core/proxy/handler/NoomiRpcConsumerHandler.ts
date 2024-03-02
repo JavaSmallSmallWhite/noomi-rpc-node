@@ -45,31 +45,27 @@ export class NoomiRpcConsumerHandler {
      * @param thisArg this指向
      * @param argumentsList 参数列表
      */
-    public async noomiRpcConsumerInvocationHandler(originalMethod: Function, thisArg: Object, argumentsList: unknown[]): Promise<unknown> {
+    public async noomiRpcConsumerInvocationHandler(originalMethod: Function, thisArg: Object, argumentsList: Array<unknown>): Promise<unknown> {
         // 1. 封装报文 请求体 和 请求
         const requestPayload: RequestPayload = new RequestPayload();
         requestPayload.setServiceName(this.serviceName);
         requestPayload.setMethodName(originalMethod.name);
 
-        // 一个很大的问题，出现这种情况，比如一个数组，["aaaa", 10, true]，每个元素类型不一，强类型语言可能无法反序列化这种
-        let argumentsObject: object = {};
-        for (let i = 0; i < argumentsList.length; i++) {
-            argumentsObject[i + ""] = argumentsList[i];
-        }
-        requestPayload.setArgumentsList(argumentsObject);
+        // todo 一个很大的问题，出现这种情况，比如一个数组为元组，["aaaa", 10, true]，每个元素类型不一，动态获取序列化描述会有困难
+        requestPayload.setArgumentsList(argumentsList);
 
         const noomiRpcRequest: NoomiRpcRequest = new NoomiRpcRequest();
         noomiRpcRequest.setRequestId(NoomiRpcStarter.getInstance().getConfiguration().idGenerator.getId());
         noomiRpcRequest.setRequestType(RequestType.COMMON_REQUEST);
         noomiRpcRequest.setSerializeType(SerializerFactory.getSerializer(NoomiRpcStarter.getInstance().getConfiguration().serializerType).code);
         noomiRpcRequest.setCompressType(CompressorFactory.getCompressor(NoomiRpcStarter.getInstance().getConfiguration().compressorType).code);
-        const descriptionMethodKey: string = this.serviceName + "+" + originalMethod.name + "+argument";
+        const descriptionMethodKey: string = this.serviceName + "+" + originalMethod.name;
         if (GlobalCache.DESCRIPTION_LIST.has(descriptionMethodKey)) {
-            const descriptionIds: string[] = GlobalCache.DESCRIPTION_LIST.get(descriptionMethodKey);
-            noomiRpcRequest.setDescriptionId(BigInt(descriptionIds[0]));
+            const descriptionId: string = GlobalCache.DESCRIPTION_LIST.get(descriptionMethodKey);
+            noomiRpcRequest.setDescriptionId(BigInt(descriptionId));
         } else {
             const descriptionId: string = NoomiRpcStarter.getInstance().getConfiguration().idGenerator.getId().toString();
-            GlobalCache.DESCRIPTION_LIST.set(descriptionMethodKey, [descriptionId]);
+            GlobalCache.DESCRIPTION_LIST.set(descriptionMethodKey, descriptionId);
             noomiRpcRequest.setDescriptionId(BigInt(descriptionId));
         }
         noomiRpcRequest.setRequestPayload(requestPayload);
@@ -90,6 +86,7 @@ export class NoomiRpcConsumerHandler {
             socketChannel.setKeepAlive(true);
             GlobalCache.CHANNEL_CACHE.set(serviceNode, socketChannel);
         }
+
         // 4. 发送请求并返回结果
         return await HandlerFactory.handleConsumerRequestAndResponse(socketChannel, noomiRpcRequest);
     }

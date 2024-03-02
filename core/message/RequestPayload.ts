@@ -21,7 +21,7 @@ export class RequestPayload {
      * 参数列表
      * @private
      */
-    private argumentsList: object;
+    private argumentsList: Array<unknown>;
 
 
     public constructor() {
@@ -48,11 +48,11 @@ export class RequestPayload {
         this.methodName = methodName;
     }
 
-    public getArgumentsList(): object {
+    public getArgumentsList(): Array<unknown> {
         return this.argumentsList;
     }
 
-    public setArgumentsList(argumentsList: object) {
+    public setArgumentsList(argumentsList: Array<unknown>) {
         this.argumentsList = argumentsList;
     }
 }

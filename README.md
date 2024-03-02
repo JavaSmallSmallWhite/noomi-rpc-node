@@ -10,7 +10,7 @@
 1. 安装zookeeper注册中心，zookeeper官网下载地址：[https://dlcdn.apache.org/zookeeper/](https://dlcdn.apache.org/zookeeper/)
 
 ### 针对服务端 ###
-1. npm i noomi-rpc-node安装。并创建一个空项目，以下均在该项目中操作。   
+1. 创建一个空项目，cd进入该项目并执行npm i noomi-rpc-node安装，以下均在该项目中操作。   
 2. 新建config目，然后在该目录下新建rpc.json文件。内容如下：
 ```json5
 // rpc.json
@@ -136,9 +136,9 @@ async function main(): Promise<void> {
     // 获取服务配置
     const service: ServiceConfig<HelloNoomiRpc> = new ServiceConfig<HelloNoomiRpc>();
     // 设置接口
-    service.interfaceProvider = new HelloNoomiRpc();
+    service.interfaceProvider = HelloNoomiRpc;
     // 设置具体实现
-    service.ref = new HelloNoomiRpcImpl();
+    service.ref = HelloNoomiRpcImpl;
     // 配置NoomiRpcStarter的信息
     const starter: NoomiRpcStarter = NoomiRpcStarter.getInstance()
     // 下面这些自行配置，不配置，使用默认的，默认的参考core目录下的Configuration文件
@@ -265,7 +265,7 @@ async function main(): Promise<void> {
     // 配置需要调用的接口对象
     const reference: ReferenceConfig<HelloNoomiRpc> = new ReferenceConfig<HelloNoomiRpc>();
     // 创造一个虚拟对象，ts没有为接口或者抽象类创建代理对象的机制，原型上也不会绑定抽象方法，因此必须创建一个虚拟无名的实现类作为代理对象。
-    reference.interfaceRef = new HelloNoomiRpc();
+    reference.interfaceRef = HelloNoomiRpc;
     // 配置NoomiRpcStarter的信息
     await NoomiRpcStarter.getInstance() // 下面这些自行配置，不配置，使用默认的，默认的参考core目录下的Configuration文件
         // .application("first-noomi-rpc-consumer-application")
@@ -393,7 +393,7 @@ import {NoomiService} from "noomi-rpc-node";
  * 使用NoomiService进行服务注册
  */
 @NoomiService<HelloNoomiRpc>({
-    interfaceProvider: new HelloNoomiRpc(),
+    interfaceProvider: HelloNoomiRpc,
 })
 export class HelloNoomiRpcImpl extends HelloNoomiRpc {
     sayHi(msg: string): Promise<string> {
@@ -561,7 +561,7 @@ export class HelloServiceImpl implements HelloService{
     private helloDao: HelloDao
 
     @NoomiReference({
-        interfaceProvider: new HelloNoomiRpc(),
+        interfaceProvider: HelloNoomiRpc,
     })
     private helloNoomiRpc: HelloNoomiRpc
 
@@ -577,5 +577,92 @@ export class HelloServiceImpl implements HelloService{
 7. tsc项目，node ./dist/app.js即可。
 8. 打开浏览器，输入地址http://localhost:3000/hello，输出{"result":"hello,sayHi"}即可。
 
+### 其他
+1. 自定义序列化方式。
+```typescript
+import {Serializer} from "../core/serialize/Serializer";
+import {RequestPayload} from "../core/message/RequestPayload";
+import {ResponsePayload} from "../core/message/ResponsePayload";
+import {CustomSerializer} from "../core/common/decorators/CustomSerializer";
+
+@CustomSerializer({
+    serializerId: 10, // 序列化id 1-5号禁止使用，为框架保留号
+    isUse: true, // isUse设置为true则表示使用该序列化
+    serializerName: "MySerializer" // 序列化器名称 （可选）
+})
+export class MySerializer implements Serializer {
+    deserialize(buffer: Uint8Array, serializeDescription?: unknown): RequestPayload | ResponsePayload | string {
+        return undefined;
+    }
+
+    serialize(body: RequestPayload | ResponsePayload | string, serializeDescription?: unknown): Uint8Array {
+        return undefined;
+    }
+}
+```
+2. 自定义压缩方式。
+```typescript
+import {Compressor} from "../core/compress/Compressor";
+import {CustomCompressor} from "../core/common/decorators/CustomCompressor";
+
+@CustomCompressor({
+    compressorId: 10, // 压缩器id 1-5号禁止使用，为框架保留号
+    isUse: true, // isUse设置为true则表示使用该压缩器
+    compressorName: "MyCompressor" // 压缩器器名称 （可选）
+})
+export class MyCompressor implements Compressor {
+    compress(requestPayloadBuffer: Uint8Array): Promise<Uint8Array> {
+        return Promise.resolve(undefined);
+    }
+
+    decompress(requestPayloadBuffer: Uint8Array): Promise<Uint8Array> {
+        return Promise.resolve(undefined);
+    }
+}
+```
+3. 自定义负载均衡方式。
+```typescript
+import {AbstractLoadBalancer} from "../core/loadbalance/AbstractLoadBalancer";
+import {Selector} from "../core/loadbalance/Selector";
+import {CustomLoadBalancer} from "../core/common/decorators/CustomLoadBalancer";
+
+@CustomLoadBalancer({
+    loadBalancerId: 10, // 负载均衡器id 1-5号禁止使用，为框架保留号
+    isUse: true, // isUse设置为true则表示使用该负载均衡器
+    loadBalancerName: "MyCompressor" // 负载均衡器名称 （可选）
+})
+export class MyLoadBalancer extends AbstractLoadBalancer {
+    protected getSelector(serviceList: Array<string>): Selector {
+        return new this.mySelector();
+    }
+
+    private mySelector = class MySelector implements Selector {
+        getNext(): string {
+            return "";
+        }
+    }
+}
+```
+4. 自定义注册中心。
+```typescript
+import {AbstractRegistry} from "../core/registry/AbstractRegistry";
+import {ServiceConfig} from "../core/ServiceConfig";
+import {CustomRegistry} from "../core/common/decorators/CustomRegistry";
+
+@CustomRegistry({
+    registryName: "MyRegistry", // 注册中心名称 
+    registryConnectConfig: {connect: "127.0.0.1:3000", username: "zhang san", password: "123456", options: {}}, // 连接配置
+    isUse: true, // 是否立刻使用
+    serviceConfiguration: {timeout: 3000} // 服务配置
+})
+export class MyRegistry extends AbstractRegistry {
+    lookup(serviceName: string): Promise<Array<string>> {
+        return Promise.resolve(undefined);
+    }
+
+    register(serviceConfig: ServiceConfig<Object>): void {
+    }
+}
+```
 ### 针对跨语言
 **针对跨语言，目前noomi-rpc-java正在开发中，敬请期待....其他语言敬请不期待了。**

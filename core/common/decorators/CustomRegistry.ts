@@ -12,7 +12,7 @@ interface RegistryOption {
     registryName: string;
 
     /**
-     * 注册中心链解配置
+     * 注册中心连接配置
      */
     registryConnectConfig: unknown;
 

@@ -3,7 +3,7 @@ import {PacketError} from "../../common/error/PacketError";
 import {NoomiRpcRequest} from "../../message/NoomiRpcRequest";
 import {RequestPayload} from "../../message/RequestPayload";
 import {Logger} from "../../common/logger/Logger";
-import {Description, Serializer} from "../../serialize/Serializer";
+import {Serializer} from "../../serialize/Serializer";
 import {SerializerFactory} from "../../serialize/SerializerFactory";
 import {Compressor} from "../../compress/Compressor";
 import {CompressorFactory} from "../../compress/CompressorFactory";
@@ -11,7 +11,6 @@ import {BufferToMessageDecoderHandler} from "../BufferToMessageDecoderHandler";
 import {Socket} from "net";
 import {TypeDescription} from "@furyjs/fury";
 import {NoomiRpcStarter} from "../../NoomiRpcStarter";
-import {GlobalCache} from "../../cache/GlobalCache";
 
 /**
  * 请求解码器
@@ -95,7 +94,6 @@ export class NoomiRpcRequestDecoder extends BufferToMessageDecoderHandler<NoomiR
             payloadBuffer = await compressor.decompress(payloadBuffer);
 
             // 反序列化
-            // 获取序列化器
             const serializer: Serializer = SerializerFactory.getSerializer(serializeType).impl;
             let result: RequestPayload;
             if (NoomiRpcStarter.getInstance().getConfiguration().serializerType === "fury") {
@@ -105,14 +103,6 @@ export class NoomiRpcRequestDecoder extends BufferToMessageDecoderHandler<NoomiR
                 const serializeDescriptionString: string = <string>serializer.deserialize(descriptionBuffer);
                 // 生成description
                 const serializeDescription: TypeDescription = JSON.parse(serializeDescriptionString);
-                // 不存在则绑定到description集合中
-                if (!GlobalCache.DESCRIPTION_SERIALIZER_LIST.has(serializeDescription["options"]["tag"])) {
-                    let description: Description = {
-                        descriptionString: serializeDescriptionString,
-                        serializerFunction: null,
-                    }
-                    GlobalCache.DESCRIPTION_SERIALIZER_LIST.set(serializeDescription["options"]["tag"], description);
-                }
                 // 截取请求体的buffer
                 payloadBuffer = payloadBuffer.subarray(Number(descriptionSize));
                 // 反序列化请求体

@@ -3,14 +3,13 @@ import {NoomiRpcResponse} from "../../message/NoomiRpcResponse";
 import {Socket} from "net";
 import {MessageConstant} from "../../message/MessageConstant";
 import {SerializerFactory} from "../../serialize/SerializerFactory";
-import {Description, Serializer} from "../../serialize/Serializer";
+import {Serializer} from "../../serialize/Serializer";
 import {Compressor} from "../../compress/Compressor";
 import {CompressorFactory} from "../../compress/CompressorFactory";
 import {Logger} from "../../common/logger/Logger";
 import {BufferUtil} from "../../common/utils/BufferUtil";
 import {TypeDescription} from "@furyjs/fury";
 import {ResponsePayload} from "../../message/ResponsePayload";
-import {GlobalCache} from "../../cache/GlobalCache";
 import {NoomiRpcStarter} from "../../NoomiRpcStarter";
 
 /**
@@ -77,55 +76,19 @@ export class NoomiRpcResponseEncoder extends MessageToBufferEncoderHandler<Noomi
             // 获取序列化器
             const serializer: Serializer = SerializerFactory.getSerializer(noomiRpcResponse.getSerializeType()).impl;
             if (NoomiRpcStarter.getInstance().getConfiguration().serializerType === "fury") {
-                let flag: boolean = false;
-                let serializeDescriptionString: string;
-                let serializeDescription: TypeDescription;
-                const descriptionMethodKey: string = responseBody.getServiceName() + "+" + responseBody.getMethodName() + "+return";
-                for (const descriptionId of GlobalCache.DESCRIPTION_LIST.get(descriptionMethodKey)) {
-                    // 获取responseBody的description
-                    serializeDescription = SerializerFactory.getDataDescription(responseBody, descriptionId);
-                    // 生成description字符串
-                    serializeDescriptionString = JSON.stringify(serializeDescription);
-                    // 判断是否存在
-                    const description: Description = GlobalCache.DESCRIPTION_SERIALIZER_LIST.get(descriptionId);
-                    if (!description) {
-                        const description: Description = {
-                            descriptionString: serializeDescriptionString,
-                            serializerFunction: null,
-                        }
-                        GlobalCache.DESCRIPTION_SERIALIZER_LIST.set(descriptionId, description);
-                        flag = true;
-                        break;
-                    }
-                    if (serializeDescriptionString === GlobalCache.DESCRIPTION_SERIALIZER_LIST.get(descriptionId).descriptionString) {
-                        flag = true;
-                        break;
-                    }
-                }
-                // 集合中不存在则添加到description集合中
-                if (!flag) {
-                    const descriptionId: string = NoomiRpcStarter.getInstance().getConfiguration().idGenerator.getId().toString();
-                    serializeDescription = SerializerFactory.getDataDescription(responseBody, descriptionId);
-                    serializeDescriptionString = JSON.stringify(serializeDescription);
-                    const description: Description = {
-                        descriptionString: serializeDescriptionString,
-                        serializerFunction: null,
-                    }
-                    GlobalCache.DESCRIPTION_LIST.get(descriptionMethodKey).push(descriptionId);
-                    GlobalCache.DESCRIPTION_SERIALIZER_LIST.set(descriptionId, description);
-                }
+                // 获取序列化描述
+                const serializeDescription: TypeDescription = SerializerFactory.getDataDescription(responseBody, noomiRpcResponse.getDescriptionId().toString());
+                // 生成description字符串
+                const serializeDescriptionString: string = JSON.stringify(serializeDescription);
                 // fury序列化responseBody的description
                 const descriptionBuffer: Uint8Array = serializer.serialize(serializeDescriptionString);
-                // 重新写入description id
-                this.index -= MessageConstant.DESCRIPTION_ID_FIELD_LENGTH;
-                headerBuffer.writeBigUInt64BE(BigInt(serializeDescription["options"]["tag"]), this.index);
-                this.index += MessageConstant.DESCRIPTION_ID_FIELD_LENGTH;
                 // 写入description size占用的字节---> 8个字节
                 headerBuffer.writeBigUInt64BE(BigInt(descriptionBuffer.length), this.index);
                 this.index += MessageConstant.DESCRIPTION_SIZE_FIELD_LENGTH;
                 // 序列化响应体
                 responseBodyBuffer = Buffer.concat([descriptionBuffer, serializer.serialize(responseBody, serializeDescription)]);
             } else {
+                // 序列化响应体
                 responseBodyBuffer = serializer.serialize(responseBody);
             }
             // 压缩响应体

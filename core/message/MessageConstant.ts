@@ -5,7 +5,7 @@ export class MessageConstant {
     /**
      * 魔术指
      */
-    public static readonly MAGIC: Buffer = Buffer.from("yang");
+    public static readonly MAGIC: Buffer = Buffer.from("soft");
 
     /**
      * 魔术指字段长度

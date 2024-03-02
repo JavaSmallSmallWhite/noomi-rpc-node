@@ -1,7 +1,7 @@
 {
   "port": 8091, // 启动端口号
   "appName": "NoomiRpcApplication", // 应用名称
-  "servicePrefix": "com.nodejs.Test", // 服务前缀，需要唯一性，主要针对跨语言开发，比如Java
+  "servicePrefix": "com.nodejs.Test", // 服务前缀
   "starterPath": ["/dist/examples/consumer/**/*.js"], // 项目启动目录
   "log4js": { // 日志配置，具体参照npm log4js
     "configuration": {

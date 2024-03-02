@@ -8,7 +8,7 @@ import {CircuitBreaker} from "../sentinel/circuitbreak/CircuitBreaker";
 import {Configuration as Config} from "log4js";
 import {readFileSync} from "fs";
 import {resolve} from "path";
-import json5 from "json5";
+import {parse} from "json5";
 import {GlobalCache} from "../cache/GlobalCache";
 import {ObjectWrapper} from "./ObjectWrapper";
 import {LoadBalancer} from "../loadbalance/LoadBalancer";
@@ -238,7 +238,7 @@ class JsonResolver {
         }
         let configObject: object = null;
         try {
-            configObject = json5.parse(jsonStr);
+            configObject = parse(jsonStr);
         } catch (error) {
             throw new ConfigError("解析rpc.json文件内容的配置对象失败。")
         }

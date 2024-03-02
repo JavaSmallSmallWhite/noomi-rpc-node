@@ -4,7 +4,6 @@ import {ServiceConfig} from "../ServiceConfig";
 import {ReferenceConfig} from "../ReferenceConfig";
 import {Socket} from "net";
 import {Registry} from "../registry/Registry";
-import {Description} from "../serialize/Serializer";
 
 /**
  * 全局缓存
@@ -33,14 +32,9 @@ export class GlobalCache {
     public static readonly SERVICES_LIST: Map<string, ServiceConfig<Object>> = new Map<string, ServiceConfig<Object>>();
 
     /**
-     * 维护fury的description id key -> 服务+方法  value -> id数组
+     * 维护fury的description id key -> 服务+方法  value -> id
      */
-    public static readonly DESCRIPTION_LIST: Map<string, string[]> = new Map<string, string[]>();
-
-    /**
-     * 维护fury序列化方法 key -> description id   value -> Description
-     */
-    public static readonly DESCRIPTION_SERIALIZER_LIST: Map<string, Description> = new Map<string, Description>();
+    public static readonly DESCRIPTION_LIST: Map<string, string> = new Map<string, string>();
 
     /**
      * 维护已经配置好的代理对象 key -> 服务名 value -> ReferenceConfig

@@ -20,7 +20,7 @@ export class InterfaceMethodProxy<T extends Object> {
                 continue;
             }
             interfaceObject[key] = this.createMethodProxy(interfaceObject, key, servicePrefix);
-            Logger.info(`接口对象${interfaceName}的${key}方法的代理对象创建成功。`)
+            Logger.info(`接口对象${interfaceName}的${key}方法的代理对象创建成功。`);
         }
         return new Proxy<T>(interfaceObject, {});
     }

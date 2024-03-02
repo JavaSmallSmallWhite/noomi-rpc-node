@@ -141,7 +141,6 @@ export class NoomiRpcStarter {
         const servicePrefix: string = service.servicePrefix || this.configuration.servicePrefix
         const serviceName: string = InterfaceUtil.combine(servicePrefix, service.interfaceProvider.constructor.name);
         GlobalCache.SERVICES_LIST.set(serviceName, service);
-        // 服务节点名称
     }
 
     /**

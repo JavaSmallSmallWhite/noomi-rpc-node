@@ -1,7 +1,7 @@
 /**
  * 服务配置类
  */
-export class ServiceConfig<T extends Object> {
+export class ServiceConfig<T> {
 
     /**
      * 服务提供接口
@@ -13,7 +13,7 @@ export class ServiceConfig<T extends Object> {
      * 具体的接口实现
      * @private
      */
-    private _ref: unknown;
+    private _ref: Object;
 
     /**
      * 服务前缀
@@ -24,21 +24,20 @@ export class ServiceConfig<T extends Object> {
     /**
      * -------------------以下为成员变量的getter和setter------------------------------------
      */
-
-    public get interfaceProvider(): T {
+    get interfaceProvider(): T {
         return this._interfaceProvider;
     }
 
-    public set interfaceProvider(value: T) {
-        this._interfaceProvider = value;
+    set interfaceProvider(value: Function) {
+        this._interfaceProvider = Reflect.construct(value, []);
     }
 
-    public get ref(): unknown {
+    get ref(): Object {
         return this._ref;
     }
 
-    public set ref(value: unknown) {
-        this._ref = value;
+    set ref(value: Function) {
+        this._ref = Reflect.construct(value, []);
     }
 
     get servicePrefix(): string {

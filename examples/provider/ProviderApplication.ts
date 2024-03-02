@@ -8,9 +8,9 @@ async function main(): Promise<void> {
     // 获取服务配置
     const service: ServiceConfig<HelloNoomiRpc> = new ServiceConfig<HelloNoomiRpc>();
     // 设置接口
-    service.interfaceProvider = new HelloNoomiRpc();
+    service.interfaceProvider = HelloNoomiRpc;
     // 设置具体实现
-    service.ref = new HelloNoomiRpcImpl();
+    service.ref = HelloNoomiRpcImpl;
     // 配置NoomiRpcStarter的信息
     const starter: NoomiRpcStarter = NoomiRpcStarter.getInstance()
     // 下面这些自行配置，不配置，使用默认的，默认的参考core目录下的Configuration文件

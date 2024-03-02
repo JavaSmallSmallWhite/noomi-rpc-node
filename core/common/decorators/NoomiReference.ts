@@ -8,7 +8,7 @@ interface ReferenceOption<T extends Object> {
     /**
      * 服务提供接口
      */
-    interfaceProvider: T;
+    interfaceProvider: Function;
 
     /**
      * 服务前缀
