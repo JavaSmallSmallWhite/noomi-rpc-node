@@ -84,7 +84,7 @@ export class SerializerFactory {
      */
     public static getDataDescription(data: unknown, tag: string): {
         options?: {
-            inner?: TypeDescription,
+            inner?: TypeDescription[],
             key?: TypeDescription,
             value?: TypeDescription,
             props?: {
@@ -99,15 +99,19 @@ export class SerializerFactory {
             return null;
         }
         if (Array.isArray(data)) {
-            const item: TypeDescription = this.getDataDescription(data[0], tag);
-            if (!item) {
-                throw new Error('empty array can\'t convert')
+            let descriptionArray: TypeDescription[] = [];
+            for (const item of data) {
+                const description: TypeDescription = this.getDataDescription(item, tag);
+                descriptionArray.push(description);
+            }
+            if (descriptionArray.length === 0) {
+                throw new Error("空数组不能转换。")
             }
             return {
-                type: InternalSerializerType.ARRAY,
-                label: 'array',
+                type: InternalSerializerType.TUPLE,
+                label: 'tuple',
                 options: {
-                    inner: item,
+                    inner: descriptionArray
                 }
             }
         }
@@ -120,7 +124,7 @@ export class SerializerFactory {
         if (typeof data === 'string') {
             return {
                 type: InternalSerializerType.STRING,
-                label: "string",
+                label: "string"
             }
         }
         if (data instanceof Set) {
@@ -128,7 +132,7 @@ export class SerializerFactory {
                 type: InternalSerializerType.FURY_SET,
                 label: "set",
                 options: {
-                    key: this.getDataDescription([...data.values()][0], tag),
+                    key: this.getDataDescription([...data.values()][0], tag)
                 }
             }
         }
@@ -138,14 +142,14 @@ export class SerializerFactory {
                 label: "map",
                 options: {
                     key: this.getDataDescription([...data.keys()][0], tag),
-                    value: this.getDataDescription([...data.values()][0], tag),
+                    value: this.getDataDescription([...data.values()][0], tag)
                 }
             }
         }
         if (typeof data === 'boolean') {
             return {
                 type: InternalSerializerType.BOOL,
-                label: "boolean",
+                label: "boolean"
             }
         }
         if (typeof data === 'number') {
@@ -166,13 +170,12 @@ export class SerializerFactory {
                 label: "object",
                 options: {
                     props: Object.fromEntries(Object.entries(data).map(([key, value]): [string, unknown] => {
-                        return [key, this.getDataDescription(value, `${tag}.${key}`)]
+                        return [key, this.getDataDescription(value, `${tag}.${key}`)];
                     }).filter(([_, v]) => Boolean(v))),
                     tag
                 }
-
             }
         }
-        throw `unknown data type ${typeof data}`
+        throw `未知数据类型 ${typeof data}`;
     }
 }

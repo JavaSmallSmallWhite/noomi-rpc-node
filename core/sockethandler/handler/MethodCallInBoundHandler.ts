@@ -55,6 +55,12 @@ export class MethodCallInBoundHandler extends InBoundHandler<NoomiRpcRequest, No
             noomiRpcResponse.setResponseType(ResponseType.SUCCESS_HEART_BEAT);
         } else {
             // 处理正常调用
+            const descriptionMethodKey: string = noomiRpcRequest.getRequestPayload().getServiceName()
+                + "+" + noomiRpcRequest.getRequestPayload().getMethodName();
+            if (!GlobalCache.DESCRIPTION_LIST.has(descriptionMethodKey)) {
+                const descriptionId: string = noomiRpcRequest.getDescriptionId().toString();
+                GlobalCache.DESCRIPTION_LIST.set(descriptionMethodKey, descriptionId);
+            }
             const requestPayload: RequestPayload = noomiRpcRequest.getRequestPayload();
             responsePayload.setServiceName(requestPayload.getServiceName());
             responsePayload.setMethodName(requestPayload.getMethodName());
@@ -66,7 +72,7 @@ export class MethodCallInBoundHandler extends InBoundHandler<NoomiRpcRequest, No
                 Logger.debug(`请求${noomiRpcRequest.getRequestId()}已经完成方法的调用`);
             } catch (error) {
                 Logger.error(`请求编号为${noomiRpcRequest.getRequestId()}的请求在调用过程中发生异常。`);
-                noomiRpcResponse.setResponseType(ResponseType.FAIL)
+                noomiRpcResponse.setResponseType(ResponseType.FAIL);
             }
         }
         ShutdownHolder.REQUEST_COUNTER--;
