@@ -133,7 +133,7 @@ export class NoomiRpcStarter {
         process.on('SIGINT', GraceFullyShutdownHook.run);
         process.on('SIGTERM', GraceFullyShutdownHook.run);
         this.configuration.registryConfig.getRegistry().register(service);
-        const servicePrefix: string = service.servicePrefix || this.configuration.servicePrefix
+        const servicePrefix: string = service.servicePrefix || this.configuration.servicePrefix;
         const serviceName: string = InterfaceUtil.combine(servicePrefix, service.interfaceProvider.constructor.name);
         GlobalCache.SERVICES_LIST.set(serviceName, service);
     }
@@ -147,16 +147,16 @@ export class NoomiRpcStarter {
         const server: Server = createServer();
         server.on("close", function (): void {
             Logger.info("tcp服务器关闭。");
-        })
+        });
         server.on("error", function (error: Error): void {
             Logger.error(`tcp服务器出现异常，异常信息为：${error.message}`);
-        })
+        });
         server.on("connection", async function (socketChannel: Socket): Promise<void> {
             await HandlerFactory.handleProviderRequestAndResponse(socketChannel);
-        })
+        });
         server.listen(port, function (): void {
             Logger.info(`tcp服务器启动成功，监听服务器地址为：${address}，监听端口为：${port}`);
-        })
+        });
     }
 
     /**

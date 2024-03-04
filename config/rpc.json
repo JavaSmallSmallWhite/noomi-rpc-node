@@ -32,28 +32,28 @@
 //    },
 //    "serviceConfig": {},
 
-        "type": "nacos",
-        "connectionConfig": { // nacos连接配置，具体参考npm nacos的连接配置，配置中的logger不用管，noomi-rpc自动传console，nacos也只能传console
-          "serverList": "127.0.0.1:8848", // 连接地址
-          "namespace": "public", // 命名空间
-          "username": "nacos",
-          "password": "nacos",
-          "endpoint": null,
-          "vipSrvRefInterMillis": 30000,
-          "ssl": false
-        },
-        "serviceConfig": {
-          "healthy": true,
-          "enabled": true,
-          "weight": 1,
-          "ephemeral": true,
-          "clusterName": "DEFAULT",
-          "groupName": "DEFAULT_GROUP"
-        }
+    "type": "nacos",
+    "connectionConfig": { // nacos连接配置，具体参考npm nacos的连接配置，配置中的logger不用管，noomi-rpc自动传console，nacos也只能传console
+      "serverList": "127.0.0.1:8848", // 连接地址
+      "namespace": "public", // 命名空间
+      "username": "nacos",
+      "password": "nacos",
+      "endpoint": null,
+      "vipSrvRefInterMillis": 30000,
+      "ssl": false
+    },
+    "serviceConfig": {
+      "healthy": true,
+      "enabled": true,
+      "weight": 1,
+      "ephemeral": true,
+      "clusterName": "DEFAULT",
+      "groupName": "DEFAULT_GROUP"
+    }
   },
   "loadBalancerType": "RoundRobinLoadBalancer", // 负载均衡器类型
   "serializerType": "fury", // 序列化类型
-  "compressorType": "gzip", // 压缩类型
+  "compressorType": "brotli", // 压缩类型
   "idGenerator": { // id发号器，生成分布式唯一id
     "dataCenterId": "2", // 数据中心编号
     "machineId": "4" // 机器号

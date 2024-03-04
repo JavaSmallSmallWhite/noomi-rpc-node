@@ -2,6 +2,9 @@ import {ObjectWrapper} from "../configuration/ObjectWrapper";
 import {Logger} from "../common/logger/Logger";
 import {Compressor} from "./Compressor";
 import {GzipCompressor} from "./impl/GzipCompressor";
+import {DeflateCompressor} from "./impl/DeflateCompressor";
+import {DeflateRawCompressor} from "./impl/DeflateRawCompressor";
+import {BrotliCompressor} from "./impl/BrotliCompressor";
 
 /**
  * 压缩工厂
@@ -23,11 +26,20 @@ export class CompressorFactory {
      * 类加载时就将所有的压缩器添加到缓存器中
      */
     static {
-        const gzipSerializer: ObjectWrapper<Compressor> = new ObjectWrapper<Compressor>(1, "gzip", new GzipCompressor());
+        const gzipCompressor: ObjectWrapper<Compressor> = new ObjectWrapper<Compressor>(1, "gzip", new GzipCompressor());
+        const deflateCompressor: ObjectWrapper<Compressor> = new ObjectWrapper<Compressor>(2, "deflate", new DeflateCompressor());
+        const deflateRawCompressor: ObjectWrapper<Compressor> = new ObjectWrapper<Compressor>(3, "deflate", new DeflateRawCompressor());
+        const brotliCompressor: ObjectWrapper<Compressor> = new ObjectWrapper<Compressor>(4, "brotli", new BrotliCompressor());
 
-        this.COMPRESSOR_CACHE.set("gzip", gzipSerializer);
+        this.COMPRESSOR_CACHE.set("gzip", gzipCompressor);
+        this.COMPRESSOR_CACHE.set("deflate", deflateCompressor);
+        this.COMPRESSOR_CACHE.set("deflateRaw", deflateRawCompressor);
+        this.COMPRESSOR_CACHE.set("brotli", brotliCompressor);
 
-        this.COMPRESSOR_CACHE_CODE.set(1, gzipSerializer);
+        this.COMPRESSOR_CACHE_CODE.set(1, gzipCompressor);
+        this.COMPRESSOR_CACHE_CODE.set(2, deflateCompressor);
+        this.COMPRESSOR_CACHE_CODE.set(3, deflateRawCompressor);
+        this.COMPRESSOR_CACHE_CODE.set(4, brotliCompressor);
     }
 
     /**
