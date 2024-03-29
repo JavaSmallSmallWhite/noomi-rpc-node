@@ -66,6 +66,7 @@ export class Constant {
     /**
      * ---------------------限流器相关配置常量------------------------------------
      */
+
     /**
      * 令牌桶的容量
      */
@@ -76,4 +77,22 @@ export class Constant {
      */
     public static readonly TOKEN_BUKET_RATE: number = 500;
 
+    /**
+     * ----------------------熔断器相关配置常量-------------------------------
+     */
+
+    /**
+     * 熔断器状态转换时间
+     */
+    public static readonly STATE_CHANGE_TIME: number = 1000;
+
+    /**
+     * 熔断器最大错误请求数
+     */
+    public static readonly CIRCUIT_BREAKER_MAX_ERROR_REQUEST: number = 10;
+
+    /**
+     * 熔断器最大异常率
+     */
+    public static readonly CIRCUIT_BREAKER_MAX_ERROR_RATE: number = 0.5;
 }

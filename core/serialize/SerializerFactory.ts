@@ -66,7 +66,7 @@ export class SerializerFactory {
      * 新增一个序列化器
      * @param serializerObjectWrapper 序列化wrapper
      */
-    public static addLoadBalancer(serializerObjectWrapper: ObjectWrapper<Serializer>): void {
+    public static addSerializer(serializerObjectWrapper: ObjectWrapper<Serializer>): void {
         if (this.SERIALIZER_CACHE_CODE.has(serializerObjectWrapper.code) ) {
             throw new SerializeError(`编号为${serializerObjectWrapper.code}的序列化器已存在，请使用其他编号。`);
         }
@@ -99,6 +99,7 @@ export class SerializerFactory {
             return null;
         }
         if (Array.isArray(data)) {
+            // todo 单一类型元素的数组和元组的description暂时没有很好的办法区分
             let descriptionArray: TypeDescription[] = [];
             for (const item of data) {
                 const description: TypeDescription = this.getDataDescription(item, tag);

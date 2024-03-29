@@ -122,6 +122,24 @@ export class NoomiRpcStarter {
     }
 
     /**
+     * 配置熔断器
+     * @param circuitBreakerType 熔断器类型
+     */
+    public circuitBreaker(circuitBreakerType: string): NoomiRpcStarter {
+        this.configuration.circuitBreakerType = circuitBreakerType;
+        return this;
+    }
+
+    /**
+     * 配置限流器
+     * @param rateLimiterType 限流器类型
+     */
+    public rateLimiter(rateLimiterType: string): NoomiRpcStarter {
+        this.configuration.rateLimiterType = rateLimiterType;
+        return this;
+    }
+
+    /**
      * ------------------------------------服务提供方的相关api------------------------------------------------------
      */
 

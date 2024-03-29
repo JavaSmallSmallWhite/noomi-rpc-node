@@ -97,6 +97,18 @@ export class Configuration {
     private _compressorType: string = "gzip";
 
     /**
+     * 熔断器类型
+     * @private
+     */
+    private _circuitBreakerType: string = "SeniorCircuitBreaker";
+
+    /**
+     * 限流器类型
+     * @private
+     */
+    private _rateLimiterType: string = "TokenBuketRateLimiter";
+
+    /**
      * 配置信息 --> id发号器
      * @private
      */
@@ -109,7 +121,6 @@ export class Configuration {
     private _everyIpRateLimiter: Map<string, RateLimiter> = new Map<string, RateLimiter>();
 
     /**
-     * todo 配置信息 --> 熔断器，ip级别的熔断，做的比较简单，未包含半打开状态half-open
      * @private
      */
     private _everyIpCircuitBreaker: Map<string, CircuitBreaker> = new Map<string, CircuitBreaker>();
@@ -212,6 +223,21 @@ export class Configuration {
         this._idGenerator = value;
     }
 
+    get circuitBreakerType(): string {
+        return this._circuitBreakerType;
+    }
+
+    set circuitBreakerType(value: string) {
+        this._circuitBreakerType = value;
+    }
+
+    get rateLimiterType(): string {
+        return this._rateLimiterType;
+    }
+
+    set rateLimiterType(value: string) {
+        this._rateLimiterType = value;
+    }
 
     get everyIpRateLimiter(): Map<string, RateLimiter> {
         return this._everyIpRateLimiter;
@@ -278,8 +304,13 @@ class JsonResolver {
             // 配置id法号器
             configuration.idGenerator = new IdGeneratorUtil(BigInt(configObject["idGenerator"]["dataCenterId"]), BigInt(configObject["idGenerator"]["machineId"]));
             Logger.info(`id发号器配置成功，id发号器为${InterfaceUtil.getInterfaceName(InterfaceUtil.getInterfaceName(configuration.idGenerator))}`);
+            // 配置熔断器类型
+            configuration.circuitBreakerType = configObject["circuitBreaker"];
+            Logger.info(`熔断器类型配置成功，熔断器名称为：${configuration.circuitBreakerType}`)
+            // 配置限流器类型
+            configuration.rateLimiterType = configObject["rateLimiter"];
+            Logger.info(`限流器类型配置成功，限流器名称为：${configuration.rateLimiterType}`)
             // 新增的标签，往下修改
-
             Logger.info("具体配置解析成功。");
         } catch (error) {
             Logger.error(`具体配置设置异常：${error.message}`);

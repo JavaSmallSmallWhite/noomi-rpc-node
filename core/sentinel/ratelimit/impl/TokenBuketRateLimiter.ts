@@ -1,4 +1,4 @@
-import {RateLimiter} from "./RateLimiter";
+import {RateLimiter} from "../RateLimiter";
 
 /**
  * 基于令牌桶算法的限流器具体实现
@@ -22,7 +22,7 @@ export class TokenBuketRateLimiter implements RateLimiter {
      * 给令牌桶添加令牌的速率
      * @private
      */
-    private rate: number;
+    private readonly rate: number;
 
     /**
      * 上一次访问令牌的时间
@@ -48,7 +48,7 @@ export class TokenBuketRateLimiter implements RateLimiter {
      */
     public allowRequest(): boolean {
         const currentTime: number = Date.now();
-        const timeInterval: number = currentTime -this.lastTokenTime;
+        const timeInterval: number = currentTime - this.lastTokenTime;
         if (timeInterval >= 1000 / this.rate) {
             const needTokens: number = Math.floor(timeInterval * this.rate / 1000);
             this.tokens = Math.min(this.capacity, this.tokens + needTokens);

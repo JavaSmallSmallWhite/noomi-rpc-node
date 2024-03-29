@@ -22,11 +22,12 @@ async function main(): Promise<void> {
     // 获取HelloNoomiRpc的代理对象，所有的rpc操作都通过代理对象去进行
     const helloNoomiRpc: HelloNoomiRpc = reference.get();
     // 调用方法
-    const result: number = <number>await helloNoomiRpc.sayHi("Hello,RPC", 10);
-    const result1: string = await helloNoomiRpc.sayHello("Hello,RPC1");
-
-    console.log(result)
-    console.log(result1)
+    for(let i: number =0; i < 100; i++) {
+        const result: number = <number>await helloNoomiRpc.sayHi("Hello,RPC", 10);
+        const result1: string = await helloNoomiRpc.sayHello("Hello,RPC1");
+        console.log(result)
+        console.log(result1)
+    }
 
 }
 main().then().catch();

@@ -10,13 +10,13 @@ import {NoomiRpcRequestDecoder} from "./handler/NoomiRpcRequestDecoder";
 import {HandlerError} from "../common/error/HandlerError";
 import {Logger} from "../common/logger/Logger";
 import {CircuitBreaker} from "../sentinel/circuitbreak/CircuitBreaker";
-import {SimpleCircuitBreaker} from "../sentinel/circuitbreak/SimpleCircuitBreaker";
 import {RequestType} from "../code/RequestType";
 import {ProxyError} from "../common/error/ProxyError";
 import {GlobalCache} from "../cache/GlobalCache";
 import {AddressPort, NetUtil} from "../common/utils/NetUtil";
 import {LoadBalancerFactory} from "../loadbalance/LoadBalancerFactory";
 import {NoomiRpcStarter} from "../NoomiRpcStarter";
+import {CircuitBreakerFactory} from "../sentinel/circuitbreak/CircuitBreakerFactory";
 
 /**
  * handler处理工厂
@@ -65,36 +65,33 @@ export class HandlerFactory {
             this.initHandler("consumer");
             this.isInitialHandler = true;
         }
-        if (!socketChannel) {
-            const serviceNode: string = await LoadBalancerFactory
-                .getLoadBalancer(NoomiRpcStarter.getInstance().getConfiguration().loadBalancerType)
-                .impl
-                .selectServerAddress(noomiRpcRequest.getRequestPayload().getServiceName());
-            socketChannel = GlobalCache.CHANNEL_CACHE.get(serviceNode);
-            if (!socketChannel) {
-                const [address, port]: AddressPort = NetUtil.parseAddress(serviceNode);
-                socketChannel = createConnection(port, address);
-                socketChannel.setKeepAlive(true);
-                GlobalCache.CHANNEL_CACHE.set(serviceNode, socketChannel);
-            }
-        }
         let tryTimes: number = 3;
         const intervalTime: number = 2000;
         let circuitBreaker: CircuitBreaker;
         while (true) {
+            if (!socketChannel) {
+                const serviceNode: string = await LoadBalancerFactory
+                    .getLoadBalancer(NoomiRpcStarter.getInstance().getConfiguration().loadBalancerType)
+                    .impl
+                    .selectServerAddress(noomiRpcRequest.getRequestPayload().getServiceName());
+                socketChannel = GlobalCache.CHANNEL_CACHE.get(serviceNode);
+                if (!socketChannel) {
+                    const [address, port]: AddressPort = NetUtil.parseAddress(serviceNode);
+                    socketChannel = createConnection(port, address);
+                    socketChannel.setKeepAlive(true);
+                    GlobalCache.CHANNEL_CACHE.set(serviceNode, socketChannel);
+                }
+            }
             try {
                 const everyIpCircuitBreaker: Map<string, CircuitBreaker> = NoomiRpcStarter.getInstance().getConfiguration().everyIpCircuitBreaker;
                 const serviceNode: string = socketChannel.remoteAddress + ":" + socketChannel.remotePort;
                 circuitBreaker = everyIpCircuitBreaker.get(serviceNode);
                 if (!circuitBreaker) {
-                    circuitBreaker = new SimpleCircuitBreaker(10);
+                    circuitBreaker = CircuitBreakerFactory.getCircuitBreaker(NoomiRpcStarter.getInstance().getConfiguration().circuitBreakerType);
                     everyIpCircuitBreaker.set(serviceNode, circuitBreaker);
                 }
 
                 if (!(noomiRpcRequest.getRequestType() === RequestType.HEART_BEAT_REQUEST) && circuitBreaker.isBreak()) {
-                    setTimeout(function (): void {
-                        NoomiRpcStarter.getInstance().getConfiguration().everyIpCircuitBreaker.get(serviceNode).reset();
-                    }, 3000);
                     Logger.error("当前断路器已经开启，无法发送请求。");
                     throw new ProxyError("当前断路器已经开启，无法发送请求。");
                 }
@@ -103,7 +100,7 @@ export class HandlerFactory {
 
                 // 监听请求
                 const result: unknown | Error = await new Promise<unknown>((resolve, reject): void => {
-                    socketChannel.on("data", async (data: Buffer): Promise<void> =>  {
+                    socketChannel.on("data", async (data: Buffer): Promise<void> => {
                         try {
                             const executeResult: unknown = await this.execute(socketChannel, "ConsumerInBound", data);
                             resolve(executeResult);
@@ -121,8 +118,9 @@ export class HandlerFactory {
                 if (result instanceof Error) {
                     throw result;
                 }
+                circuitBreaker.recordRequest();
                 return result;
-            }catch (error) {
+            } catch (error) {
                 tryTimes--;
                 circuitBreaker.recordErrorRequest();
                 await new Promise((resolve): void => {
@@ -150,7 +148,7 @@ export class HandlerFactory {
             this.isInitialHandler = true;
         }
         // 监听请求
-        socketChannel.on("data", async (data: Buffer): Promise<void> =>  {
+        socketChannel.on("data", async (data: Buffer): Promise<void> => {
             try {
                 await this.execute(socketChannel, "ProviderHandler", data);
             } catch (error) {
@@ -169,7 +167,7 @@ export class HandlerFactory {
      * @param item 客户端consumer或者服务端provider
      * @private
      */
-    private static initHandler(item: "consumer" | "provider"): void{
+    private static initHandler(item: "consumer" | "provider"): void {
         if (item === "consumer") {
             this.addHandler("ConsumerOutBound", new NoomiRpcRequestEncoder());
             this.addHandler("ConsumerInBound", new NoomiRpcResponseDecoder())

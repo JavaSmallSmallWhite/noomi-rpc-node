@@ -15,8 +15,8 @@ export class GraceFullyShutdownHook {
 
         const start: number = Date.now();
         while (true) {
-            await new Promise((resolve) => {
-                setTimeout(function () {
+            await new Promise((resolve): void => {
+                setTimeout(function (): void {
                     resolve(null);
                 }, 100);
             });

@@ -14,7 +14,7 @@
       "categories": {
         "default": {
           "appenders": ["stdout"],
-          "level": "debug"
+          "level": "info"
         }
       }
     },
@@ -34,7 +34,7 @@
 
     "type": "nacos",
     "connectionConfig": { // nacos连接配置，具体参考npm nacos的连接配置，配置中的logger不用管，noomi-rpc自动传console，nacos也只能传console
-      "serverList": "127.0.0.1:8848", // 连接地址
+      "serverList": "117.72.47.95:8848", // 连接地址
       "namespace": "public", // 命名空间
       "username": "nacos",
       "password": "nacos",
@@ -42,7 +42,7 @@
       "vipSrvRefInterMillis": 30000,
       "ssl": false
     },
-    "serviceConfig": {
+    "serviceConfig": { // nacos服务配置，具体参考npm nacos
       "healthy": true,
       "enabled": true,
       "weight": 1,
@@ -51,11 +51,13 @@
       "groupName": "DEFAULT_GROUP"
     }
   },
-  "loadBalancerType": "RoundRobinLoadBalancer", // 负载均衡器类型
-  "serializerType": "fury", // 序列化类型
-  "compressorType": "brotli", // 压缩类型
+  "loadBalancerType": "RoundRobinLoadBalancer", // 负载均衡器类型，目前包含ConsistentHashLoadBalancer、MinimumResponseTimeLoadBalancer、RoundRobinLoadBalancer三种
+  "serializerType": "fury", // 序列化类型，目前包含json和fury
+  "compressorType": "brotli", // 压缩类型，目前包含brotli、deflate、deflateRaw、gzip四种
   "idGenerator": { // id发号器，生成分布式唯一id
     "dataCenterId": "2", // 数据中心编号
     "machineId": "4" // 机器号
-  }
+  },
+  "circuitBreaker": "SeniorCircuitBreaker", // 熔断器类型，包含SimpleCircuitBreaker简单熔断器和SeniorCircuitBreaker高级熔断器
+  "rateLimiter": "TokenBuketRateLimiter"// 限流器类型
 }

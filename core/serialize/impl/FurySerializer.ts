@@ -19,7 +19,7 @@ export class FurySerializer implements Serializer{
     /**
      * fury反序列化
      * @param buffer 待反序列化的Buffer
-     * @param serializeDescription 序列化方式，json序列化不需要
+     * @param serializeDescription 序列化描述，json序列化不需要
      */
     public deserialize(buffer: Uint8Array, serializeDescription?: TypeDescription): RequestPayload | ResponsePayload | string {
         if (!buffer) {
@@ -46,7 +46,7 @@ export class FurySerializer implements Serializer{
     /**
      * fury序列化
      * @param body 序列化内容
-     * @param serializeDescription 序列化方式，json序列化不需要
+     * @param serializeDescription 序列化描述，json序列化不需要
      */
     public serialize(body: RequestPayload | ResponsePayload | string, serializeDescription?: TypeDescription): Uint8Array {
         if (!body) {

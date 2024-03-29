@@ -10,10 +10,9 @@ import {RequestType} from "../../code/RequestType";
 import {ResponsePayload} from "../../message/ResponsePayload";
 import {GlobalCache} from "../../cache/GlobalCache";
 import {RateLimiter} from "../../sentinel/ratelimit/RateLimiter";
-import {TokenBuketRateLimiter} from "../../sentinel/ratelimit/TokenBuketRateLimiter";
 import {ShutdownHolder} from "../../shutdown/ShutdownHolder";
 import {NoomiRpcStarter} from "../../NoomiRpcStarter";
-import {Constant} from "../../common/utils/Constant";
+import {RateLimiterFactory} from "../../sentinel/ratelimit/RateLimiterFactory";
 
 /**
  * 服务调用处理器
@@ -41,7 +40,7 @@ export class MethodCallInBoundHandler extends InBoundHandler<NoomiRpcRequest, No
         const address: string = socketChannel.remoteAddress;
         let rateLimiter: RateLimiter = everyIpRateLimiter.get(address);
         if (!rateLimiter) {
-            rateLimiter = new TokenBuketRateLimiter(Constant.TOKEN_BUKET_CAPACITY, Constant.TOKEN_BUKET_RATE);
+            rateLimiter = RateLimiterFactory.getRateLimiter(NoomiRpcStarter.getInstance().getConfiguration().rateLimiterType);
             everyIpRateLimiter.set(address, rateLimiter);
         }
         const allowRequest: boolean = rateLimiter.allowRequest();

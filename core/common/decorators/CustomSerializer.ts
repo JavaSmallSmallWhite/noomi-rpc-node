@@ -30,7 +30,7 @@ export interface SerializerOption {
 export function CustomSerializer(serializerOption: SerializerOption): (target: Function) => void {
     return (target: Function): void => {
         const serializerName: string = serializerOption["serializerName"] || target.name
-        SerializerFactory.addLoadBalancer(
+        SerializerFactory.addSerializer(
             new ObjectWrapper<Serializer>(
                 serializerOption["serializerId"],
                 serializerName,

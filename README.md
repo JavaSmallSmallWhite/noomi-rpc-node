@@ -17,8 +17,8 @@
 {
   "port": 8091, // 启动端口号
   "appName": "NoomiRpcApplication", // 应用名称
-  "servicePrefix": "com.nodejs.Test", // 服务前缀，需要唯一性，主要针对跨语言开发，比如Java
-  "starterPath": ["/dist/provider/**/*.js"], // 项目启动目录
+  "servicePrefix": "com.nodejs.Test", // 服务前缀
+  "starterPath": ["/dist/examples/provider/**/*.js"], // 项目启动目录
   "log4js": { // 日志配置，具体参照npm log4js
     "configuration": {
       "appenders": {
@@ -30,7 +30,7 @@
       "categories": {
         "default": {
           "appenders": ["stdout"],
-          "level": "error"
+          "level": "info"
         }
       }
     },
@@ -58,7 +58,7 @@
     //      "vipSrvRefInterMillis": 30000,
     //      "ssl": false
     //    },
-    //    "serviceConfig": {
+    //    "serviceConfig": { // nacos服务配置，具体参考npm nacos
     //      "healthy": true,
     //      "enabled": true,
     //      "weight": 1,
@@ -67,14 +67,16 @@
     //      "groupName": "DEFAULT_GROUP"
     //    }
   },
-  "loadBalancerType": "RoundRobinLoadBalancer", // 负载均衡器类型
-  "serializerType": "json", // 序列化类型
-  "compressorType": "gzip", // 压缩类型
+  "loadBalancerType": "RoundRobinLoadBalancer", // 负载均衡器类型，目前包含ConsistentHashLoadBalancer、MinimumResponseTimeLoadBalancer、RoundRobinLoadBalancer三种
+  "serializerType": "fury", // 序列化类型，目前包含json和fury
+  "compressorType": "brotli", // 压缩类型，目前包含brotli、deflate、deflateRaw、gzip四种
   "idGenerator": { // id发号器，生成分布式唯一id
     "dataCenterId": "2", // 数据中心编号
     "machineId": "4" // 机器号
-  }
+  },
+  "circuitBreaker": "SeniorCircuitBreaker", // 熔断器类型，包含SimpleCircuitBreaker简单熔断器和SeniorCircuitBreaker高级熔断器
 }
+
 
 
 ```
@@ -164,8 +166,8 @@ main().then()
 {
   "port": 8091, // 启动端口号
   "appName": "NoomiRpcApplication", // 应用名称
-  "servicePrefix": "com.nodejs.Test", // 服务前缀，需要唯一性，主要针对跨语言开发，比如Java
-  "starterPath": ["/dist/consumer/**/*.js"], // 项目启动目录
+  "servicePrefix": "com.nodejs.Test", // 服务前缀
+  "starterPath": ["/dist/examples/consumer/**/*.js"], // 项目启动目录
   "log4js": { // 日志配置，具体参照npm log4js
     "configuration": {
       "appenders": {
@@ -177,7 +179,7 @@ main().then()
       "categories": {
         "default": {
           "appenders": ["stdout"],
-          "level": "error"
+          "level": "info"
         }
       }
     },
@@ -205,7 +207,7 @@ main().then()
     //      "vipSrvRefInterMillis": 30000,
     //      "ssl": false
     //    },
-    //    "serviceConfig": {
+    //    "serviceConfig": { // nacos服务配置，具体参考npm nacos
     //      "healthy": true,
     //      "enabled": true,
     //      "weight": 1,
@@ -214,14 +216,16 @@ main().then()
     //      "groupName": "DEFAULT_GROUP"
     //    }
   },
-  "loadBalancerType": "RoundRobinLoadBalancer", // 负载均衡器类型
-  "serializerType": "json", // 序列化类型
-  "compressorType": "gzip", // 压缩类型
+  "loadBalancerType": "RoundRobinLoadBalancer", // 负载均衡器类型，目前包含ConsistentHashLoadBalancer、MinimumResponseTimeLoadBalancer、RoundRobinLoadBalancer三种
+  "serializerType": "fury", // 序列化类型，目前包含json和fury
+  "compressorType": "brotli", // 压缩类型，目前包含brotli、deflate、deflateRaw、gzip四种
   "idGenerator": { // id发号器，生成分布式唯一id
     "dataCenterId": "2", // 数据中心编号
     "machineId": "4" // 机器号
-  }
+  },
+  "circuitBreaker": "SeniorCircuitBreaker", // 熔断器类型，包含SimpleCircuitBreaker简单熔断器和SeniorCircuitBreaker高级熔断器
 }
+
 
 
 ```
@@ -290,15 +294,15 @@ main().then().catch()
 ### 融入noomi使用
 ### 针对服务端 
 1. npm i noomi-cli1 -g全局安装noomi脚手架，然后noomi create server创建服务端目录同时npm i noomi-rpc-node。
-2. noomi-rpc-node服务端和noomi服务端是两个进程，基本上不能融入，后续会引入inversifyjs来实现ioc等功能，不再融入noomi。现只能做成如下形式：
+2. noomi-rpc-node服务端和noomi服务端是两个进程，暂时不能融入，后续将noomi的web和ioc分离后，再融入noomi的ioc部分。现只能做成如下形式：
 3. 在config目录中新建rpc.json文件，内容如下：
 ```json5
 // rpc.json
 {
-  "port": 8090, // 启动端口号
+  "port": 8091, // 启动端口号
   "appName": "NoomiRpcApplication", // 应用名称
-  "servicePrefix": "com.nodejs.Test", // 服务前缀，需要唯一性，主要针对跨语言开发，比如Java
-  "starterPath": ["/dist/module/provider/**/*.js"], // 项目启动目录
+  "servicePrefix": "com.nodejs.Test", // 服务前缀
+  "starterPath": ["/dist/examples/provider/**/*.js"], // 项目启动目录
   "log4js": { // 日志配置，具体参照npm log4js
     "configuration": {
       "appenders": {
@@ -310,7 +314,7 @@ main().then().catch()
       "categories": {
         "default": {
           "appenders": ["stdout"],
-          "level": "debug"
+          "level": "info"
         }
       }
     },
@@ -328,33 +332,35 @@ main().then().catch()
     },
     "serviceConfig": {},
 
-//    "type": "nacos",
-//    "connectionConfig": { // nacos连接配置，具体参考npm nacos的连接配置，配置中的logger不用管，noomi-rpc自动传console，nacos也只能传console
-//      "serverList": "127.0.0.1:8848", // 连接地址
-//      "namespace": "public", // 命名空间
-//      "username": "nacos",
-//      "password": "nacos",
-//      "endpoint": null,
-//      "vipSrvRefInterMillis": 30000,
-//      "ssl": false
-//    },
-//    "serviceConfig": {
-//      "healthy": true,
-//      "enabled": true,
-//      "weight": 1,
-//      "ephemeral": true,
-//      "clusterName": "DEFAULT",
-//      "groupName": "DEFAULT_GROUP"
-//    }
+    //    "type": "nacos",
+    //    "connectionConfig": { // nacos连接配置，具体参考npm nacos的连接配置，配置中的logger不用管，noomi-rpc自动传console，nacos也只能传console
+    //      "serverList": "127.0.0.1:8848", // 连接地址
+    //      "namespace": "public", // 命名空间
+    //      "username": "nacos",
+    //      "password": "nacos",
+    //      "endpoint": null,
+    //      "vipSrvRefInterMillis": 30000,
+    //      "ssl": false
+    //    },
+    //    "serviceConfig": { // nacos服务配置，具体参考npm nacos
+    //      "healthy": true,
+    //      "enabled": true,
+    //      "weight": 1,
+    //      "ephemeral": true,
+    //      "clusterName": "DEFAULT",
+    //      "groupName": "DEFAULT_GROUP"
+    //    }
   },
-  "loadBalancerType": "RoundRobinLoadBalancer", // 负载均衡器类型
-  "serializerType": "json", // 序列化类型
-  "compressorType": "gzip", // 压缩类型
+  "loadBalancerType": "RoundRobinLoadBalancer", // 负载均衡器类型，目前包含ConsistentHashLoadBalancer、MinimumResponseTimeLoadBalancer、RoundRobinLoadBalancer三种
+  "serializerType": "fury", // 序列化类型，目前包含json和fury
+  "compressorType": "brotli", // 压缩类型，目前包含brotli、deflate、deflateRaw、gzip四种
   "idGenerator": { // id发号器，生成分布式唯一id
     "dataCenterId": "2", // 数据中心编号
     "machineId": "4" // 机器号
-  }
+  },
+  "circuitBreaker": "SeniorCircuitBreaker", // 熔断器类型，包含SimpleCircuitBreaker简单熔断器和SeniorCircuitBreaker高级熔断器
 }
+
 ```
 4. 在module目录下新建provider目录，在provider目录下新建api目录，在api目录下新建HelloNoomiRpc.ts文件。内容如下：
 ```typescript
@@ -420,10 +426,10 @@ NoomiRpcStarter.getInstance().start();
 ```json5
 // rpc.json
 {
-  "port": 8090, // 启动端口号
+  "port": 8091, // 启动端口号
   "appName": "NoomiRpcApplication", // 应用名称
-  "servicePrefix": "com.nodejs.Test", // 服务前缀，需要唯一性，主要针对跨语言开发，比如Java
-  "starterPath": ["/dist/module/src/**/*.js"], // 项目启动目录
+  "servicePrefix": "com.nodejs.Test", // 服务前缀
+  "starterPath": ["/dist/examples/consumer/**/*.js"], // 项目启动目录
   "log4js": { // 日志配置，具体参照npm log4js
     "configuration": {
       "appenders": {
@@ -435,7 +441,7 @@ NoomiRpcStarter.getInstance().start();
       "categories": {
         "default": {
           "appenders": ["stdout"],
-          "level": "debug"
+          "level": "info"
         }
       }
     },
@@ -453,33 +459,35 @@ NoomiRpcStarter.getInstance().start();
     },
     "serviceConfig": {},
 
-//    "type": "nacos",
-//    "connectionConfig": { // nacos连接配置，具体参考npm nacos的连接配置，配置中的logger不用管，noomi-rpc自动传console，nacos也只能传console
-//      "serverList": "127.0.0.1:8848", // 连接地址
-//      "namespace": "public", // 命名空间
-//      "username": "nacos",
-//      "password": "nacos",
-//      "endpoint": null,
-//      "vipSrvRefInterMillis": 30000,
-//      "ssl": false
-//    },
-//    "serviceConfig": {
-//      "healthy": true,
-//      "enabled": true,
-//      "weight": 1,
-//      "ephemeral": true,
-//      "clusterName": "DEFAULT",
-//      "groupName": "DEFAULT_GROUP"
-//    }
+    //    "type": "nacos",
+    //    "connectionConfig": { // nacos连接配置，具体参考npm nacos的连接配置，配置中的logger不用管，noomi-rpc自动传console，nacos也只能传console
+    //      "serverList": "127.0.0.1:8848", // 连接地址
+    //      "namespace": "public", // 命名空间
+    //      "username": "nacos",
+    //      "password": "nacos",
+    //      "endpoint": null,
+    //      "vipSrvRefInterMillis": 30000,
+    //      "ssl": false
+    //    },
+    //    "serviceConfig": { // nacos服务配置，具体参考npm nacos
+    //      "healthy": true,
+    //      "enabled": true,
+    //      "weight": 1,
+    //      "ephemeral": true,
+    //      "clusterName": "DEFAULT",
+    //      "groupName": "DEFAULT_GROUP"
+    //    }
   },
-  "loadBalancerType": "RoundRobinLoadBalancer", // 负载均衡器类型
-  "serializerType": "json", // 序列化类型
-  "compressorType": "gzip", // 压缩类型
+  "loadBalancerType": "RoundRobinLoadBalancer", // 负载均衡器类型，目前包含ConsistentHashLoadBalancer、MinimumResponseTimeLoadBalancer、RoundRobinLoadBalancer三种
+  "serializerType": "fury", // 序列化类型，目前包含json和fury
+  "compressorType": "brotli", // 压缩类型，目前包含brotli、deflate、deflateRaw、gzip四种
   "idGenerator": { // id发号器，生成分布式唯一id
     "dataCenterId": "2", // 数据中心编号
     "machineId": "4" // 机器号
-  }
+  },
+  "circuitBreaker": "SeniorCircuitBreaker", // 熔断器类型，包含SimpleCircuitBreaker简单熔断器和SeniorCircuitBreaker高级熔断器
 }
+
 ```
 3. 在module目录下的src目录下新建api目录，在api目录下新建HelloNoomiRpc.ts文件。内容如下：
 ```typescript
