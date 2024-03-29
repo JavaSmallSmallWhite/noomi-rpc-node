@@ -75,6 +75,7 @@
     "machineId": "4" // 机器号
   },
   "circuitBreaker": "SeniorCircuitBreaker", // 熔断器类型，包含SimpleCircuitBreaker简单熔断器和SeniorCircuitBreaker高级熔断器
+  "rateLimiter": "TokenBuketRateLimiter"// 限流器类型
 }
 
 
@@ -224,6 +225,7 @@ main().then()
     "machineId": "4" // 机器号
   },
   "circuitBreaker": "SeniorCircuitBreaker", // 熔断器类型，包含SimpleCircuitBreaker简单熔断器和SeniorCircuitBreaker高级熔断器
+  "rateLimiter": "TokenBuketRateLimiter"// 限流器类型
 }
 
 
@@ -359,6 +361,7 @@ main().then().catch()
     "machineId": "4" // 机器号
   },
   "circuitBreaker": "SeniorCircuitBreaker", // 熔断器类型，包含SimpleCircuitBreaker简单熔断器和SeniorCircuitBreaker高级熔断器
+  "rateLimiter": "TokenBuketRateLimiter"// 限流器类型
 }
 
 ```
@@ -486,6 +489,7 @@ NoomiRpcStarter.getInstance().start();
     "machineId": "4" // 机器号
   },
   "circuitBreaker": "SeniorCircuitBreaker", // 熔断器类型，包含SimpleCircuitBreaker简单熔断器和SeniorCircuitBreaker高级熔断器
+  "rateLimiter": "TokenBuketRateLimiter"// 限流器类型
 }
 
 ```

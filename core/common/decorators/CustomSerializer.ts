@@ -15,7 +15,7 @@ export interface SerializerOption {
     /**
      * 是否使用
      */
-    isUse: boolean,
+    isUse?: boolean,
 
     /**
      * 序列化器名称，不可与框架自带的序列化器名称重复
@@ -38,7 +38,7 @@ export function CustomSerializer(serializerOption: SerializerOption): (target: F
             )
         );
         if (serializerOption["isUse"]) {
-            NoomiRpcStarter.getInstance().getConfiguration().loadBalancerType = serializerName;
+            NoomiRpcStarter.getInstance().getConfiguration().serializerType = serializerName;
         }
     }
 }

@@ -15,7 +15,7 @@ export interface LoadBalancerOption {
     /**
      * 是否使用
      */
-    isUse: boolean,
+    isUse?: boolean,
 
     /**
      * 负载均衡器名称，不可与框架自带的负载均衡器名称重复

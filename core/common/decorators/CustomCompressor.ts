@@ -15,7 +15,7 @@ interface CompressorOption {
     /**
      * 是否使用
      */
-    isUse: boolean,
+    isUse?: boolean,
 
     /**
      * 序列化器名称，不可与框架自带的压缩器名称重复
@@ -38,7 +38,7 @@ export function CustomCompressor(compressorOption: CompressorOption): (target: F
             )
         );
         if (compressorOption["isUse"]) {
-            NoomiRpcStarter.getInstance().getConfiguration().loadBalancerType = compressorName;
+            NoomiRpcStarter.getInstance().getConfiguration().compressorType = compressorName;
         }
     }
 }
