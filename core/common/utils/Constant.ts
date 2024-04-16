@@ -61,6 +61,9 @@ export class Constant {
     /**
      * --------------------心跳检测相关配置常量-----------------------------------
      */
+    /**
+     * 心跳检测间隔时间
+     */
     public static readonly HEART_BEAT_CHECK_INTERVAL: number = 2000;
 
     /**

@@ -19,6 +19,7 @@ async function main(): Promise<void> {
         // .registry(new RegistryConfig( "zookeeper"))
         // .serializer("fury")
         // .compressor("gzip")
+        // ...
 
     // 发布服务
     await starter.publish(service);

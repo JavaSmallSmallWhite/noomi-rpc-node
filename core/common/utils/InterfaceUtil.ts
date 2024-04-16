@@ -33,8 +33,8 @@ export class InterfaceUtil {
      * @param interfaceObj 接口对象
      */
     public static getInterfaceMethodsName(interfaceObj: Object): Array<string> {
-        const interfacePrototype: ObjectConstructor = Object.getPrototypeOf(interfaceObj);
-        const propertyNames: Array<string> = Object.getOwnPropertyNames(interfacePrototype);
+        // const interfacePrototype: ObjectConstructor = Object.getPrototypeOf(interfaceObj);
+        const propertyNames: Array<string> = Object.getOwnPropertyNames(interfaceObj);
         return propertyNames.filter(methodName => methodName !== "constructor"
             && typeof interfaceObj[methodName] === "function");
     }

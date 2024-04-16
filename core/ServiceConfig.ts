@@ -29,7 +29,7 @@ export class ServiceConfig<T> {
     }
 
     set interfaceProvider(value: Function) {
-        this._interfaceProvider = Reflect.construct(value, []);
+        this._interfaceProvider = value.prototype;
     }
 
     get ref(): Object {
@@ -37,7 +37,7 @@ export class ServiceConfig<T> {
     }
 
     set ref(value: Function) {
-        this._ref = Reflect.construct(value, []);
+        this._ref = value.prototype;
     }
 
     get servicePrefix(): string {

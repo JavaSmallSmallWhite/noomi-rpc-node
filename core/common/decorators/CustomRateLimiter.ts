@@ -1,5 +1,4 @@
 import {NoomiRpcStarter} from "../../NoomiRpcStarter";
-import {CircuitBreakerFactory} from "../../sentinel/circuitbreak/CircuitBreakerFactory";
 import {RateLimiterFactory} from "../../sentinel/ratelimit/RateLimiterFactory";
 
 /**
@@ -10,7 +9,7 @@ export interface RateLimiterOption {
     /**
      * 自定义的限流器参数
      */
-    rateLimiterArguments: [],
+    rateLimiterArguments: Array<unknown>,
 
     /**
      * 熔断器名称，不可与框架自带的熔断器名称重复

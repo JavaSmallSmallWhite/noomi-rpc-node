@@ -676,5 +676,52 @@ export class MyRegistry extends AbstractRegistry {
     }
 }
 ```
+
+5. 自定义限流器
+```typescript
+@CustomRateLimiter({
+    rateLimiterArguments: ["参数一", "参数二"], // 自定义限流器需要的参数，按照构造器参数顺序填写，比如速率、容量等
+    rateLimiterName: "MyRateLimiter", // 限流器名称
+    isUse: true // 是否使用自定义的
+})
+class MyRateLimiter implements RateLimiter {
+
+    public constructor(rate: number, capacity: number) {
+
+    }
+
+    allowRequest(): boolean {
+        return false;
+    }
+
+}
+```
+6. 自定义熔断器
+```typescript
+@CustomCircuitBreaker({
+    circuitBreakerArguments: ["参数一", "参数二"], // 自定义熔断器需要的参数，按照构造器参数顺序填写，比如最大的错误请求数、最大的异常阈值等
+    circuitBreakerName: "MyCircuitBreaker", // 限流器名称
+    isUse: true // 是否使用自定义的
+})
+class MyCircuitBreaker implements CircuitBreaker {
+
+    public constructor(maxErrorRequest: number, maxErrorRate: number) {
+
+    }
+
+    isBreak(): boolean {
+        return false;
+    }
+
+    recordErrorRequest(): void {
+    }
+
+    recordRequest(): void {
+    }
+
+    reset(): void {
+    }
+}
+```
 ### 针对跨语言
 **针对跨语言，目前noomi-rpc-java正在开发中，敬请期待....其他语言敬请不期待了。**

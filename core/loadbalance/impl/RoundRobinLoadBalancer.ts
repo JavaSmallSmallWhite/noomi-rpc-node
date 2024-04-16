@@ -60,6 +60,5 @@ export class RoundRobinLoadBalancer extends AbstractLoadBalancer {
             }
             return serviceNode;
         }
-
     }
 }

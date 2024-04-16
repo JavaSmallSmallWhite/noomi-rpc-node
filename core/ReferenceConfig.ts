@@ -43,7 +43,7 @@ export class ReferenceConfig<T extends Object> {
     }
 
     set interfaceRef(value: Function) {
-        this._interfaceRef = Reflect.construct(value, []);
+        this._interfaceRef = value.prototype;
     }
 
     get servicePrefix(): string {

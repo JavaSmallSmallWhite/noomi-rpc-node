@@ -17,6 +17,7 @@ async function main(): Promise<void> {
         // .loadBalancer("RoundRobinLoadBalancer")
         // .serializer("fury")
         // .compressor("gzip")
+        // ...
         .reference(reference);
 
     // 获取HelloNoomiRpc的代理对象，所有的rpc操作都通过代理对象去进行
