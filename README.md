@@ -68,7 +68,7 @@
     //    }
   },
   "loadBalancerType": "RoundRobinLoadBalancer", // 负载均衡器类型，目前包含ConsistentHashLoadBalancer、MinimumResponseTimeLoadBalancer、RoundRobinLoadBalancer三种
-  "serializerType": "fury", // 序列化类型，目前包含json和fury
+  "serializerType": "test_fury", // 序列化类型，目前包含json和fury
   "compressorType": "brotli", // 压缩类型，目前包含brotli、deflate、deflateRaw、gzip四种
   "idGenerator": { // id发号器，生成分布式唯一id
     "dataCenterId": "2", // 数据中心编号
@@ -83,7 +83,7 @@
 ```
 3. 新建provider目录，在provider目录下新建rpc目录，在rpc目录下新建HelloNoomiRpc.ts文件。内容如下：
 ```typescript
-// HelloNoomiRpc.ts
+// HelloNoomiRpcApi.ts
 /**
  * 接口定义
  */
@@ -112,7 +112,7 @@ export class HelloNoomiRpc {
 
 4. 在provider目录下新建impl目录，在impl目录中新建HelloNoomiRpcImpl.ts文件。内容如下：
 ```typescript
-// HelloNoomiRpcImpl.ts
+// HelloNoomiRpc.ts
 /**
  * 实现接口
  */
@@ -148,7 +148,7 @@ async function main(): Promise<void> {
     // .application("first-noomi-rpc-provider-application")
     // .servicePrefix("com.nodejs.Test")
     // .registry(new RegistryConfig( "zookeeper"))
-    // .serializer("fury")
+    // .serializer("test_fury")
     // .compressor("gzip")
 
     // 发布服务
@@ -218,7 +218,7 @@ main().then()
     //    }
   },
   "loadBalancerType": "RoundRobinLoadBalancer", // 负载均衡器类型，目前包含ConsistentHashLoadBalancer、MinimumResponseTimeLoadBalancer、RoundRobinLoadBalancer三种
-  "serializerType": "fury", // 序列化类型，目前包含json和fury
+  "serializerType": "test_fury", // 序列化类型，目前包含json和fury
   "compressorType": "brotli", // 压缩类型，目前包含brotli、deflate、deflateRaw、gzip四种
   "idGenerator": { // id发号器，生成分布式唯一id
     "dataCenterId": "2", // 数据中心编号
@@ -233,7 +233,7 @@ main().then()
 ```
 3. 新建consumer目录，在consumer目录下新建rpc目录，在rpc目录下新建HelloNoomiRpc.ts文件。内容如下：
 ```typescript
-// HelloNoomiRpc.ts
+// HelloNoomiRpcApi.ts
 /**
  * 接口定义
  */
@@ -278,7 +278,7 @@ async function main(): Promise<void> {
         // .servicePrefix("com.nodejs.Test")
         // .registry(new RegistryConfig("zookeeper"))
         // .loadBalancer("RoundRobinLoadBalancer")
-        // .serializer("fury")
+        // .serializer("test_fury")
         // .compressor("gzip")
         .reference(reference);
 
@@ -354,7 +354,7 @@ main().then().catch()
     //    }
   },
   "loadBalancerType": "RoundRobinLoadBalancer", // 负载均衡器类型，目前包含ConsistentHashLoadBalancer、MinimumResponseTimeLoadBalancer、RoundRobinLoadBalancer三种
-  "serializerType": "fury", // 序列化类型，目前包含json和fury
+  "serializerType": "test_fury", // 序列化类型，目前包含json和fury
   "compressorType": "brotli", // 压缩类型，目前包含brotli、deflate、deflateRaw、gzip四种
   "idGenerator": { // id发号器，生成分布式唯一id
     "dataCenterId": "2", // 数据中心编号
@@ -367,7 +367,7 @@ main().then().catch()
 ```
 4. 在module目录下新建provider目录，在provider目录下新建api目录，在api目录下新建HelloNoomiRpc.ts文件。内容如下：
 ```typescript
-// HelloNoomiRpc.ts
+// HelloNoomiRpcApi.ts
 /**
  * 接口定义
  */
@@ -394,7 +394,7 @@ export class HelloNoomiRpc {
 ```
 5. 回到module目录的provider目录中，新建impl目录，在impl目录中新建HelloNoomiRpcImpl.ts文件，内容如下：
 ```typescript
-// HelloNoomiRpcImpl.ts
+// HelloNoomiRpc.ts
 import {HelloNoomiRpc} from "../api/HelloNoomiRpc";
 import {NoomiService} from "noomi-rpc-node";
 
@@ -482,7 +482,7 @@ NoomiRpcStarter.getInstance().start();
     //    }
   },
   "loadBalancerType": "RoundRobinLoadBalancer", // 负载均衡器类型，目前包含ConsistentHashLoadBalancer、MinimumResponseTimeLoadBalancer、RoundRobinLoadBalancer三种
-  "serializerType": "fury", // 序列化类型，目前包含json和fury
+  "serializerType": "test_fury", // 序列化类型，目前包含json和fury
   "compressorType": "brotli", // 压缩类型，目前包含brotli、deflate、deflateRaw、gzip四种
   "idGenerator": { // id发号器，生成分布式唯一id
     "dataCenterId": "2", // 数据中心编号
@@ -495,7 +495,7 @@ NoomiRpcStarter.getInstance().start();
 ```
 3. 在module目录下的src目录下新建api目录，在api目录下新建HelloNoomiRpc.ts文件。内容如下：
 ```typescript
-// HelloNoomiRpc.ts
+// HelloNoomiRpcApi.ts
 /**
  * 接口定义
  */

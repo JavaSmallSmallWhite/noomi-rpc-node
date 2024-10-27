@@ -1,0 +1,15 @@
+{
+    "product":"typeorm",
+    "options":{
+        "type": "mysql",
+        "host": "localhost",
+        "port": 3306,
+        "username": "root",
+        "password": "field",
+        "database": "test",
+        "logging": true,
+        "entities": [
+            "/dist/test/app/module/dao/typeorm/*.js"
+        ]
+    }
+}

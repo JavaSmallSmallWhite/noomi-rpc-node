@@ -1,50 +1,83 @@
+import { InstanceFactory } from "noomi";
+import { Constructor } from "./common/utils/TypesUtil";
+
 /**
  * 服务配置类
  */
 export class ServiceConfig<T> {
+  /**
+   * 具体的接口实现
+   * @private
+   */
+  private _interfaceProvider: Constructor;
 
-    /**
-     * 服务提供接口
-     * @private
-     */
-    private _interfaceProvider: T;
+  /**
+   * 服务名称
+   * @private
+   */
+  private _serviceName: string;
 
-    /**
-     * 具体的接口实现
-     * @private
-     */
-    private _ref: Object;
+  /**
+   * proto文件路径，使用protobuf序列化时才需要
+   * @private
+   */
+  private _protoFile?: string;
 
-    /**
-     * 服务前缀
-     * @private
-     */
-    private _servicePrefix: string
+  /**
+   * 传输的对象服务名称，使用protobuf序列化时才需要
+   * @private
+   */
+  private _protoServiceName?: string;
 
-    /**
-     * -------------------以下为成员变量的getter和setter------------------------------------
-     */
-    get interfaceProvider(): T {
-        return this._interfaceProvider;
-    }
+  /**
+   * fury序列化描述类，使用fury序列化时才需要
+   * @private
+   */
+  private _descriptionClass?: Constructor;
 
-    set interfaceProvider(value: Function) {
-        this._interfaceProvider = value.prototype;
-    }
+  /**
+   * -------------------以下为成员变量的getter和setter------------------------------------
+   */
 
-    get ref(): Object {
-        return this._ref;
-    }
+  get interfaceProvider(): T {
+    return <T>InstanceFactory.getInstance(this._interfaceProvider);
+  }
 
-    set ref(value: Function) {
-        this._ref = value.prototype;
-    }
+  set interfaceProvider(value: Constructor) {
+    InstanceFactory.addInstance(value, { singleton: true });
+    this._interfaceProvider = value;
+  }
 
-    get servicePrefix(): string {
-        return this._servicePrefix;
-    }
+  get serviceName(): string {
+    return this._serviceName;
+  }
 
-    set servicePrefix(value: string) {
-        this._servicePrefix = value;
-    }
+  set serviceName(value: string) {
+    this._serviceName = value;
+  }
+
+  get protoFile(): string {
+    return this._protoFile;
+  }
+
+  set protoFile(value: string) {
+    this._protoFile = value;
+  }
+
+  get protoServiceName(): string {
+    return this._protoServiceName;
+  }
+
+  set protoServiceName(value: string) {
+    this._protoServiceName = value;
+  }
+
+  get descriptionClass(): NonNullable<unknown> {
+    return InstanceFactory.getInstance(this._descriptionClass);
+  }
+
+  set descriptionClass(value: Constructor) {
+    InstanceFactory.addInstance(value, { singleton: true });
+    this._descriptionClass = value;
+  }
 }

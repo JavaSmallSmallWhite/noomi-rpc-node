@@ -1,0 +1,20 @@
+{
+    "product":"relaen",
+    "options":{
+        "dialect":"mysql",
+        "host":"localhost",
+        "port":3306,
+        "username":"root",
+        "password":"field",
+        "database":"test",
+        "pool":{
+            "min":0,
+            "max":10
+        },
+        "entities": [
+            "/dist/test/app/module/dao/relaen/**/*.js"
+        ],
+        "cache":true,
+        "debug":true
+    }
+}

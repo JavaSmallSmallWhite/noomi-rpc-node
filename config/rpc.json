@@ -1,7 +1,8 @@
 {
   "port": 8091, // 启动端口号
   "appName": "NoomiRpcApplication", // 应用名称
-  "servicePrefix": "com.nodejs.Test", // 服务前缀
+  "apiDir": ["/examples/consumer/api"], // 接口目录
+//  "starterPath": ["/dist/examples/provider/**/*.js"], // 项目启动目录,
   "starterPath": ["/dist/examples/consumer/**/*.js"], // 项目启动目录
   "log4js": { // 日志配置，具体参照npm log4js
     "configuration": {
@@ -52,12 +53,13 @@
     }
   },
   "loadBalancerType": "RoundRobinLoadBalancer", // 负载均衡器类型，目前包含ConsistentHashLoadBalancer、MinimumResponseTimeLoadBalancer、RoundRobinLoadBalancer三种
-  "serializerType": "fury", // 序列化类型，目前包含json和fury
+  "serializerType": "fury", // 序列化类型，目前包含json、fury、protobuf
   "compressorType": "brotli", // 压缩类型，目前包含brotli、deflate、deflateRaw、gzip四种
   "idGenerator": { // id发号器，生成分布式唯一id
     "dataCenterId": "2", // 数据中心编号
     "machineId": "4" // 机器号
   },
   "circuitBreaker": "SeniorCircuitBreaker", // 熔断器类型，包含SimpleCircuitBreaker简单熔断器和SeniorCircuitBreaker高级熔断器
-  "rateLimiter": "TokenBuketRateLimiter"// 限流器类型
+  "rateLimiter": "TokenBuketRateLimiter", // 限流器类型
+//  "database":"database/relaen.json" // 数据库，参考noomi
 }

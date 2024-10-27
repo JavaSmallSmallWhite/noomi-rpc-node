@@ -1,9 +1,9 @@
 export class NetworkError extends Error {
-    constructor(message?: string) {
-        if (!message) {
-            super();
-        } else {
-            super(message);
-        }
+  constructor(message?: string) {
+    if (!message) {
+      super();
+    } else {
+      super(message);
     }
+  }
 }

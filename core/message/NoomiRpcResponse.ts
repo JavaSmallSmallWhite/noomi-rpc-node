@@ -1,95 +1,93 @@
-import {ResponsePayload} from "./ResponsePayload";
+import { ResponsePayload } from "./ResponsePayload";
 
 /**
  * 响应的封装，服务提供方回复的响应
  */
 export class NoomiRpcResponse {
+  /**
+   * 请求id 8个字节
+   * @private
+   */
+  private requestId: bigint;
 
-    /**
-     * 请求id 8个字节
-     * @private
-     */
-    private requestId: bigint;
+  /**
+   * 压缩类型 1个字节
+   * @private
+   */
+  private compressType: number;
 
-    /**
-     * 压缩类型 1个字节
-     * @private
-     */
-    private compressType: number;
+  /**
+   * 序列化类型 1个字节
+   * @private
+   */
+  private serializeType: number;
 
-    /**
-     * 序列化类型 1个字节
-     * @private
-     */
-    private serializeType: number;
+  /**
+   * description id 8个字节
+   * @private
+   */
+  private descriptionId: bigint;
 
-    /**
-     * description id 8个字节
-     * @private
-     */
-    private descriptionId: bigint;
+  /**
+   * 响应码 1 成功  2 异常
+   * @private
+   */
+  private responseType: number;
 
-    /**
-     * 响应码 1 成功  2 异常
-     * @private
-     */
-    private responseType: number;
+  /**
+   * 响应体
+   * @private
+   */
+  private responseBody: ResponsePayload;
 
-    /**
-     * 响应体
-     * @private
-     */
-    private responseBody: ResponsePayload;
+  /**
+   * ------------------------------以下是属性的getter和setter方法----------------------------------------
+   */
+  public setRequestId(requestId: bigint): void {
+    this.requestId = requestId;
+  }
 
+  public getRequestId(): bigint {
+    return this.requestId;
+  }
 
-    /**
-     * ------------------------------以下是属性的getter和setter方法----------------------------------------
-     */
-    public setRequestId(requestId: bigint): void {
-        this.requestId = requestId;
-    }
+  public setCompressType(compressType: number): void {
+    this.compressType = compressType;
+  }
 
-    public getRequestId(): bigint {
-        return this.requestId;
-    }
+  public getCompressType(): number {
+    return this.compressType;
+  }
 
-    public setCompressType(compressType: number): void {
-        this.compressType = compressType;
-    }
+  public setSerializeType(serializeType: number): void {
+    this.serializeType = serializeType;
+  }
 
-    public getCompressType(): number {
-        return this.compressType;
-    }
+  public getSerializeType(): number {
+    return this.serializeType;
+  }
 
-    public setSerializeType(serializeType: number): void {
-        this.serializeType = serializeType;
-    }
+  public setDescriptionId(descriptionId: bigint): void {
+    this.descriptionId = descriptionId;
+  }
 
-    public getSerializeType(): number {
-        return this.serializeType;
-    }
+  public getDescriptionId(): bigint {
+    return this.descriptionId;
+  }
 
-    public setDescriptionId(descriptionId: bigint): void {
-        this.descriptionId = descriptionId;
-    }
+  public setResponseType(responseType: number): void {
+    this.responseType = responseType;
+  }
 
-    public getDescriptionId(): bigint {
-        return this.descriptionId;
-    }
+  public getResponseType(): number {
+    return this.responseType;
+  }
 
-    public setResponseType(responseType: number): void {
-        this.responseType = responseType;
-    }
+  public setResponseBody(responseBody: ResponsePayload): void {
+    this.responseBody = responseBody;
+  }
 
-    public getResponseType(): number {
-        return this.responseType;
-    }
-
-    public setResponseBody(responseBody: ResponsePayload): void {
-        this.responseBody = responseBody;
-    }
-
-    public getResponseBody(): ResponsePayload {
-        return this.responseBody;
-    }
+  public getResponseBody(): ResponsePayload {
+    return this.responseBody;
+  }
 }

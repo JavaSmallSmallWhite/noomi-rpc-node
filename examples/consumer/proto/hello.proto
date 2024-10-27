@@ -1,0 +1,14 @@
+package com.node.test;
+
+message Request {
+    required string name = 1;
+    optional int32 age = 2;
+}
+
+message Response {
+  required int32 number = 1;
+}
+
+service Greeter {
+  rpc sayHi (Request) returns (Response){}
+}

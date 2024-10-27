@@ -1,58 +1,69 @@
-import {Logger} from "../common/logger/Logger";
+import { Logger } from "../common/logger/Logger";
 
 /**
  * 请求body的封装
  */
 export class RequestPayload {
+  /**
+   * 服务名
+   * @private
+   */
+  private serviceName: string;
 
-    /**
-     * 服务名
-     * @private
-     */
-    private serviceName: string;
+  /**
+   * 方法名
+   * @private
+   */
+  private methodName: string;
 
-    /**
-     * 方法名
-     * @private
-     */
-    private methodName: string;
+  /**
+   * 参数列表
+   * @private
+   */
+  private argumentsList: Array<unknown>;
 
-    /**
-     * 参数列表
-     * @private
-     */
-    private argumentsList: Array<unknown>;
+  /**
+   * token
+   * @private
+   */
+  private token: string;
 
+  public constructor() {
+    Logger.debug("创建请求体成功。");
+  }
 
-    public constructor() {
-        Logger.debug("创建请求体成功。");
-    }
+  /**
+   * -----------------------------以下是属性的getter和setter方法----------------------------------------
+   */
+  public getServiceName(): string {
+    return this.serviceName;
+  }
 
+  public setServiceName(serviceName: string): void {
+    this.serviceName = serviceName;
+  }
 
-    /**
-     * -----------------------------以下是属性的getter和setter方法----------------------------------------
-     */
-    public getServiceName(): string {
-        return this.serviceName;
-    }
+  public getMethodName(): string {
+    return this.methodName;
+  }
 
-    public setServiceName(serviceName: string): void {
-        this.serviceName = serviceName;
-    }
+  public setMethodName(methodName: string) {
+    this.methodName = methodName;
+  }
 
-    public getMethodName(): string {
-        return this.methodName;
-    }
+  public getArgumentsList(): Array<unknown> {
+    return this.argumentsList;
+  }
 
-    public setMethodName(methodName: string) {
-        this.methodName = methodName;
-    }
+  public setArgumentsList(argumentsList: Array<unknown>) {
+    this.argumentsList = argumentsList;
+  }
 
-    public getArgumentsList(): Array<unknown> {
-        return this.argumentsList;
-    }
+  public getToken(): string {
+    return this.token;
+  }
 
-    public setArgumentsList(argumentsList: Array<unknown>) {
-        this.argumentsList = argumentsList;
-    }
+  public setToken(token: string) {
+    this.token = token;
+  }
 }

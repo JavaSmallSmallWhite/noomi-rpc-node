@@ -1,5 +1,5 @@
-export class RateLimiterError extends Error{
-    constructor(message: string) {
-        super(message);
-    }
+export class RateLimiterError extends Error {
+  constructor(message: string) {
+    super(message);
+  }
 }

@@ -1,7 +1,5 @@
-export class DateError extends Error{
-
-    constructor(message: string) {
-        super(message);
-    }
-
+export class DateError extends Error {
+  constructor(message: string) {
+    super(message);
+  }
 }

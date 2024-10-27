@@ -1,26 +1,26 @@
-import {SerializerFactory} from "../../serialize/SerializerFactory";
-import {ObjectWrapper} from "../../configuration/ObjectWrapper";
-import {Serializer} from "../../serialize/Serializer";
-import {NoomiRpcStarter} from "../../NoomiRpcStarter";
+import { SerializerFactory } from "../../serialize/SerializerFactory";
+import { ObjectWrapper } from "../../configuration/ObjectWrapper";
+import { Serializer } from "../../serialize/Serializer";
+import { NoomiRpcStarter } from "../../NoomiRpcStarter";
 
 /**
  * 自定义添加序列化器的选项
  */
 export interface SerializerOption {
-    /**
-     * 序列化器id，框架自带1号和2号序列化器，不可与框架自带的序列化器名称重复
-     */
-    serializerId: number,
+  /**
+   * 序列化器id，框架自带1号和2号序列化器，不可与框架自带的序列化器名称重复
+   */
+  serializerId: number;
 
-    /**
-     * 是否使用
-     */
-    isUse?: boolean,
+  /**
+   * 是否使用
+   */
+  isUse?: boolean;
 
-    /**
-     * 序列化器名称，不可与框架自带的序列化器名称重复
-     */
-    serializerName?: string
+  /**
+   * 序列化器名称，不可与框架自带的序列化器名称重复
+   */
+  serializerName?: string;
 }
 
 /**
@@ -28,17 +28,17 @@ export interface SerializerOption {
  * @constructor
  */
 export function CustomSerializer(serializerOption: SerializerOption): (target: Function) => void {
-    return (target: Function): void => {
-        const serializerName: string = serializerOption["serializerName"] || target.name
-        SerializerFactory.addSerializer(
-            new ObjectWrapper<Serializer>(
-                serializerOption["serializerId"],
-                serializerName,
-                Reflect.construct(target, [])
-            )
-        );
-        if (serializerOption["isUse"]) {
-            NoomiRpcStarter.getInstance().getConfiguration().serializerType = serializerName;
-        }
+  return (target: Function): void => {
+    const serializerName: string = serializerOption["serializerName"] || target.name;
+    SerializerFactory.addSerializer(
+      new ObjectWrapper<Serializer>(
+        serializerOption["serializerId"],
+        serializerName,
+        Reflect.construct(target, [])
+      )
+    );
+    if (serializerOption["isUse"]) {
+      NoomiRpcStarter.getInstance().getConfiguration().serializerType = serializerName;
     }
+  };
 }
