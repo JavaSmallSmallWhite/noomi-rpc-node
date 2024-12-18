@@ -13,6 +13,7 @@ import { Application } from "./common/utils/ApplicationUtil";
 import { Socket } from "./common/utils/TypesUtil";
 import { HeartBeatDetector } from "./heartbeat/HeartBeatDetector";
 import { NoomiRpcError } from "./common/error/NoomiRpcError";
+import { TipManager } from "./common/error/TipManager";
 
 /**
  * RPC框架启动类
@@ -144,10 +145,10 @@ export class NoomiRpcStarter {
     process.on("SIGTERM", GraceFullyShutdownHook.run);
     const serviceName: string = service.serviceName;
     if (!serviceName) {
-      throw new NoomiRpcError(`未配置服务名称。`);
+      throw new NoomiRpcError("0210");
     }
     if (GlobalCache.SERVICES_LIST.has(serviceName)) {
-      throw new NoomiRpcError(`${serviceName}已存在。`);
+      throw new NoomiRpcError("0211", serviceName);
     }
     this.configuration.registryConfig.getRegistry().register(service);
     GlobalCache.SERVICES_LIST.set(serviceName, service);
@@ -161,16 +162,16 @@ export class NoomiRpcStarter {
     const address = NetUtil.getIpv4Address();
     const server = Application.net.createServer();
     server.on("close", function (): void {
-      Logger.info("tcp服务器关闭。");
+      Logger.info(TipManager.getTip("0152"));
     });
     server.on("error", function (error: Error): void {
-      Logger.error(`tcp服务器出现异常，异常信息为：${error.message}`);
+      Logger.error(TipManager.getError("0409", error.message));
     });
     server.on("connection", function (socketChannel: Socket): void {
       HandlerFactory.handleProviderRequestAndResponse(socketChannel).then();
     });
     server.listen(port, function (): void {
-      Logger.info(`tcp服务器启动成功，监听服务器地址为：${address}，监听端口为：${port}`);
+      Logger.info(TipManager.getTip("0153", address, port));
     });
   }
 

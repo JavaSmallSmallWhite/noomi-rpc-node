@@ -15,6 +15,8 @@ import { RateLimiterFactory } from "../../sentinel/ratelimit/RateLimiterFactory"
 import { Socket } from "../../common/utils/TypesUtil";
 import { FilterFactory } from "../../filter/FilterFactory";
 import { WebAfterHandler } from "../../webafter/WebAfterHandler";
+import { TipManager } from "../../common/error/TipManager";
+import { NoomiRpcError } from "../../common/error/NoomiRpcError";
 
 /**
  * 服务调用处理器
@@ -54,7 +56,7 @@ export class MethodCallInBoundHandler extends InBoundHandler<NoomiRpcRequest, No
     const allowRequest: boolean = rateLimiter.allowRequest();
 
     if (!allowRequest) {
-      Logger.error("服务端被限流。");
+      Logger.error(TipManager.getTip("0707"));
       // 处理限流
       noomiRpcResponse.setResponseType(ResponseType.RATE_LIMIT);
     } else if (noomiRpcRequest.getRequestType() === RequestType.HEART_BEAT_REQUEST) {
@@ -89,9 +91,9 @@ export class MethodCallInBoundHandler extends InBoundHandler<NoomiRpcRequest, No
         responsePayload.setReturnValue(returnValue);
         noomiRpcResponse.setResponseType(ResponseType.SUCCESS_COMMON);
         noomiRpcResponse.setResponseBody(responsePayload);
-        Logger.debug(`请求${noomiRpcRequest.getRequestId()}已经完成方法的调用`);
+        Logger.debug(``);
       } catch (error) {
-        Logger.error(`请求编号为${noomiRpcRequest.getRequestId()}的请求在调用过程中发生异常。`);
+        Logger.error(TipManager.getTip("0145", noomiRpcRequest.getRequestId()));
         noomiRpcResponse.setResponseType(ResponseType.FAIL);
       }
     }
@@ -112,8 +114,7 @@ export class MethodCallInBoundHandler extends InBoundHandler<NoomiRpcRequest, No
     try {
       returnValue = await service.interfaceProvider[methodName](...argumentsList);
     } catch (error) {
-      Logger.error(`调用服务${serviceName}的方法${methodName}时发生了异常`);
-      throw new Error(error.message);
+      throw new NoomiRpcError("0900", serviceName, methodName, error.message);
     }
     return returnValue;
   }

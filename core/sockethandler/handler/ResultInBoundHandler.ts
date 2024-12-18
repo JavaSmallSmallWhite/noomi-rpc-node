@@ -9,6 +9,7 @@ import { LoadBalancer } from "../../loadbalance/LoadBalancer";
 import { NoomiRpcStarter } from "../../NoomiRpcStarter";
 import { Socket } from "../../common/utils/TypesUtil";
 import { NoomiRpcError } from "../../common/error/NoomiRpcError";
+import { TipManager } from "../../common/error/TipManager";
 
 /**
  * 结果处理器
@@ -28,34 +29,38 @@ export class ResultInBoundHandler extends InBoundHandler<NoomiRpcResponse, unkno
     const circuitBreaker: CircuitBreaker = everyIpCircuitBreaker.get(serviceNode);
 
     if (responseType === ResponseType.SUCCESS_HEART_BEAT) {
-      Logger.debug(
-        `已寻找到编号为${noomiRpcResponse.getRequestId()}的请求和响应，处理心跳检测，处理结果。`
-      );
+      Logger.debug(TipManager.getTip("0149", noomiRpcResponse.getRequestId()));
     } else if (responseType === ResponseType.SUCCESS_COMMON) {
-      Logger.debug(`已寻找到编号为${noomiRpcResponse.getRequestId()}的请求和响应，处理结果。`);
+      Logger.debug(TipManager.getTip("0150", noomiRpcResponse.getRequestId()));
       return Promise.resolve(noomiRpcResponse.getResponseBody().getReturnValue());
     } else if (responseType === ResponseType.RATE_LIMIT) {
       circuitBreaker.recordErrorRequest();
       Logger.error(
-        `当前id为${noomiRpcResponse.getRequestId()}的请求，被限流，响应码${noomiRpcResponse.getResponseType()}。`
+        TipManager.getError(
+          "0708",
+          noomiRpcResponse.getRequestId(),
+          noomiRpcResponse.getResponseType()
+        )
       );
-      throw new NoomiRpcError(responseType, ResponseType.RATE_LIMIT_DESCRIPTION);
     } else if (responseType === ResponseType.RESOURCE_NOT_FOUND) {
       circuitBreaker.recordErrorRequest();
       Logger.error(
-        `当前id为${noomiRpcResponse.getRequestId()}的请求，未找到目标资源，响应码${noomiRpcResponse.getResponseType()}。`
+        TipManager.getError(
+          "0709",
+          noomiRpcResponse.getRequestId(),
+          noomiRpcResponse.getResponseType()
+        )
       );
-      throw new NoomiRpcError(responseType, ResponseType.RESOURCE_NOT_FOUND_DESCRIPTION);
     } else if (responseType === ResponseType.FAIL) {
       circuitBreaker.recordErrorRequest();
       Logger.error(
-        `当前id为${noomiRpcResponse.getRequestId()}的请求，返回错误的结果，响应码${noomiRpcResponse.getResponseType()}。`
+        TipManager.getError(
+          "0710",
+          noomiRpcResponse.getRequestId(),
+          noomiRpcResponse.getResponseType()
+        )
       );
-      throw new NoomiRpcError(responseType, ResponseType.FAIL_DESCRIPTION);
     } else if (responseType === ResponseType.BE_CLOSING) {
-      Logger.error(
-        `当前id为${noomiRpcResponse.getRequestId()}的请求，访问被拒绝，目标服务器正处于关闭中，响应码${noomiRpcResponse.getResponseType()}。`
-      );
       GlobalCache.CHANNEL_CACHE.delete(serviceNode);
       const loadBalancer: LoadBalancer = LoadBalancerFactory.getLoadBalancer(
         NoomiRpcStarter.getInstance().getConfiguration().loadBalancerType
@@ -63,7 +68,13 @@ export class ResultInBoundHandler extends InBoundHandler<NoomiRpcResponse, unkno
       loadBalancer.reLoadBalance(noomiRpcResponse.getResponseBody().getServiceName(), [
         ...GlobalCache.CHANNEL_CACHE.keys()
       ]);
-      throw new NoomiRpcError("");
+      Logger.error(
+        TipManager.getError(
+          "0711",
+          noomiRpcResponse.getRequestId(),
+          noomiRpcResponse.getResponseType()
+        )
+      );
     }
   }
 }

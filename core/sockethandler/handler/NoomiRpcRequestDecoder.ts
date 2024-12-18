@@ -10,6 +10,7 @@ import { BufferToMessageDecoderHandler } from "../BufferToMessageDecoderHandler"
 import { Socket } from "../../common/utils/TypesUtil";
 import { InterfaceUtil } from "../../common/utils/InterfaceUtil";
 import { NoomiRpcError } from "../../common/error/NoomiRpcError";
+import { TipManager } from "../../common/error/TipManager";
 
 /**
  * 请求解码器
@@ -24,7 +25,7 @@ export class NoomiRpcRequestDecoder extends BufferToMessageDecoderHandler<NoomiR
     _socketChannel: Socket,
     noomiRpcRequestBuffer: Buffer
   ): Promise<NoomiRpcRequest> {
-    Logger.debug("开始解析请求报文。");
+    Logger.debug(TipManager.getTip("0143"));
 
     // 偏移量指针
     let index: number = 0;
@@ -35,14 +36,14 @@ export class NoomiRpcRequestDecoder extends BufferToMessageDecoderHandler<NoomiR
       .toString();
     index += MessageConstant.MAGIC_FIELD_LENGTH;
     if (magic !== MessageConstant.MAGIC.toString()) {
-      throw new NoomiRpcError("获得的请求不合法。");
+      throw new NoomiRpcError("0405");
     }
 
     // 解析版本
     const version: number = noomiRpcRequestBuffer.readUInt8(index);
     index += MessageConstant.VERSION_FIELD_LENGTH;
     if (version > MessageConstant.VERSION) {
-      throw new NoomiRpcError("获得的请求版本不被支持。");
+      throw new NoomiRpcError("0406");
     }
 
     // 解析头部长度
@@ -140,10 +141,9 @@ export class NoomiRpcRequestDecoder extends BufferToMessageDecoderHandler<NoomiR
       requestPayload.setServiceName(serviceName);
       requestPayload.setMethodName(methodName);
       requestPayload.setArgumentsList(argumentsList);
-      Logger.debug(`请求id为${requestId}的请求反序列化成功。`);
       noomiRpcRequest.setRequestPayload(requestPayload);
     }
-    Logger.debug(`解析id为${requestId}的请求成功。`);
+    Logger.debug(TipManager.getTip("0144", requestId));
     return noomiRpcRequest;
   }
 }

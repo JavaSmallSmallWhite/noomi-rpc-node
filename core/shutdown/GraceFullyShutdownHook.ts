@@ -1,5 +1,6 @@
 import { ShutdownHolder } from "./ShutdownHolder";
 import { Logger } from "../common/logger/Logger";
+import { TipManager } from "../common/error/TipManager";
 
 /**
  * 服务端的优雅关闭
@@ -9,7 +10,7 @@ export class GraceFullyShutdownHook {
    * 服务端关闭执行函数
    */
   public static async run(): Promise<void> {
-    Logger.info("进程关闭中.....");
+    Logger.info(TipManager.getTip("0140"));
     ShutdownHolder.BAFFLE = true;
 
     const start: number = Date.now();
@@ -24,7 +25,7 @@ export class GraceFullyShutdownHook {
         break;
       }
     }
-    Logger.info("进程关闭结束。");
+    Logger.info(TipManager.getTip("0141"));
     process.exit(0);
   }
 }

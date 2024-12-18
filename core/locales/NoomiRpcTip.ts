@@ -90,13 +90,37 @@ export const NoomiRpcTip_zh: NoomiRpcTip = {
     "0133": "创建NoomiRpc请求成功",
     "0134": "创建NoomiRpc响应成功",
 
-    "0135": "接口对象${0}的${1}方法的代理对象创建成功。",
+    "0135": "接口对象${0}的${1}方法的代理对象创建成功",
 
-    "0136": "服务${0}，已经被注册。"
+    "0136": "服务${0}，已经被注册",
+
+    "0137": "description反序列化操作完成",
+    "0138": "请求体反序列化操作完成",
+    "0139": "序列化成功，序列化后的字节数为：${0}",
+
+    "0140": "进程关闭中.....",
+    "0141": "进程关闭结束",
+
+    "0142": "请求报文封装成功，请求报文如下：${0}",
+    "0143": "开始解析请求报文",
+    "0144": "解析id为${0}的请求成功",
+    "0145": "请求${0}已经完成方法的调用",
+    "0146": "响应报文封装成功，响应报文如下：${0}",
+    "0147": "开始解析响应报文",
+    "0148": "请求id为${0}的响应反序列化成功",
+    "0149": "已寻找到编号为${0}的请求和响应，处理心跳检测，处理结果",
+    "0150": "已寻找到编号为${0}的请求和响应，处理结果",
+    "0151": "检测到服务${0}有节点上/下线，将重新拉取服务列表...",
+
+    "0152": "tcp服务器关闭",
+    "0153": "tcp服务器启动成功，监听服务器地址为：${0}，监听端口为：${1}",
+    "0154": "接口对象${0}的代理对象创建成功"
   },
   //异常消息，前两位表示模块，后两位表示序号
   error: {
     "0000": "未知错误",
+    "0001": "空数组不能转换",
+    "0002": "未知数据类型：${0}",
 
     "0100": "读取rpc.json配置文件失败",
     "0101": "解析rpc.json文件内容的配置对象失败",
@@ -105,6 +129,7 @@ export const NoomiRpcTip_zh: NoomiRpcTip = {
     "0104": "接口文件中：${0}不存在",
     "0105": "对象wrapper配置：${0}的配置已存在",
     "0106": "对象wrapper配置：${0}的配置不存在",
+    "0107": "未配置服务名称或未配置接口对象",
 
     "0200": "连接${0}注册中心的配置未配置连接地址",
     "0201": "创建${0}注册中心实例时发生异常，异常信息为：${1}",
@@ -116,13 +141,23 @@ export const NoomiRpcTip_zh: NoomiRpcTip = {
     "0207": "获取${0}节点的子节点发生异常，异常信息为：${1}",
     "0208": "获取${0}节点数据发生异常，异常信息为：${1}",
     "0209": "关闭zookeeper时发生问题，异常信息为：${0}",
+    "0210": "未配置服务名称",
+    "0211": "${0}服务已存在",
 
     "0300": "您传入的数据中心编号不合法！",
     "0301": "您输入的机器编号不合法！",
     "0302": "您的服务器进行了时钟回调！",
 
     "0400": "未获取到本地Ipv4地址！",
-    "0401": "和地址为${0}:${1}的主机连接发生异常，正在进行第${2",
+    "0401": "和地址为${0}:${1}的主机连接发生异常，正在进行第${2}",
+    "0402": "handler处理器类别不合法",
+    "0403": "handler处理器不合法",
+    "0404": "handler处理链异常",
+    "0405": "非法请求",
+    "0406": "获得的请求版本不被支持",
+    "0407": "非法响应",
+    "0408": "获得的请求版本不被支持",
+    "0409": "tcp服务器出现异常，异常信息为：${0}",
 
     "0500": "对字节数组进行压缩时发生异常，异常信息为：${0}",
     "0501": "对字节数组进行解压缩时发生异常，异常信息为：${0}",
@@ -131,12 +166,37 @@ export const NoomiRpcTip_zh: NoomiRpcTip = {
 
     "0600": "未找到您配置的${0}负载均衡器，默认选用1号RoundRobinLoadBalancer的负载均衡器。",
     "0601": "未找到您配置的编号为${0}负载均衡器，默认选用1号RoundRobinLoadBalancer的负载均衡器。",
-    "0602":
-      "不存在您所指定的负载均衡类型或负载均衡码，默认选用1号RoundRobinLoadBalancer的负载均衡器。",
+    "0602": "不存在该负载均衡类型或负载均衡码，默认选用1号RoundRobinLoadBalancer的负载均衡器。",
     "0603": "编号为${0}的负载均衡器已存在，请使用其他编号。",
     "0604": "名称为${0}的负载均衡器已存在，请使用其他名称。",
     "0605": "进行负载均衡选取节点时发现服务列表为空",
-    "0606": "本地没有获取到服务列表"
+    "0606": "本地没有获取到服务列表",
+
+    "0700": "未找到您配置的${0}熔断器，默认选用SeniorCircuitBreaker熔断器",
+    "0701": "熔断器名称为${0}的熔断器器已存在，请使用其他名称",
+    "0702": "未找到您配置的${0}限流器，默认选用TokenBuketRateLimiter限流器",
+    "0703": "限流器名称为${0}的限流器已存在，请使用其他名称",
+    "0704": "当前断路器已经开启，无法发送请求",
+    "0705": "对方法${0}进行调用时，重试${1}次，依然不可调用",
+    "0706": "在进行第${0}次重试时发生异常。",
+    "0707": "服务端被限流",
+    "0708": "当前id为${0}的请求，被限流，响应码为：${1}",
+    "0709": "当前id为${0}的请求，未找到目标资源，响应码为：${1}",
+    "0710": "当前id为${0}的请求，返回错误的结果，响应码为：${1}",
+    "0711": "当前id为${0}的请求，访问被拒绝，目标服务器正处于关闭中，响应码为：${1}",
+
+    "0800": "反序列化时传入的Buffer流为空，或者反序列化后指定的目标类为空",
+    "0801": "反序列化操作失败， 异常信息为：${0}",
+    "0802": "序列化的请求体为空",
+    "0803": "序列化操作失败，异常信息为：${0}",
+    "0804": "未配置proto文件或对象类型名或方法名或参数返回值标签名",
+    "0805": "未找到您配置的${0}序列化器，默认选用1号json的序列化器",
+    "0806": "未找到您配置的编号为${0}的序列化器，默认选用1号json的负载均衡器",
+    "0807": "不存在您所指定的序列化类型或序列化码，默认选用1号json的序列化器",
+    "0808": "编号为${0}的序列化器已存在，请使用其他编号",
+    "0809": "序列化名称为${0}的序列化器已存在，请使用其他名称。",
+
+    "0900": "调用服务${0}的方法${1}时发生了异常，异常信息为：${2}"
   },
   //模型消息
   model: {
@@ -169,74 +229,168 @@ export const NoomiRpcTip_zh: NoomiRpcTip = {
  */
 export const NoomiRpcTip_en: NoomiRpcTip = {
   tip: {
-    "0100": "Noomi is booting ...",
-    "0101": "redis initing ...",
-    "0102": "redis inition finished",
-    "0103": "web initing ...",
-    "0104": "web inition finished",
-    "0105": "instance factory initing ...",
-    "0106": "instance factory inition finished!",
-    "0107": "filter initing...",
-    "0108": "filter inition finished",
-    "0109": "route factory initing ...",
-    "0110": "route factory inition finished",
-    "0111": "datasource initing ...",
-    "0112": "datasource inition finished",
-    "0113": "aop initing ...",
-    "0114": "aop inition finished",
-    "0115": "security initing ...",
-    "0116": "security inition finished",
-    "0117": "Noomi is started!",
-    "0118": "address is in used，trying again ...",
-    "0119": "check and execute launch hooks ...",
-    "0120": "launch hooks execution finished!",
-    "0121": "Http Server is running,listening port ${0}",
-    "0122": "Https Server is running,listening port ${0}"
+    "0100": "Startup port set successfully! The port is: ${0}",
+    "0101": "Internationalization language set successfully! The language is: ${0}",
+    "0102": "Application name set successfully! The application name is: ${0}",
+    "0103": "Log information set successfully! The log information used is: ${0}",
+    "0104": "Interface directory set successfully! The interface directory is: ${0}",
+    "0105": "Startup directory set successfully! The service prefix is: ${0}",
+    "0106": "Registry center set successfully! The registry center is: ${0}",
+    "0107": "Load balancing strategy set successfully! The load balancing strategy is: ${0}",
+    "0108": "Serializer set successfully! The serialization strategy is: ${0}",
+    "0109": "Compressor set successfully! The compression strategy is: ${0}",
+    "0110": "ID generator set successfully! The ID generator is: ${0}",
+    "0111": "Circuit breaker type set successfully! The circuit breaker name is: ${0}",
+    "0112": "Rate limiter type set successfully! The rate limiter name is: ${0}",
+    "0113": "Specific configuration parsing succeeded!",
+
+    "0114":
+      "User did not set the ${0} registry center connection configuration, default connection configuration will be used",
+    "0115": "Client successfully connected to the ${0} registry center",
+    "0116": "${0} service's ${1}:${2} node registered successfully",
+    "0117": "Successfully retrieved all service node instances under ${0}.",
+    "0118": "Service ${0} is now listening.",
+    "0119": "Root node ${0} created successfully.",
+    "0120": "Node ${0} already exists, no need to create",
+    "0121": "Successfully retrieved all child nodes under ${0}. Child nodes are: ${1}",
+    "0122": "Successfully retrieved node data for ${0}. Node data is: ${1}.",
+    "0123": "Zookeeper connection closed successfully!",
+
+    "0124": "Generated distributed unique ID: ${0}!",
+
+    "0125": "Byte array was compressed, length reduced from ${0} to ${1}",
+    "0126": "Byte array was decompressed, length reduced from ${0} to ${1}",
+    "0127": "Could not find the ${0} compressor you configured, defaulting to compressor 1 (gzip)",
+    "0128":
+      "Could not find the compressor with ID ${0} you configured, defaulting to compressor 1 (gzip)",
+    "0129":
+      "The specified compression type or compression code does not exist, defaulting to compressor 1 (gzip)",
+
+    "0130": "The response time with ${0} server is: ${1}",
+
+    "0131": "Node with hash ${0} has been added to the hash ring",
+    "0132": "Service node with response time ${0}ms has been selected",
+    "0133": "NoomiRpc request created successfully",
+    "0134": "NoomiRpc response created successfully",
+
+    "0135": "Proxy object for method ${1} of interface object ${0} created successfully",
+
+    "0136": "Service ${0} is already registered",
+
+    "0137": "Description deserialization completed",
+    "0138": "Request body deserialization completed",
+    "0139": "Serialization successful, serialized byte count: ${0}",
+
+    "0140": "Process closing....",
+    "0141": "Process closed",
+
+    "0142": "Request message packaged successfully, the request message is: ${0}",
+    "0143": "Started parsing request message",
+    "0144": "Request with ID ${0} parsed successfully",
+    "0145": "Request ${0} has completed method invocation",
+    "0146": "Response message packaged successfully, the response message is: ${0}",
+    "0147": "Started parsing response message",
+    "0148": "Response deserialization for request with ID ${0} completed successfully",
+    "0149":
+      "Found request and response with ID ${0}, processing heartbeat detection, result processed",
+    "0150": "Found request and response with ID ${0}, processing result",
+    "0151": "Detected node up/down for service ${0}, will pull the service list again...",
+
+    "0152": "TCP server closed",
+    "0153": "TCP server started successfully, listening on address: ${0}, port: ${1}",
+    "0154": "Proxy object for interface object ${0} created successfully"
   },
-  //异常消息
+  // Error messages, the first two digits represent module, the last two digits represent sequence
   error: {
-    "0000": "unknown error",
-    "0001": "Error in configuration process,noomi.ini may be invalid",
-    "0050": "file is not exist",
-    "0100": "Error in exception configuration file,Please read the official documentation!",
-    "0500": "Error in web configuration file,Please read the official documentation!",
-    "0501": "upload file is oversize",
-    "0502": "form submit without boundary",
-    "0600": "Lack of redis config!",
+    "0000": "Unknown error",
+    "0001": "Empty array cannot be converted",
+    "0002": "Unknown data type: ${0}",
 
-    "1000": "Error in instance configuration file,Please read the official documentation!",
-    "1001": "Instance '${0}' does not exist",
-    "1002": "Instance '${0}' already exists，it cannot be defined repatedly",
-    "1003": "Module must be defined as class",
-    "1004": "Module path '${0}' does not exist",
-    "1010": "Instance method '${0}' does not exist",
-    "1011": "instance decorator params are wrong",
+    "0100": "Failed to read rpc.json configuration file",
+    "0101": "Failed to parse rpc.json file content to configuration object",
+    "0102": "Configuration initialization exception! Exception message: ${0}",
+    "0103": "Interface file path: ${0} does not exist",
+    "0104": "Interface file: ${0} does not exist",
+    "0105": "Object wrapper configuration: ${0} already exists",
+    "0106": "Object wrapper configuration: ${0} does not exist",
+    "0107": "Service name not configured or interface object not configured",
 
-    "2000": "Error in aop configuration file,Please read the official documentation!",
-    "2001": "Error in expressions parameter configuration of pointcut",
-    "2002": "pointcut '${0}' does not exist",
-    "2003": "pointcut '${0}' already exists，it cannot be defined repatedly",
-    "2005": "advice '${0}' already exists",
+    "0200": "Connection address for ${0} registry center is not configured",
+    "0201":
+      "Exception occurred while creating ${0} registry center instance, exception message: ${1}",
+    "0202": "Registration failed for ${0} service's ${1}:${2} node, exception message: ${3}",
+    "0203": "Failed to retrieve ${0} service node instances, exception message: ${1}",
+    "0204": "Service ${0} listen failed, exception message: ${1}",
+    "0205": "Exception occurred while creating ${0}, exception message: ${1}",
+    "0206": "Exception occurred while judging ${0} node, exception message: ${1}",
+    "0207": "Exception occurred while retrieving ${0} node's child nodes, exception message: ${1}",
+    "0208": "Exception occurred while retrieving ${0} node data, exception message: ${1}",
+    "0209": "Exception occurred while closing zookeeper, exception message: ${0}",
+    "0210": "Service name not configured",
+    "0211": "${0} service already exists",
 
-    "2100": "Error in route configuration file,Please read the official documentation!",
-    "2101": "Error in route results configuration",
-    "2102": "Error in access route",
-    "2103": "Route '${0}' is not exist",
+    "0300": "Invalid data center ID passed in!",
+    "0301": "Invalid machine ID entered!",
+    "0302": "Your server performed a clock rollback!",
 
-    "2200": "Error in filter configuration file,Please read the official documentation!",
+    "0400": "Could not retrieve local IPv4 address!",
+    "0401": "Exception occurred while connecting to host at ${0}:${1}, retrying ${2} times",
+    "0402": "Handler processor type is invalid",
+    "0403": "Handler processor is invalid",
+    "0404": "Handler processing chain exception",
+    "0405": "Illegal request",
+    "0406": "Received request version is not supported",
+    "0407": "Illegal response",
+    "0408": "Received response version is not supported",
+    "0409": "TCP server exception, exception message: ${0}",
 
-    "2500": "Error in orm configuration file,Please read the official documentation!",
+    "0500": "Exception occurred while compressing byte array, exception message: ${0}",
+    "0501": "Exception occurred while decompressing byte array, exception message: ${0}",
+    "0502": "Compressor with ID ${0} already exists, please use a different ID",
+    "0503": "Compressor with name ${0} already exists, please use a different name.",
 
-    "2600": "Error in redis configuration file,Please read the official documentation!",
-    "2601": "redis client '${0}' does not exist",
+    "0600":
+      "Could not find the ${0} load balancer you configured, defaulting to load balancer 1 (RoundRobinLoadBalancer).",
+    "0601":
+      "Could not find the load balancer with ID ${0} you configured, defaulting to load balancer 1 (RoundRobinLoadBalancer).",
+    "0602":
+      "The specified load balancing type or load balancing code does not exist, defaulting to load balancer 1 (RoundRobinLoadBalancer).",
+    "0603": "Load balancer with ID ${0} already exists, please use a different ID.",
+    "0604": "Load balancer with name ${0} already exists, please use a different name.",
+    "0605": "Found empty service list when selecting node for load balancing",
+    "0606": "No service list retrieved locally",
 
-    "2700": "Error in security configuration file,Please read the official documentation!",
+    "0700":
+      "Could not find the ${0} circuit breaker you configured, defaulting to SeniorCircuitBreaker circuit breaker",
+    "0701": "Circuit breaker with name ${0} already exists, please use a different name",
+    "0702":
+      "Could not find the ${0} rate limiter you configured, defaulting to TokenBucketRateLimiter rate limiter",
+    "0703": "Rate limiter with name ${0} already exists, please use a different name",
+    "0704": "Circuit breaker is already open, cannot send request",
+    "0705": "Call failed after ${1} retries for method ${0}",
+    "0706": "Exception occurred during retry ${0}.",
+    "0707": "Server limited the request",
+    "0708": "Request with ID ${0} limited, response code: ${1}",
+    "0709": "Request with ID ${0} not found, response code: ${1}",
+    "0710": "Request with ID ${0} returned error, response code: ${1}",
+    "0711": "Request with ID ${0} was denied, target server is shut down, response code: ${1}",
 
-    "2800": "Error in data source configuration file,Please read the official documentation!",
+    "0800":
+      "Buffer stream passed in for deserialization is empty, or target class for deserialization is empty",
+    "0801": "Deserialization failed, exception message: ${0}",
+    "0802": "Serialized request body is empty",
+    "0803": "Serialization failed, exception message: ${0}",
+    "0804":
+      "Proto file, object type name, method name, or parameter return value label name not configured",
+    "0805": "Could not find the ${0} serializer you configured, defaulting to serializer 1 (json)",
+    "0806":
+      "Could not find the serializer with ID ${0} you configured, defaulting to serializer 1 (json)",
+    "0807":
+      "The specified serialization type or serialization code does not exist, defaulting to serializer 1 (json)",
+    "0808": "Serializer with ID ${0} already exists, please use a different ID",
+    "0809": "Serializer with name ${0} already exists, please use a different name.",
 
-    "3002": "Attempt to allocate Buffer larger than maximum size",
-    "3010": "key already exists，it cannot be defined as object",
-    "3011": "need value"
+    "0900": "Exception occurred while calling method ${1} of service ${0}, exception message: ${2}"
   },
   //模型消息
   model: {

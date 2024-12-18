@@ -12,6 +12,7 @@ import { MsgpackSerializer } from "./impl/MsgpackSerializer";
 import { Application } from "../common/utils/ApplicationUtil";
 import { InternalSerializerType, TypeDescription } from "../common/utils/TypesUtil";
 import { NoomiRpcError } from "../common/error/NoomiRpcError";
+import { TipManager } from "../common/error/TipManager";
 
 /**
  * 序列化工厂
@@ -68,7 +69,7 @@ export class SerializerFactory {
       const serializerObjectWrapper: ObjectWrapper<Serializer> =
         this.SERIALIZER_CACHE.get(serializerTypeOrCode);
       if (!serializerObjectWrapper) {
-        Logger.error(`未找到您配置的${serializerTypeOrCode}序列化器，默认选用1号json的序列化器。`);
+        Logger.error(TipManager.getError("0805", serializerTypeOrCode));
         return this.SERIALIZER_CACHE.get("json");
       }
       return serializerObjectWrapper;
@@ -77,14 +78,12 @@ export class SerializerFactory {
       const serializerObjectWrapper: ObjectWrapper<Serializer> =
         this.SERIALIZER_CACHE_CODE.get(serializerTypeOrCode);
       if (!serializerObjectWrapper) {
-        Logger.error(
-          `未找到您配置的编号为${serializerTypeOrCode}的序列化器，默认选用1号json的负载均衡器。`
-        );
+        Logger.error(TipManager.getError("0806", serializerTypeOrCode));
         return this.SERIALIZER_CACHE_CODE.get(1);
       }
       return serializerObjectWrapper;
     }
-    Logger.error("不存在您所指定的序列化类型或序列化码，默认选用1号json的序列化器。");
+    Logger.error(TipManager.getError("0807"));
     return this.SERIALIZER_CACHE_CODE.get(1);
   }
 
@@ -109,14 +108,10 @@ export class SerializerFactory {
       return serializerWrapper;
     }
     if (this.SERIALIZER_CACHE_CODE.has(serializerObjectWrapper.code)) {
-      throw new NoomiRpcError(
-        `编号为${serializerObjectWrapper.code}的序列化器已存在，请使用其他编号。`
-      );
+      throw new NoomiRpcError("0808", serializerObjectWrapper.code);
     }
     if (this.SERIALIZER_CACHE.has(serializerObjectWrapper.name)) {
-      throw new NoomiRpcError(
-        `序列化名称为${serializerObjectWrapper.name}的序列化器已存在，请使用其他名称。`
-      );
+      throw new NoomiRpcError("0809", serializerObjectWrapper.name);
     }
     this.SERIALIZER_CACHE.set(serializerObjectWrapper.name, serializerObjectWrapper);
     this.SERIALIZER_CACHE_CODE.set(serializerObjectWrapper.code, serializerObjectWrapper);
@@ -156,7 +151,7 @@ export class SerializerFactory {
         descriptionArray.push(description);
       }
       if (descriptionArray.length === 0) {
-        throw new NoomiRpcError("空数组不能转换。");
+        throw new NoomiRpcError("0001");
       }
       return {
         type: Application.fury.InternalSerializerType.TUPLE,
@@ -231,7 +226,7 @@ export class SerializerFactory {
         }
       };
     }
-    throw new NoomiRpcError(`未知数据类型 ${typeof data}`);
+    throw new NoomiRpcError("0002", typeof data);
   }
 
   /**

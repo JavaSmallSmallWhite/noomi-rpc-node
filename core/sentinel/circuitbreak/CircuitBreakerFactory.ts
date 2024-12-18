@@ -4,6 +4,7 @@ import { Constant } from "../../common/utils/Constant";
 import { SeniorCircuitBreaker } from "./impl/SeniorCircuitBreaker";
 import { Logger } from "../../common/logger/Logger";
 import { NoomiRpcError } from "../../common/error/NoomiRpcError";
+import { TipManager } from "../../common/error/TipManager";
 
 /**
  * 熔断器工厂
@@ -39,9 +40,7 @@ export class CircuitBreakerFactory {
   public static getCircuitBreaker(circuitBreakerType: string): CircuitBreaker {
     const circuitBreaker: CircuitBreaker = this.CIRCUIT_BREAKER_CACHE.get(circuitBreakerType);
     if (!circuitBreaker) {
-      Logger.error(
-        `未找到您配置的${circuitBreakerType}熔断器，默认选用SeniorCircuitBreaker熔断器。`
-      );
+      Logger.error(TipManager.getError("0700", circuitBreakerType));
       return this.CIRCUIT_BREAKER_CACHE.get("SeniorCircuitBreaker");
     }
     return circuitBreaker;
@@ -57,9 +56,7 @@ export class CircuitBreakerFactory {
     circuitBreaker: CircuitBreaker
   ): void {
     if (this.CIRCUIT_BREAKER_CACHE.has(circuitBreakerName)) {
-      throw new NoomiRpcError(
-        `熔断器名称为${circuitBreakerName}的熔断器器已存在，请使用其他名称。`
-      );
+      throw new NoomiRpcError("0701", circuitBreakerName);
     }
     this.CIRCUIT_BREAKER_CACHE.set(circuitBreakerName, circuitBreaker);
   }

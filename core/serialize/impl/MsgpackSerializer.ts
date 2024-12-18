@@ -2,6 +2,7 @@ import { Serializer } from "../Serializer";
 import { Logger } from "../../common/logger/Logger";
 import { Application } from "../../common/utils/ApplicationUtil";
 import { NoomiRpcError } from "../../common/error/NoomiRpcError";
+import { TipManager } from "../../common/error/TipManager";
 
 /**
  * msgpack序列化器
@@ -13,16 +14,15 @@ export class MsgpackSerializer implements Serializer {
    */
   public async serialize(body: unknown | string): Promise<Uint8Array> {
     if (!body) {
-      Logger.debug("序列化的请求体为空。");
+      Logger.debug(TipManager.getError("0802"));
       return null;
     }
     try {
       const buffer = Application.msgpack.encode(body);
-      Logger.debug(`requestPayload请求体已经完成了序列化操作，序列化后的字节数位${buffer.length}`);
+      Logger.debug(TipManager.getTip("0139", buffer.length));
       return buffer;
     } catch (error) {
-      Logger.error("requestPayload请求体的msgpack序列化操作失败。");
-      throw new NoomiRpcError(error.message);
+      throw new NoomiRpcError("0803", error.message);
     }
   }
   /**
@@ -31,16 +31,15 @@ export class MsgpackSerializer implements Serializer {
    */
   public async deserialize(buffer: Uint8Array): Promise<unknown | string> {
     if (!buffer) {
-      Logger.debug("反序列化时传入的Buffer流为空。");
+      Logger.debug(TipManager.getError("0800"));
       return null;
     }
     try {
       const body = Application.msgpack.decode(buffer);
-      Logger.debug("反序列化操作完成。");
+      Logger.debug(TipManager.getTip("0138"));
       return body;
     } catch (error) {
-      Logger.error(`${buffer}流的msgpack反序列化操作失败。`);
-      throw new NoomiRpcError(error.message);
+      throw new NoomiRpcError("0801", error.message);
     }
   }
 }

@@ -17,6 +17,7 @@ import { CircuitBreakerFactory } from "../sentinel/circuitbreak/CircuitBreakerFa
 import { Socket } from "../common/utils/TypesUtil";
 import { Application } from "../common/utils/ApplicationUtil";
 import { NoomiRpcError } from "../common/error/NoomiRpcError";
+import { TipManager } from "../common/error/TipManager";
 
 /**
  * handler处理工厂
@@ -47,10 +48,10 @@ export class HandlerFactory {
    */
   private static addHandler(category: string, handler: Handler): void {
     if (!category) {
-      throw new NoomiRpcError("handler处理器类别不合法");
+      throw new NoomiRpcError("0402");
     }
     if (!handler) {
-      throw new NoomiRpcError("handler处理器不合法");
+      throw new NoomiRpcError("0403");
     }
     if (!this.handlerChain.has(category)) {
       this.handlerChain.set(category, [handler]);
@@ -76,7 +77,6 @@ export class HandlerFactory {
     let tryTimes: number = 3;
     const intervalTime: number = 2000;
     let circuitBreaker: CircuitBreaker;
-    // eslint-disable-next-line no-constant-condition
     while (true) {
       if (!socketChannel) {
         const serviceNode: string = await LoadBalancerFactory.getLoadBalancer(
@@ -106,8 +106,7 @@ export class HandlerFactory {
           !(noomiRpcRequest.getRequestType() === RequestType.HEART_BEAT_REQUEST) &&
           circuitBreaker.isBreak()
         ) {
-          Logger.error("当前断路器已经开启，无法发送请求。");
-          throw new NoomiRpcError("");
+          throw new NoomiRpcError("0704");
         }
         // 发送请求
         await this.execute(socketChannel, "ConsumerOutBound", noomiRpcRequest);
@@ -148,11 +147,15 @@ export class HandlerFactory {
         });
         if (tryTimes < 0) {
           Logger.error(
-            `对方法${noomiRpcRequest.getRequestPayload().getMethodName()}进行调用时，重试${3 - tryTimes - 1}次，依然不可调用。`
+            TipManager.getError(
+              "0705",
+              noomiRpcRequest.getRequestPayload().getMethodName(),
+              2 - tryTimes
+            )
           );
           break;
         }
-        Logger.error(`在进行第${3 - tryTimes}次重试时发生异常。`);
+        Logger.error(TipManager.getError("0706", 3 - tryTimes));
       }
     }
   }
@@ -219,6 +222,6 @@ export class HandlerFactory {
         return result;
       }
     }
-    throw new NoomiRpcError("");
+    throw new NoomiRpcError("0404");
   }
 }

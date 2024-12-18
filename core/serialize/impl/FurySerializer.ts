@@ -7,6 +7,7 @@ import { ServiceConfig } from "../../ServiceConfig";
 import { GlobalCache } from "../../cache/GlobalCache";
 import { Type } from "@furyjs/fury";
 import { NoomiRpcError } from "../../common/error/NoomiRpcError";
+import { TipManager } from "../../common/error/TipManager";
 
 /**
  * hps
@@ -33,22 +34,21 @@ export class FurySerializer implements Serializer {
     serializeDescription?: TypeDescription
   ): Promise<unknown | string> {
     if (!buffer) {
-      Logger.debug("反序列化时传入的Buffer流为空，或者反序列化后指定的目标类为空");
+      Logger.debug(TipManager.getError("0800"));
       return null;
     }
     try {
       if (!serializeDescription) {
         const descriptionString: string = this.fury.deserialize(buffer);
-        Logger.debug("description反序列化操作完成。");
+        Logger.debug(TipManager.getTip("0137"));
         return descriptionString;
       }
       const { deserialize } = this.fury.registerSerializer(serializeDescription);
       const body = deserialize(buffer);
-      Logger.debug("请求体反序列化操作完成。");
+      Logger.debug(TipManager.getTip("0138"));
       return body;
     } catch (error) {
-      Logger.error(`${buffer}流的fury反序列化操作失败。`);
-      throw new NoomiRpcError(error.message);
+      throw new NoomiRpcError("0801", error.message);
     }
   }
 
@@ -62,17 +62,16 @@ export class FurySerializer implements Serializer {
     serializeDescription: TypeDescription
   ): Promise<Uint8Array> {
     if (!body) {
-      Logger.debug("序列化的请求体为空。");
+      Logger.debug(TipManager.getError("0802"));
       return null;
     }
     try {
       const { serialize } = this.fury.registerSerializer(serializeDescription);
       const bodyBuffer = serialize(body);
-      Logger.debug(`序列化成功，序列化后的字节数位${bodyBuffer.length}`);
+      Logger.debug(TipManager.getTip("0139", bodyBuffer.length));
       return bodyBuffer;
     } catch (error) {
-      Logger.error("fury序列化操作失败。");
-      throw new NoomiRpcError(error.message);
+      throw new NoomiRpcError("0803", error.message);
     }
   }
 

@@ -7,6 +7,7 @@ import { LoadBalancerFactory } from "../loadbalance/LoadBalancerFactory";
 import { GlobalCache } from "../cache/GlobalCache";
 import { Event } from "../common/utils/TypesUtil";
 import { Application } from "../common/utils/ApplicationUtil";
+import { TipManager } from "../common/error/TipManager";
 
 /**
  * zookeeper注册中心服务节点的动态上下限监控
@@ -18,7 +19,7 @@ export class ZookeeperUpAndDownWatcher {
    */
   public static async process(event: Event): Promise<void> {
     if (event.getType() === Application.zookeeper.Event.NODE_CHILDREN_CHANGED) {
-      Logger.debug(`检测到服务${event.getPath()}有节点上/下线，将重新拉取服务列表...`);
+      Logger.debug(TipManager.getTip("0151", event.getPath()));
       const serviceName: string = getServiceName(event.getPath());
       const registry: Registry = NoomiRpcStarter.getInstance()
         .getConfiguration()

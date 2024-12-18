@@ -10,6 +10,7 @@ import { BufferUtil } from "../../common/utils/BufferUtil";
 import { MessageToBufferEncoderHandler } from "../MessageToBufferEncoderHandler";
 import { Socket } from "../../common/utils/TypesUtil";
 import { InterfaceUtil } from "../../common/utils/InterfaceUtil";
+import { TipManager } from "../../common/error/TipManager";
 
 /**
  * 请求编码器
@@ -142,7 +143,7 @@ export class NoomiRpcRequestEncoder extends MessageToBufferEncoderHandler<NoomiR
       requestBuffer.writeUint32BE(MessageConstant.HEADER_LENGTH, index);
     }
     if (Logger.getLogger().isDebugEnabled()) {
-      Logger.debug(`请求报文封装成功，请求报文如下：${BufferUtil.formatBuffer(requestBuffer)}`);
+      Logger.debug(TipManager.getTip("0142", BufferUtil.formatBuffer(requestBuffer)));
     }
     return requestBuffer;
   }

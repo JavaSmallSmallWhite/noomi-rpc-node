@@ -3,6 +3,7 @@ import { TokenBuketRateLimiter } from "./impl/TokenBuketRateLimiter";
 import { Constant } from "../../common/utils/Constant";
 import { Logger } from "../../common/logger/Logger";
 import { NoomiRpcError } from "../../common/error/NoomiRpcError";
+import { TipManager } from "../../common/error/TipManager";
 
 /**
  * 限流器工厂
@@ -33,7 +34,7 @@ export class RateLimiterFactory {
   public static getRateLimiter(rateLimiterType: string): RateLimiter {
     const rateLimiter: RateLimiter = this.RATE_LIMITER_CACHE.get(rateLimiterType);
     if (!rateLimiter) {
-      Logger.error(`未找到您配置的${rateLimiterType}限流器，默认选用TokenBuketRateLimiter限流器。`);
+      Logger.error(TipManager.getError("0702", rateLimiterType));
       return this.RATE_LIMITER_CACHE.get("TokenBuketRateLimiter");
     }
     return rateLimiter;
@@ -46,7 +47,7 @@ export class RateLimiterFactory {
    */
   public static addRateLimiter(rateLimiterName: string, rateLimiter: RateLimiter): void {
     if (this.RATE_LIMITER_CACHE.has(rateLimiterName)) {
-      throw new NoomiRpcError(`限流器名称为${rateLimiterName}的限流器已存在，请使用其他名称。`);
+      throw new NoomiRpcError("0703", rateLimiterName);
     }
     this.RATE_LIMITER_CACHE.set(rateLimiterName, rateLimiter);
   }

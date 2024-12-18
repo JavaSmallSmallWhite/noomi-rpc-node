@@ -4,6 +4,7 @@ import { InterfaceUtil } from "./common/utils/InterfaceUtil";
 import { InstanceFactory } from "noomi";
 import { Constructor } from "./common/utils/TypesUtil";
 import { NoomiRpcError } from "./common/error/NoomiRpcError";
+import { TipManager } from "./common/error/TipManager";
 
 /**
  * 代理对象管理类
@@ -50,13 +51,13 @@ export class ReferenceConfig<T> {
    */
   public get(): T {
     if (!this.serviceName || !this.interfaceRef) {
-      throw new NoomiRpcError("未配置服务名称或未配置接口对象");
+      throw new NoomiRpcError("0107");
     }
     const proxy: T = this.interfaceMethodProxy.createProxyForInterface(
       this.interfaceRef,
       this.serviceName
     );
-    Logger.info("接口对象" + InterfaceUtil.getInterfaceName(proxy) + "的代理对象创建成功。");
+    Logger.info(TipManager.getTip("0154", InterfaceUtil.getInterfaceName(proxy)));
     return proxy;
   }
 

@@ -5,6 +5,7 @@ import { Logger } from "../common/logger/Logger";
 import { GlobalCache } from "../cache/GlobalCache";
 import { Hosts, Socket, SubscribeInfo } from "../common/utils/TypesUtil";
 import { Application } from "../common/utils/ApplicationUtil";
+import { TipManager } from "../common/error/TipManager";
 
 /**
  * nacos注册中心服务节点的动态上下限监控
@@ -16,7 +17,7 @@ export class NacosUpAndDownWatcher {
    * @param hosts 服务节点
    */
   public static process(serviceName: string | SubscribeInfo, hosts: Hosts): void {
-    Logger.debug(`检测到服务${serviceName}有节点上/下线，将重新拉取服务列表...`);
+    Logger.debug(TipManager.getTip("0151", serviceName));
     const serviceNodes: Array<string> = [];
     // 处理新增的节点
     for (const host of hosts) {

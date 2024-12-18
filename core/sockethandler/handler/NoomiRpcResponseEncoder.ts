@@ -10,6 +10,7 @@ import { BufferUtil } from "../../common/utils/BufferUtil";
 import { ResponsePayload } from "../../message/ResponsePayload";
 import { Socket } from "../../common/utils/TypesUtil";
 import { InterfaceUtil } from "../../common/utils/InterfaceUtil";
+import { TipManager } from "../../common/error/TipManager";
 
 /**
  * 响应编码编码器
@@ -134,7 +135,7 @@ export class NoomiRpcResponseEncoder extends MessageToBufferEncoderHandler<Noomi
       responseBuffer.writeUint32BE(MessageConstant.HEADER_LENGTH, index);
     }
     if (Logger.getLogger().isDebugEnabled()) {
-      Logger.debug(`请求报文封装成功，请求报文如下：${BufferUtil.formatBuffer(responseBuffer)}`);
+      Logger.debug(TipManager.getTip("0146", BufferUtil.formatBuffer(responseBuffer)));
     }
     return responseBuffer;
   }

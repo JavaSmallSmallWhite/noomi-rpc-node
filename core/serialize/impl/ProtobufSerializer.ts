@@ -6,6 +6,7 @@ import { Root, Type } from "../../common/utils/TypesUtil";
 import { ReferenceConfig } from "../../ReferenceConfig";
 import { ServiceConfig } from "../../ServiceConfig";
 import { NoomiRpcError } from "../../common/error/NoomiRpcError";
+import { TipManager } from "../../common/error/TipManager";
 
 /**
  * protobuf序列化器
@@ -18,14 +19,14 @@ export class ProtobufSerializer implements Serializer {
    */
   public async deserialize(buffer: Uint8Array, type: Type): Promise<unknown> {
     if (!buffer) {
-      Logger.debug("反序列化时传入的Buffer流为空");
+      Logger.debug(TipManager.getError("0800"));
       return null;
     }
     try {
       const decodeMessage = type.decode(buffer);
       return type.toObject(decodeMessage);
     } catch (error) {
-      throw new NoomiRpcError(`protobuf反序列化失败：${error.message}`);
+      throw new NoomiRpcError("0801", error.message);
     }
   }
 
@@ -54,14 +55,14 @@ export class ProtobufSerializer implements Serializer {
    */
   public async serialize(body: unknown, type: Type): Promise<Uint8Array> {
     if (!body) {
-      Logger.debug("序列化的请求体为空。");
+      Logger.debug(TipManager.getError("0802"));
       return null;
     }
     try {
       const message = type.create(body);
       return type.encode(message).finish();
     } catch (error) {
-      throw new NoomiRpcError(`protobuf序列化失败：${error.message}`);
+      throw new NoomiRpcError("0803", error.message);
     }
   }
 
@@ -85,7 +86,7 @@ export class ProtobufSerializer implements Serializer {
       config = GlobalCache.SERVICES_LIST.get(serviceName);
     }
     if (!config.protoFile || !config.protoServiceName) {
-      throw new NoomiRpcError("未配置proto文件或对象类型名或方法名或参数返回值标签名");
+      throw new NoomiRpcError("0804");
     }
     const protoFile: string = config.protoFile;
     const protoObjectName: string = config.protoServiceName;
