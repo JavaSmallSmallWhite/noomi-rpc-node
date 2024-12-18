@@ -3,7 +3,7 @@ import { SimpleCircuitBreaker } from "./impl/SimpleCircuitBreaker";
 import { Constant } from "../../common/utils/Constant";
 import { SeniorCircuitBreaker } from "./impl/SeniorCircuitBreaker";
 import { Logger } from "../../common/logger/Logger";
-import { CircuitBreakerError } from "../../common/error/CircuitBreakerError";
+import { NoomiRpcError } from "../../common/error/NoomiRpcError";
 
 /**
  * 熔断器工厂
@@ -57,7 +57,7 @@ export class CircuitBreakerFactory {
     circuitBreaker: CircuitBreaker
   ): void {
     if (this.CIRCUIT_BREAKER_CACHE.has(circuitBreakerName)) {
-      throw new CircuitBreakerError(
+      throw new NoomiRpcError(
         `熔断器名称为${circuitBreakerName}的熔断器器已存在，请使用其他名称。`
       );
     }

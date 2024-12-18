@@ -1,9 +1,9 @@
 import { InterfaceMethodProxy } from "./proxy/InterfaceMethodProxy";
 import { Logger } from "./common/logger/Logger";
 import { InterfaceUtil } from "./common/utils/InterfaceUtil";
-import { ConfigError } from "./common/error/ConfigError";
 import { InstanceFactory } from "noomi";
 import { Constructor } from "./common/utils/TypesUtil";
+import { NoomiRpcError } from "./common/error/NoomiRpcError";
 
 /**
  * 代理对象管理类
@@ -50,7 +50,7 @@ export class ReferenceConfig<T> {
    */
   public get(): T {
     if (!this.serviceName || !this.interfaceRef) {
-      throw new ConfigError("未配置服务名称或未配置接口对象");
+      throw new NoomiRpcError("未配置服务名称或未配置接口对象");
     }
     const proxy: T = this.interfaceMethodProxy.createProxyForInterface(
       this.interfaceRef,

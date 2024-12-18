@@ -1,11 +1,11 @@
 import { Serializer } from "../Serializer";
 import { GlobalCache } from "../../cache/GlobalCache";
-import { SerializeError } from "../../common/error/SerializeError";
 import { Logger } from "../../common/logger/Logger";
 import { Application } from "../../common/utils/ApplicationUtil";
 import { Root, Type } from "../../common/utils/TypesUtil";
 import { ReferenceConfig } from "../../ReferenceConfig";
 import { ServiceConfig } from "../../ServiceConfig";
+import { NoomiRpcError } from "../../common/error/NoomiRpcError";
 
 /**
  * protobuf序列化器
@@ -25,7 +25,7 @@ export class ProtobufSerializer implements Serializer {
       const decodeMessage = type.decode(buffer);
       return type.toObject(decodeMessage);
     } catch (error) {
-      throw new SerializeError(`protobuf反序列化失败：${error.message}`);
+      throw new NoomiRpcError(`protobuf反序列化失败：${error.message}`);
     }
   }
 
@@ -61,7 +61,7 @@ export class ProtobufSerializer implements Serializer {
       const message = type.create(body);
       return type.encode(message).finish();
     } catch (error) {
-      throw new SerializeError(`protobuf序列化失败：${error.message}`);
+      throw new NoomiRpcError(`protobuf序列化失败：${error.message}`);
     }
   }
 
@@ -85,7 +85,7 @@ export class ProtobufSerializer implements Serializer {
       config = GlobalCache.SERVICES_LIST.get(serviceName);
     }
     if (!config.protoFile || !config.protoServiceName) {
-      throw new SerializeError("未配置proto文件或对象类型名或方法名或参数返回值标签名");
+      throw new NoomiRpcError("未配置proto文件或对象类型名或方法名或参数返回值标签名");
     }
     const protoFile: string = config.protoFile;
     const protoObjectName: string = config.protoServiceName;

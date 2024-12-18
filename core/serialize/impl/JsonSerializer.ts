@@ -1,7 +1,7 @@
 import { Serializer } from "../Serializer";
 import { Logger } from "../../common/logger/Logger";
-import { SerializeError } from "../../common/error/SerializeError";
 import { Application } from "../../common/utils/ApplicationUtil";
+import { NoomiRpcError } from "../../common/error/NoomiRpcError";
 
 /**
  * Json序列化器
@@ -25,7 +25,7 @@ export class JsonSerializer implements Serializer {
       return bodyBuffer;
     } catch (error) {
       Logger.error("requestPayload请求体的json序列化操作失败。");
-      throw new SerializeError(error.message);
+      throw new NoomiRpcError(error.message);
     }
   }
 
@@ -45,7 +45,7 @@ export class JsonSerializer implements Serializer {
       return body;
     } catch (error) {
       Logger.error(`${buffer}流的json反序列化操作失败。`);
-      throw new SerializeError(error.message);
+      throw new NoomiRpcError(error.message);
     }
   }
 }

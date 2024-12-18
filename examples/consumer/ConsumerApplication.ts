@@ -1,15 +1,17 @@
 import { ReferenceConfig } from "../../core/ReferenceConfig";
 import { NoomiRpcStarter } from "../../core/NoomiRpcStarter";
+import { HelloNoomiRpcApi, HelloNoomiRpcDescription } from "./api/HelloNoomiRpcApi";
 import { InterfaceUtil } from "../../core/common/utils/InterfaceUtil";
-import { HelloNoomiRpcApi } from "./api/HelloNoomiRpcApi";
-import { HelloNoomiRpcDescription } from "./description/HelloNoomiRpcDescription";
 
 async function main(): Promise<void> {
   // 配置需要调用的接口对象
   const reference: ReferenceConfig<HelloNoomiRpcApi> = new ReferenceConfig<HelloNoomiRpcApi>();
   reference.serviceName = "com.nodejs.test.HelloNoomiRpc";
   // 创造一个虚拟对象，ts没有为接口或者抽象类创建代理对象的机制，原型上也不会绑定抽象方法，因此必须创建一个虚拟无名的实现类作为代理对象。
-  reference.interfaceRef = InterfaceUtil.genInterfaceClass("HelloNoomiRpcApi.ts");
+  reference.interfaceRef = InterfaceUtil.genInterfaceClass(
+    "HelloNoomiRpcApi.ts",
+    "HelloNoomiRpcApi"
+  );
 
   // reference.protoFile = process.cwd() + "/examples/consumer/proto/hello.proto";
   // reference.protoServiceName = "com.node.test.Greeter";

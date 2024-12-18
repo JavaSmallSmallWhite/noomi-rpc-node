@@ -1,4 +1,5 @@
 import { ObjectWrapperType } from "./ObjectWrapperType";
+import { NoomiRpcError } from "../common/error/NoomiRpcError";
 
 /**
  * wrapper配置工厂
@@ -20,7 +21,7 @@ export class ObjectWrapperFactory {
    */
   public static addObjectWrapperConfig(name: string, config: ObjectWrapperType): void {
     if (this.OBJECT_WRAPPER_CONFIG_CACHE.has(name)) {
-      throw new Error(`${name}的配置已存在。`);
+      throw new NoomiRpcError("0105", name);
     }
     this.OBJECT_WRAPPER_CONFIG_CACHE.set(name, config);
   }
@@ -31,7 +32,7 @@ export class ObjectWrapperFactory {
    */
   public static getObjectWrapperConfig(name: string): ObjectWrapperType {
     if (!this.OBJECT_WRAPPER_CONFIG_CACHE.has(name)) {
-      throw new Error(`${name}的配置不存在。`);
+      throw new NoomiRpcError("0106", name);
     }
     return this.OBJECT_WRAPPER_CONFIG_CACHE.get(name);
   }

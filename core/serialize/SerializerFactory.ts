@@ -3,7 +3,6 @@ import { ObjectWrapper } from "../configuration/ObjectWrapper";
 import { JsonSerializer } from "./impl/JsonSerializer";
 import { Logger } from "../common/logger/Logger";
 import { FurySerializer } from "./impl/FurySerializer";
-import { SerializeError } from "../common/error/SerializeError";
 import { ObjectWrapperFactory } from "../configuration/ObjectWrapperFactory";
 import { ObjectWrapperType, UnknownClass } from "../configuration/ObjectWrapperType";
 import { Compressor } from "../compress/Compressor";
@@ -12,6 +11,7 @@ import { ProtobufSerializer } from "./impl/ProtobufSerializer";
 import { MsgpackSerializer } from "./impl/MsgpackSerializer";
 import { Application } from "../common/utils/ApplicationUtil";
 import { InternalSerializerType, TypeDescription } from "../common/utils/TypesUtil";
+import { NoomiRpcError } from "../common/error/NoomiRpcError";
 
 /**
  * 序列化工厂
@@ -109,12 +109,12 @@ export class SerializerFactory {
       return serializerWrapper;
     }
     if (this.SERIALIZER_CACHE_CODE.has(serializerObjectWrapper.code)) {
-      throw new SerializeError(
+      throw new NoomiRpcError(
         `编号为${serializerObjectWrapper.code}的序列化器已存在，请使用其他编号。`
       );
     }
     if (this.SERIALIZER_CACHE.has(serializerObjectWrapper.name)) {
-      throw new SerializeError(
+      throw new NoomiRpcError(
         `序列化名称为${serializerObjectWrapper.name}的序列化器已存在，请使用其他名称。`
       );
     }
@@ -156,7 +156,7 @@ export class SerializerFactory {
         descriptionArray.push(description);
       }
       if (descriptionArray.length === 0) {
-        throw new SerializeError("空数组不能转换。");
+        throw new NoomiRpcError("空数组不能转换。");
       }
       return {
         type: Application.fury.InternalSerializerType.TUPLE,
@@ -231,7 +231,7 @@ export class SerializerFactory {
         }
       };
     }
-    throw new SerializeError(`未知数据类型 ${typeof data}`);
+    throw new NoomiRpcError(`未知数据类型 ${typeof data}`);
   }
 
   /**

@@ -4,6 +4,7 @@ import { Logger } from "../../common/logger/Logger";
 import { NoomiRpcRequest } from "../../message/NoomiRpcRequest";
 import { GlobalCache } from "../../cache/GlobalCache";
 import { Application } from "../../common/utils/ApplicationUtil";
+import { TipManager } from "../../common/error/TipManager";
 
 /**
  * 一致性hash负载均衡器
@@ -77,7 +78,7 @@ export class ConsistentHashLoadBalancer extends AbstractLoadBalancer {
         for (let j = 0; j < 4; j++) {
           const hashValue: number = this.hashCalculate(digest, j);
           this.circle.set(hashValue, serviceNode);
-          Logger.debug(`hash为${hashValue}的节点已经挂在到了哈希环上。`);
+          Logger.debug(TipManager.getTip("0131", hashValue));
         }
       }
     }

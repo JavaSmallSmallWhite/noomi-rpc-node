@@ -10,6 +10,7 @@ import { ZookeeperUpAndDownWatcher } from "../../watch/ZookeeperUpAndDownWatcher
 import { NoomiRpcStarter } from "../../NoomiRpcStarter";
 import { Zookeeper } from "../../common/utils/TypesUtil";
 import { Application } from "../../common/utils/ApplicationUtil";
+import { TipManager } from "../../common/error/TipManager";
 
 /**
  * zookeeper注册中心的服务注册与发现类
@@ -66,7 +67,7 @@ export class ZookeeperRegistry extends AbstractRegistry {
         Application.zookeeper.CreateMode.EPHEMERAL
       );
     }
-    Logger.debug(`服务${parentNode}，已经被注册。`);
+    Logger.debug(TipManager.getTip("0136", parentNode));
   }
 
   /**

@@ -9,10 +9,10 @@ import { HandlerFactory } from "./sockethandler/HandlerFactory";
 import { IdGenerator } from "./common/utils/IdGenerator";
 import { GlobalCache } from "./cache/GlobalCache";
 import { GraceFullyShutdownHook } from "./shutdown/GraceFullyShutdownHook";
-import { ConfigError } from "./common/error/ConfigError";
 import { Application } from "./common/utils/ApplicationUtil";
 import { Socket } from "./common/utils/TypesUtil";
 import { HeartBeatDetector } from "./heartbeat/HeartBeatDetector";
+import { NoomiRpcError } from "./common/error/NoomiRpcError";
 
 /**
  * RPC框架启动类
@@ -22,7 +22,7 @@ export class NoomiRpcStarter {
    * 初始化配置对象
    * @private
    */
-  private readonly configuration: Configuration;
+  private configuration: Configuration;
 
   /**
    * 单例模式的懒汉式创建启动对象
@@ -36,7 +36,7 @@ export class NoomiRpcStarter {
    */
   private constructor() {
     this.configuration = new Configuration();
-    InterfaceUtil.loadDecorators(this.configuration.starterPath);
+    InterfaceUtil.loadDecorators(this.getConfiguration().starterPath);
   }
 
   /**
@@ -144,10 +144,10 @@ export class NoomiRpcStarter {
     process.on("SIGTERM", GraceFullyShutdownHook.run);
     const serviceName: string = service.serviceName;
     if (!serviceName) {
-      throw new ConfigError(`未配置服务名称。`);
+      throw new NoomiRpcError(`未配置服务名称。`);
     }
     if (GlobalCache.SERVICES_LIST.has(serviceName)) {
-      throw new ConfigError(`${serviceName}已存在。`);
+      throw new NoomiRpcError(`${serviceName}已存在。`);
     }
     this.configuration.registryConfig.getRegistry().register(service);
     GlobalCache.SERVICES_LIST.set(serviceName, service);

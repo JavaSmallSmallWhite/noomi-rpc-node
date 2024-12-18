@@ -1,7 +1,7 @@
 import { Serializer } from "../Serializer";
 import { Logger } from "../../common/logger/Logger";
 import { Application } from "../../common/utils/ApplicationUtil";
-import { SerializeError } from "../../common/error/SerializeError";
+import { NoomiRpcError } from "../../common/error/NoomiRpcError";
 
 /**
  * msgpack序列化器
@@ -22,7 +22,7 @@ export class MsgpackSerializer implements Serializer {
       return buffer;
     } catch (error) {
       Logger.error("requestPayload请求体的msgpack序列化操作失败。");
-      throw new SerializeError(error.message);
+      throw new NoomiRpcError(error.message);
     }
   }
   /**
@@ -40,7 +40,7 @@ export class MsgpackSerializer implements Serializer {
       return body;
     } catch (error) {
       Logger.error(`${buffer}流的msgpack反序列化操作失败。`);
-      throw new SerializeError(error.message);
+      throw new NoomiRpcError(error.message);
     }
   }
 }

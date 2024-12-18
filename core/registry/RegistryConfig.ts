@@ -3,8 +3,8 @@ import { NacosRegistry } from "./impl/NacosRegistry";
 import { NacosRegistryConnectConfig } from "../common/utils/nacos/NacosConfig";
 import { Registry } from "./Registry";
 import { GlobalCache } from "../cache/GlobalCache";
-import { RegistryError } from "../common/error/RegistryError";
 import { ZookeeperConnectConfig } from "../common/utils/zookeeper/ZookeeperConfig";
+import { NoomiRpcError } from "../common/error/NoomiRpcError";
 
 /**
  * 连接配置类型
@@ -52,7 +52,7 @@ export class RegistryConfig {
       if (GlobalCache.REGISTRY_CACHE.has(this._registryName)) {
         return GlobalCache.REGISTRY_CACHE.get(this._registryName);
       }
-      throw new RegistryError(`注册中心缓存池不存在${this._registryName}注册中心。`);
+      throw new NoomiRpcError(`注册中心缓存池不存在${this._registryName}注册中心。`);
     }
   }
 

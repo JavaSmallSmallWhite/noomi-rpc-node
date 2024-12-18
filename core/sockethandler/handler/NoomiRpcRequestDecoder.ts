@@ -1,5 +1,4 @@
 import { MessageConstant } from "../../message/MessageConstant";
-import { PacketError } from "../../common/error/PacketError";
 import { NoomiRpcRequest } from "../../message/NoomiRpcRequest";
 import { RequestPayload } from "../../message/RequestPayload";
 import { Logger } from "../../common/logger/Logger";
@@ -10,6 +9,7 @@ import { CompressorFactory } from "../../compress/CompressorFactory";
 import { BufferToMessageDecoderHandler } from "../BufferToMessageDecoderHandler";
 import { Socket } from "../../common/utils/TypesUtil";
 import { InterfaceUtil } from "../../common/utils/InterfaceUtil";
+import { NoomiRpcError } from "../../common/error/NoomiRpcError";
 
 /**
  * 请求解码器
@@ -35,14 +35,14 @@ export class NoomiRpcRequestDecoder extends BufferToMessageDecoderHandler<NoomiR
       .toString();
     index += MessageConstant.MAGIC_FIELD_LENGTH;
     if (magic !== MessageConstant.MAGIC.toString()) {
-      throw new PacketError("获得的请求不合法。");
+      throw new NoomiRpcError("获得的请求不合法。");
     }
 
     // 解析版本
     const version: number = noomiRpcRequestBuffer.readUInt8(index);
     index += MessageConstant.VERSION_FIELD_LENGTH;
     if (version > MessageConstant.VERSION) {
-      throw new PacketError("获得的请求版本不被支持。");
+      throw new NoomiRpcError("获得的请求版本不被支持。");
     }
 
     // 解析头部长度

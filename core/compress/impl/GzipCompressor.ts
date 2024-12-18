@@ -1,7 +1,8 @@
 import { Compressor } from "../Compressor";
 import { Logger } from "../../common/logger/Logger";
-import { CompressError } from "../../common/error/CompressError";
 import { Application } from "../../common/utils/ApplicationUtil";
+import { NoomiRpcError } from "../../common/error/NoomiRpcError";
+import { TipManager } from "../../common/error/TipManager";
 
 /**
  * gzip压缩器
@@ -20,16 +21,13 @@ export class GzipCompressor implements Compressor {
           if (error) {
             reject(error);
           }
-          Logger.debug(
-            `对字节数组进行进行了压缩，长度由${requestPayloadBuffer.length}压缩至${buffer.length}。`
-          );
+          Logger.debug(TipManager.getTip("0125", requestPayloadBuffer.length, buffer.length));
           resolve(buffer);
         }
       );
     });
     if (compressResult instanceof Error) {
-      Logger.error("对字节数组进行压缩时发生异常。");
-      throw new CompressError(compressResult.message);
+      throw new NoomiRpcError("0500", compressResult.message);
     }
     return compressResult;
   }
@@ -47,16 +45,13 @@ export class GzipCompressor implements Compressor {
           if (error) {
             reject(error);
           }
-          Logger.debug(
-            `对字节数组进行进行了解压缩，长度由${requestPayloadBuffer.length}变为${buffer.length}。`
-          );
+          Logger.debug(TipManager.getTip("0126", requestPayloadBuffer.length, buffer.length));
           resolve(buffer);
         }
       );
     });
     if (decompressResult instanceof Error) {
-      Logger.error("对字节数组进行解压缩时发生异常。");
-      throw new CompressError(decompressResult.message);
+      throw new NoomiRpcError("0501", decompressResult.message);
     }
     return decompressResult;
   }

@@ -2,7 +2,7 @@ import { NoomiRpcRequest } from "../message/NoomiRpcRequest";
 import { ServiceConfig } from "../ServiceConfig";
 import { ReferenceConfig } from "../ReferenceConfig";
 import { Registry } from "../registry/Registry";
-import { AsyncLocalStorage, Socket, TypeDescription } from "../common/utils/TypesUtil";
+import { AsyncLocalStorage, Socket } from "../common/utils/TypesUtil";
 import { Application } from "../common/utils/ApplicationUtil";
 
 /**

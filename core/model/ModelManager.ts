@@ -1,0 +1,224 @@
+import { CommonDataType, PropOption, UnknownClass, Util, Validator } from "noomi";
+import { TipManager } from "../common/error/TipManager";
+import { BaseService } from "../BaseService";
+
+/**
+ * model管理器
+ * @remarks
+ * 管理所有DataModel的数据校验、类型转换信息并提供校验和类型转换操作
+ */
+export class ModelManager {
+  /**
+   * null属性检查
+   * @remarks
+   * 结构为：
+   *
+   * key: 方法名
+   *
+   * value: 待检测map
+   */
+  private static nullCheckMap: Map<string, string[]> = new Map();
+
+  /**
+   * 模型map
+   * @remarks
+   * key: model类名
+   *
+   * value:配置项
+   * ```json
+   * {
+   *      prop1:{
+   *          type:'类型',
+   *          validator:{validator1:[],...}
+   *      },
+   *      ...
+   * }
+   * ```
+   */
+  private static modelMap: Map<string, object> = new Map();
+
+  /**
+   * 获取空校验属性数组
+   * @param className -   类名
+   * @param methodName -  方法名
+   * @returns             空校验属性数组
+   */
+  public static getNullCheck(className: string, methodName: string): string[] {
+    return this.nullCheckMap.get(className + "." + methodName);
+  }
+
+  /**
+   * 获取属性配置
+   * @param clazz -       类
+   * @param propName -    属性名
+   * @returns             属性配置
+   */
+  public static getProp(clazz: UnknownClass, propName: string): PropOption {
+    //如果找不到，则从父类查找
+    while (clazz.name && clazz.name !== "" && clazz.name !== "Object") {
+      if (!this.modelMap.has(clazz.name)) {
+        return;
+      }
+      const obj = this.modelMap.get(clazz.name);
+      if (obj[propName]) {
+        return obj[propName];
+      }
+      //找父类
+      clazz = clazz["__proto__"];
+    }
+  }
+
+  /**
+   * 转换和校验，返回数据类型或校验不正确的属性消息集合
+   * @param service       服务基类
+   * @param methodName -  方法名
+   * @param model -       待处理模型
+   * @returns             类型转换或校验结果
+   */
+  public static handle(service: BaseService, methodName: string, model: any): object {
+    const errObj = {};
+    //空校验
+    const nullArr = this.getNullCheck(service.constructor.name, methodName);
+    if (nullArr) {
+      for (const p of nullArr) {
+        const r = Validator.validate("nullable", model[p]);
+        if (!r) {
+          errObj[p] = TipManager.getModel("nullable");
+        }
+      }
+    }
+    //对所有自有属性进行校验
+    for (const p in model) {
+      // 空校验异常的属性不处理，方法不处理
+      if (errObj[p] || typeof model[p] === "function") {
+        continue;
+      }
+
+      const cfg = this.getProp(model.constructor, p);
+      //如果不存在配置项，则表示不属于模型，删除
+      if (!cfg) {
+        delete model[p];
+        continue;
+      }
+      //类型转换
+      if (cfg.type) {
+        const typeMsg = this.transform(model, p, cfg.type);
+        if (typeMsg) {
+          errObj[p] = typeMsg;
+        }
+      }
+      //校验，如果转换错误，则不再校验
+      if (!errObj[p] && cfg.validator) {
+        const r = this.validate(model, p, cfg.validator);
+        if (r !== null) {
+          errObj[p] = r;
+        }
+      }
+    }
+    return Object.getOwnPropertyNames(errObj).length === 0 ? null : errObj;
+  }
+
+  /**
+   * 验证
+   * @param model -       模型
+   * @param name -        属性名
+   * @param validator -   校验器
+   * @returns     null或字符串(表示验证异常)
+   */
+  public static validate(model: unknown, name: string, validator: unknown): string {
+    const value = model[name];
+    for (const vn of Object.keys(validator)) {
+      if (Validator.hasValidator(vn)) {
+        const r = Validator.validate(vn, value, ...validator[vn]);
+        if (!r) {
+          return TipManager.getModel(vn, ...validator[vn]);
+        }
+      } else if (model[vn] && typeof model[vn] === "function") {
+        // 模型自定义校验器
+        const r = model[vn](value, validator[vn]);
+        if (r !== null) {
+          return r;
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
+   * 数据格式转换
+   * @param model -   模型
+   * @param name -    属性名
+   * @param type      类型
+   * @returns         如果失败，则返回失败信息
+   */
+  private static transform(model: unknown, name: string, type: CommonDataType): string {
+    let v = model[name];
+    const tp = typeof v;
+    // 非字符串，需要去掉两端空格
+    if (type !== "string" && tp === "string") {
+      v = v.trim();
+      // 非字符串，且为''，则删除
+      if (v === "") {
+        delete model[name];
+        return;
+      }
+    }
+    // 类型不为string则不转换
+    if (tp === "string") {
+      switch (type) {
+        case "int": // 整数
+          if (/(^[+-]?0$)|(^[+-]?[1-9]\d*$)/.test(v)) {
+            v = parseInt(v);
+          } else {
+            return TipManager.getModel(type);
+          }
+          break;
+        case "float": // 小数
+          if (/^[+-]?\d+(\.?\d+)?$/.test(v)) {
+            v = parseFloat(v);
+          } else {
+            return TipManager.getModel(type);
+          }
+          break;
+        case "number": //数字
+          if (/^[+-]?\d+(\.?\d+)?$/.test(v)) {
+            v = Number(v);
+          } else {
+            return TipManager.getModel(type);
+          }
+          break;
+        case "boolean": // bool
+          if (v === "true") {
+            v = true;
+          } else if (v === "false") {
+            v = false;
+          } else {
+            return TipManager.getModel(type);
+          }
+          break;
+        case "array": // 数组类型
+          try {
+            v = Util.eval(v);
+            if (!Array.isArray(v)) {
+              return TipManager.getModel(type);
+            }
+          } catch (e) {
+            return TipManager.getModel(type);
+          }
+          break;
+        case "object": // object类型
+          try {
+            v = Util.eval("(" + v + ")");
+            if (typeof v !== "object") {
+              return TipManager.getModel(type);
+            }
+          } catch (e) {
+            return TipManager.getModel(type);
+          }
+          break;
+        default: // 字符串，不处理
+      }
+    }
+    model[name] = v;
+  }
+}

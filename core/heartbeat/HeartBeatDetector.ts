@@ -11,6 +11,7 @@ import { GlobalCache } from "../cache/GlobalCache";
 import { Constant } from "../common/utils/Constant";
 import { Socket } from "../common/utils/TypesUtil";
 import { Application } from "../common/utils/ApplicationUtil";
+import { TipManager } from "../common/error/TipManager";
 
 /**
  * 心跳检测
@@ -54,7 +55,12 @@ export class HeartBeatDetector {
         } catch (error) {
           tryTimes--;
           Logger.error(
-            `和地址为${socketChannel.remoteAddress}:${socketChannel.remotePort}的主机连接发生异常，正在进行第${3 - tryTimes}次重试....`
+            TipManager.getError(
+              "0401",
+              socketChannel.remoteAddress,
+              socketChannel.remotePort,
+              3 - tryTimes
+            )
           );
           if (tryTimes === 0) {
             GlobalCache.CHANNEL_CACHE.delete(key);
@@ -72,7 +78,7 @@ export class HeartBeatDetector {
         }
         const duringTime: bigint = endTime - startTime;
         GlobalCache.ANSWER_TIME_CHANNEL_CACHE.set(duringTime, socketChannel);
-        Logger.debug(`和${key}服务器的响应时间是${duringTime}`);
+        Logger.debug(TipManager.getTip("0130", key, duringTime));
         break;
       }
     }

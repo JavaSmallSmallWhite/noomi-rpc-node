@@ -67,6 +67,7 @@ export class MessageConstant {
    * methodName字段长度
    */
   public static readonly METHOD_NAME_SIZE_FIELD_LENGTH: number = 2;
+
   /**
    * 响应类型占用长度字节
    */

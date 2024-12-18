@@ -1,6 +1,5 @@
 import { Constant } from "../Constant";
 import { Logger } from "../../logger/Logger";
-import { NacosError } from "../../error/NacosError";
 import { NacosRegistryConnectConfig, NacosServiceInstance } from "./NacosConfig";
 import { NacosUpAndDownWatcher } from "../../../watch/NacosUpAndDownWatcher";
 import {
@@ -12,6 +11,8 @@ import {
   SubscribeInfo
 } from "../TypesUtil";
 import { Application } from "../ApplicationUtil";
+import { NoomiRpcError } from "../../error/NoomiRpcError";
+import { TipManager } from "../../error/TipManager";
 
 /**
  * nacos注册中心工具类
@@ -31,7 +32,7 @@ export class NacosUtil {
     nacosRegistryConnectConfig?: NacosRegistryConnectConfig
   ): NacosNamingClient {
     if (!nacosRegistryConnectConfig) {
-      Logger.info("用户未设置nacos注册中心的连接配置，将启用默认的连接配置。");
+      Logger.info(TipManager.getTip("0114", "nacos"));
       const serviceList: string | string[] = Constant.SERVICE_LIST;
       const namespace: string = Constant.NAMESPACE;
       const logger: Console = console;
@@ -43,8 +44,7 @@ export class NacosUtil {
       return this.createNacosRegistryCenter(connectConfig);
     } else {
       if (!nacosRegistryConnectConfig.serverList) {
-        Logger.error("连接nacos注册中心的配置未配置连接地址。");
-        throw new NacosError("连接nacos注册中心的配置未配置连接地址。");
+        throw new NoomiRpcError("0200", "nacos");
       }
       nacosRegistryConnectConfig.logger ||= console;
       nacosRegistryConnectConfig.namespace ||= Constant.NAMESPACE;
@@ -55,11 +55,10 @@ export class NacosUtil {
         const client: NacosNamingClient = new Application.nacos.NacosNamingClient(
           <NacosNamingClientConfig>nacosRegistryConnectConfig
         );
-        Logger.debug("客户端已经连接nacos注册中心成功。");
+        Logger.debug(TipManager.getTip("0115", "nacos"));
         return client;
       } catch (error) {
-        Logger.error("创建nacos注册中心实例时发生异常：");
-        throw new NacosError(error.message);
+        throw new NoomiRpcError("0201", "nacos", error.message);
       }
     }
   }
@@ -84,13 +83,21 @@ export class NacosUtil {
       }
       await nacos.registerInstance(serviceName, <Instance>nacosServiceInstance, groupName);
       Logger.debug(
-        `${serviceName}服务的${nacosServiceInstance.ip}:${nacosServiceInstance.port}节点注册成功。`
+        TipManager.getTip(
+          "0116",
+          serviceName,
+          nacosServiceInstance.ip,
+          nacosServiceInstance.port.toString()
+        )
       );
     } catch (error) {
-      Logger.error(
-        `${serviceName}服务的${nacosServiceInstance.ip}:${nacosServiceInstance.port}节点注册失败。`
+      throw new NoomiRpcError(
+        "0202",
+        serviceName,
+        nacosServiceInstance.ip,
+        nacosServiceInstance.port.toString(),
+        error.message
       );
-      throw new NacosError(error.message);
     }
   }
 
@@ -119,12 +126,11 @@ export class NacosUtil {
         clusters,
         subscribe
       );
-      Logger.debug(`获取${serviceName}下的所有服务节点实例成功。`);
+      Logger.debug(TipManager.getTip("0117", serviceName));
       this.watch(nacos, serviceName);
       return hosts;
     } catch (error) {
-      Logger.error(`获取${serviceName}服务的节点实例失败。`);
-      throw new NacosError(error.message);
+      throw new NoomiRpcError("0203", serviceName, error.message);
     }
   }
 
@@ -139,10 +145,9 @@ export class NacosUtil {
       nacos.subscribe(serviceName, (hosts: Hosts): void => {
         NacosUpAndDownWatcher.process(serviceName, hosts);
       });
-      Logger.debug(`服务${serviceName}监听成功。`);
+      Logger.debug(TipManager.getTip("0118", serviceName));
     } catch (error) {
-      Logger.error(`服务${serviceName}监听失败。`);
-      throw new NacosError(error.message);
+      throw new NoomiRpcError("0204", serviceName, error.message);
     }
   }
 }

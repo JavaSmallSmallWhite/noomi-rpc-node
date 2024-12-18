@@ -1,10 +1,10 @@
 import { ConsulRegistryConnectConfig, ServiceOptions } from "./ConsulConfig";
 import { Logger } from "../../logger/Logger";
 import { Constant } from "../Constant";
-import { ConsulError } from "../../error/ConsulError";
 import { NoomiRpcStarter } from "../../../NoomiRpcStarter";
 import { ConsulConnection } from "../TypesUtil";
 import { Application } from "../ApplicationUtil";
+import { NoomiRpcError } from "../../error/NoomiRpcError";
 
 /**
  * consul工具类
@@ -51,7 +51,7 @@ export class ConsulUtil {
       Logger.error(
         `${serviceOptions.name}服务的${serviceOptions.address}:${serviceOptions.port}节点注册失败。`
       );
-      throw new ConsulError(error.message);
+      throw new NoomiRpcError(error.message);
     }
   }
 
@@ -68,7 +68,7 @@ export class ConsulUtil {
       return newRes;
     } catch (error) {
       Logger.error(`获取${serviceName}服务的节点实例失败。`);
-      throw new ConsulError(error.message);
+      throw new NoomiRpcError(error.message);
     }
   }
 }

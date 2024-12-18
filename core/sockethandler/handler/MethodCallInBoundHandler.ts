@@ -93,10 +93,9 @@ export class MethodCallInBoundHandler extends InBoundHandler<NoomiRpcRequest, No
       } catch (error) {
         Logger.error(`请求编号为${noomiRpcRequest.getRequestId()}的请求在调用过程中发生异常。`);
         noomiRpcResponse.setResponseType(ResponseType.FAIL);
-      } finally {
-        ShutdownHolder.REQUEST_COUNTER--;
       }
     }
+    ShutdownHolder.REQUEST_COUNTER--;
     return noomiRpcResponse;
   }
 

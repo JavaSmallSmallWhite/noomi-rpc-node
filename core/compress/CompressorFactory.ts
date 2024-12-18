@@ -7,8 +7,9 @@ import { DeflateRawCompressor } from "./impl/DeflateRawCompressor";
 import { BrotliCompressor } from "./impl/BrotliCompressor";
 import { ObjectWrapperFactory } from "../configuration/ObjectWrapperFactory";
 import { ObjectWrapperType, UnknownClass } from "../configuration/ObjectWrapperType";
-import { CompressError } from "../common/error/CompressError";
 import { InstanceFactory } from "noomi";
+import { NoomiRpcError } from "../common/error/NoomiRpcError";
+import { TipManager } from "../common/error/TipManager";
 
 /**
  * 压缩工厂
@@ -75,7 +76,7 @@ export class CompressorFactory {
       const compressorObjectWrapper: ObjectWrapper<Compressor> =
         this.COMPRESSOR_CACHE.get(compressorTypeOrCode);
       if (!compressorObjectWrapper) {
-        Logger.error(`未找到您配置的${compressorTypeOrCode}压缩器，默认选用1号gzip的压缩器。`);
+        Logger.error(TipManager.getTip("0127", compressorTypeOrCode));
         return this.COMPRESSOR_CACHE.get("gzip");
       }
       return this.COMPRESSOR_CACHE.get(compressorTypeOrCode);
@@ -84,14 +85,12 @@ export class CompressorFactory {
       const compressorObjectWrapper: ObjectWrapper<Compressor> =
         this.COMPRESSOR_CACHE_CODE.get(compressorTypeOrCode);
       if (!compressorObjectWrapper) {
-        Logger.error(
-          `未找到您配置的编号为${compressorTypeOrCode}压缩器，默认选用1号gzip的压缩器。`
-        );
+        Logger.error(TipManager.getTip("0128", compressorTypeOrCode));
         return this.COMPRESSOR_CACHE_CODE.get(1);
       }
       return this.COMPRESSOR_CACHE_CODE.get(compressorTypeOrCode);
     }
-    Logger.error("不存在您所指定的压缩类型或压缩码，默认选用1号gzip的压缩器。");
+    Logger.error(TipManager.getTip("0129"));
     return this.COMPRESSOR_CACHE_CODE.get(1);
   }
 
@@ -116,14 +115,10 @@ export class CompressorFactory {
       return compressorWrapper;
     }
     if (this.COMPRESSOR_CACHE_CODE.has(compressorObjectWrapper.code)) {
-      throw new CompressError(
-        `编号为${compressorObjectWrapper.code}的压缩器已存在，请使用其他编号。`
-      );
+      throw new NoomiRpcError("0502", compressorObjectWrapper.code);
     }
     if (this.COMPRESSOR_CACHE.has(compressorObjectWrapper.name)) {
-      throw new CompressError(
-        `压缩名称为${compressorObjectWrapper.name}的压缩器已存在，请使用其他名称。`
-      );
+      throw new NoomiRpcError("0503", compressorObjectWrapper.name);
     }
     this.COMPRESSOR_CACHE.set(compressorObjectWrapper.name, compressorObjectWrapper);
     this.COMPRESSOR_CACHE_CODE.set(compressorObjectWrapper.code, compressorObjectWrapper);

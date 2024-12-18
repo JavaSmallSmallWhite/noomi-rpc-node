@@ -1,7 +1,8 @@
 import { Application } from "./ApplicationUtil";
-import { ClassElement, Constructor, Node, SourceFile, TransformationContext } from "./TypesUtil";
+import { ClassElement, Constructor, InterfaceDeclaration, ClassDeclaration } from "./TypesUtil";
 import { NoomiRpcStarter } from "../../NoomiRpcStarter";
 import { Util } from "noomi";
+import { NoomiRpcError } from "../error/NoomiRpcError";
 
 /**
  * 服务工具类
@@ -38,146 +39,111 @@ export class InterfaceUtil {
   /**
    * 生成接口的代理实现类
    * @param name 接口文件名称
+   * @param interfaceName 接口名称
    */
-  public static genInterfaceClass(name: string): Constructor {
+  public static genInterfaceClass(name: string, interfaceName: string): Constructor {
     // 获取文件的绝对路径并读取代码
-    let apiDir = NoomiRpcStarter.getInstance().getConfiguration().apiDir;
-    if (!Array.isArray(apiDir)) {
-      apiDir = [apiDir];
-    }
-    const interfacePath = Util.getAbsPath(apiDir.concat([name]));
+    const apiDir = NoomiRpcStarter.getInstance().getConfiguration().apiDir;
+    const interfacePaths = Array.isArray(apiDir) ? apiDir : [apiDir];
+    const interfacePath = Util.getAbsPath(interfacePaths.concat([name]));
+
     if (!Application.fs.existsSync(interfacePath)) {
-      throw new Error("接口文件不存在");
+      throw new NoomiRpcError("0103", interfacePath);
     }
-    const interfaceCode = Application.fs.readFileSync(interfacePath).toString();
 
-    // 使用正则表达式过滤掉注释
-    const cleanCode = interfaceCode
-      .replace(/\/\*[\s\S]*?\*\//g, "") // 去除多行注释
-      .replace(/\/\/.*/g, "") // 去除单行注释
-      .trim();
+    const interfaceCode = Application.fs.readFileSync(interfacePath, "utf-8");
 
-    // 创建源文件
+    // 使用 TypeScript 创建源文件的 AST
     const sourceFile = Application.typescript.createSourceFile(
       "temp.ts",
-      cleanCode,
+      interfaceCode,
       Application.typescript.ScriptTarget.Latest,
       true
     );
-    let interfaceCount = 0;
 
-    // 判断节点是否是无关节点，如注释、空行等
-    const isIrrelevantNode = (node: Node): boolean => {
-      return <boolean>(
-        (Application.typescript.isJSDoc(node) ||
-          Application.typescript.isEmptyStatement(node) ||
-          node.kind === Application.typescript.SyntaxKind.WhitespaceTrivia ||
-          node.kind === Application.typescript.SyntaxKind.NewLineTrivia)
-      );
-    };
-    // 遍历 AST，处理节点
-    const visitNode = (node: Node, context: TransformationContext): Node | undefined => {
-      if (isIrrelevantNode(node)) {
-        return Application.typescript.visitEachChild(
-          node,
-          (child) => visitNode(child, context),
-          context
-        );
-      }
+    // 处理接口的逻辑：创建代理类
+    const createProxyClass = (interfaceNode: InterfaceDeclaration) => {
+      const classElements: ClassElement[] = [];
+      const { factory } = Application.typescript;
 
-      if (Application.typescript.isInterfaceDeclaration(node)) {
-        interfaceCount++;
-
-        if (interfaceCount > 1) {
-          throw new Error("文件中只能包含一个接口声明。");
-        }
-
-        const interfaceName = node.name.text;
-        const classElements: ClassElement[] = [];
-        const { factory } = Application.typescript;
-
-        node.members.forEach((member) => {
-          if (Application.typescript.isMethodSignature(member)) {
-            const methodName = member.name.getText(sourceFile);
-            const params = member.parameters.map((param) =>
-              factory.createParameterDeclaration(
-                undefined, // 修饰符
-                undefined, // ...
-                param.name, // 参数名
-                undefined, // 可选标记
-                undefined, // 参数类型
-                undefined // 初始化器
-              )
-            );
-
-            const methodBody = factory.createBlock(
-              [
-                factory.createThrowStatement(
-                  factory.createNewExpression(factory.createIdentifier("Error"), undefined, [
-                    factory.createStringLiteral(`方法 ${methodName} 未实现。`)
-                  ])
-                )
-              ],
-              true
-            );
-
-            const proxyMethod = factory.createMethodDeclaration(
+      // 遍历接口中的方法，生成代理类的相应方法
+      interfaceNode.members.forEach((member) => {
+        if (Application.typescript.isMethodSignature(member)) {
+          const methodName = member.name.getText(sourceFile);
+          const params = member.parameters.map((param) =>
+            factory.createParameterDeclaration(
               undefined, // 修饰符
-              undefined, // *
-              factory.createIdentifier(methodName), // 方法名
+              undefined, // 可变参数
+              param.name, // 参数名
               undefined, // 可选标记
-              undefined, // 类型参数
-              params, // 参数
-              undefined, // 返回类型
-              methodBody // 方法体
-            );
+              undefined, // 参数类型
+              undefined // 初始化器
+            )
+          );
 
-            classElements.push(proxyMethod);
-          }
-        });
+          // 生成代理方法体，抛出未实现的错误
+          const methodBody = factory.createBlock(
+            [
+              factory.createThrowStatement(
+                factory.createNewExpression(factory.createIdentifier("Error"), undefined, [
+                  factory.createStringLiteral(`Method ${methodName} not implemented`)
+                ])
+              )
+            ],
+            true
+          );
 
-        return factory.createClassDeclaration(
-          undefined, // 修饰符
-          interfaceName, // 类名
-          undefined, // 类型参数
-          undefined, // 继承
-          classElements // 类成员
-        );
-      } else if (!Application.typescript.isSourceFile(node) && !isIrrelevantNode(node)) {
-        // 如果不是源文件节点，并且不是无关节点，则抛出错误
-        throw new Error("文件中包含接口以外的其他声明。");
-      }
+          // 创建代理方法
+          const proxyMethod = factory.createMethodDeclaration(
+            undefined, // 修饰符
+            undefined, // 星号
+            factory.createIdentifier(methodName), // 方法名
+            undefined, // 可选标记
+            undefined, // 类型参数
+            params, // 参数
+            undefined, // 返回类型
+            methodBody // 方法体
+          );
 
-      return Application.typescript.visitEachChild(
-        node,
-        (child) => visitNode(child, context),
-        context
+          classElements.push(proxyMethod);
+        }
+      });
+
+      // 返回代理类的节点
+      return factory.createClassDeclaration(
+        undefined, // 修饰符
+        factory.createIdentifier(interfaceName), // 类名
+        undefined, // 类型参数
+        undefined, // 继承
+        classElements // 类成员
       );
     };
 
-    // 转换 AST 并检查
-    const transformer: (
-      context: any
-    ) => (rootNode: any) => Node | (SourceFile & undefined) | (Node & undefined) = (context) => {
-      return (rootNode) => {
-        const result = Application.typescript.visitNode(rootNode, (node) =>
-          visitNode(node, context)
-        );
+    // 遍历 AST，找到目标接口并生成代理类
+    let proxyClassNode: ClassDeclaration | null = null;
+    Application.typescript.forEachChild(sourceFile, (node) => {
+      if (Application.typescript.isInterfaceDeclaration(node) && node.name.text === interfaceName) {
+        proxyClassNode = createProxyClass(node);
+      }
+    });
 
-        if (interfaceCount === 0) {
-          throw new Error("文件中必须包含一个接口声明。");
-        }
+    // 如果未找到目标接口，抛出错误
+    if (!proxyClassNode) {
+      throw new NoomiRpcError("0104", interfaceName);
+    }
 
-        return result;
-      };
-    };
-    const transformed = Application.typescript.transform(sourceFile, [transformer]);
+    // 使用打印器将生成的代理类转换为 TypeScript 代码
     const printer = Application.typescript.createPrinter({
       newLine: Application.typescript.NewLineKind.LineFeed
     });
-    const result = printer.printFile(transformed.transformed[0]);
 
-    // 使用生成的代码
+    const result = printer.printNode(
+      Application.typescript.EmitHint.Unspecified,
+      proxyClassNode,
+      sourceFile
+    );
+
+    // 返回生成的代理类代码
     return new Function(`return ${result};`)();
   }
 

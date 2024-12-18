@@ -1,7 +1,8 @@
 import { AbstractLoadBalancer } from "../AbstractLoadBalancer";
 import { Selector } from "../Selector";
 import { Logger } from "../../common/logger/Logger";
-import { LoadBalancerError } from "../../common/error/LoadBalancerError";
+import { NoomiRpcError } from "../../common/error/NoomiRpcError";
+import { TipManager } from "../../common/error/TipManager";
 
 /**
  * 轮询负载均衡器
@@ -47,8 +48,8 @@ export class RoundRobinLoadBalancer extends AbstractLoadBalancer {
      */
     public getNext(): string {
       if (!this.serviceNodes || this.serviceNodes.length === 0) {
-        Logger.error("进行负载均衡选取节点时发现服务列表为空。");
-        throw new LoadBalancerError("本地没有获取到服务列表。");
+        Logger.error(TipManager.getError("0605"));
+        throw new NoomiRpcError("0606");
       }
       const serviceNode: string = this.serviceNodes[this.index];
       if (this.index === this.serviceNodes.length - 1) {

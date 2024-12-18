@@ -60,6 +60,8 @@ export type SourceFile = import("typescript").SourceFile;
 export type Node = import("typescript").Node;
 export type ClassElement = import("typescript").ClassElement;
 export type TransformationContext = import("typescript").TransformationContext;
+export type InterfaceDeclaration = import("typescript").InterfaceDeclaration;
+export type ClassDeclaration = import("typescript").ClassDeclaration;
 
 // 类
 export type Constructor = new (...args: unknown[]) => void;

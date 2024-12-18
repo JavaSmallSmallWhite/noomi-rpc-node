@@ -1,5 +1,6 @@
-import { DateError } from "../error/DateError";
 import { Logger } from "../logger/Logger";
+import { NoomiRpcError } from "../error/NoomiRpcError";
+import { TipManager } from "../error/TipManager";
 
 /**
  * 雪花算法生成分布式请求id
@@ -97,11 +98,11 @@ export class IdGenerator {
    */
   public constructor(dataCenterId: bigint, machineId: bigint) {
     if (dataCenterId > IdGenerator.DATA_CENTER_MAX || dataCenterId < 0n) {
-      throw new TypeError("您传入的数据中心编号不合法。");
+      throw new NoomiRpcError("0300");
     }
 
     if (machineId > IdGenerator.MACHINE_MAX || machineId < 0n) {
-      throw new TypeError("您输入的机器编号不合法。");
+      throw new NoomiRpcError("0301");
     }
     this.dataCenterId = dataCenterId;
     this.machineId = machineId;
@@ -114,7 +115,7 @@ export class IdGenerator {
     const currentTime: bigint = BigInt(Date.now());
     let timeStamp: bigint = currentTime - IdGenerator.START_STAMP;
     if (timeStamp < this.lastTimeStamp) {
-      throw new DateError("您的服务器进行了时钟回调。");
+      throw new NoomiRpcError("0302");
     }
     if (timeStamp == this.lastTimeStamp) {
       this.sequenceId++;
@@ -133,7 +134,7 @@ export class IdGenerator {
       (this.dataCenterId << IdGenerator.DATA_CENTER_LEFT) |
       (this.machineId << IdGenerator.MACHINE_LEFT) |
       sequence;
-    Logger.debug(`请求id为${requestId}`);
+    Logger.debug(TipManager.getTip("0123", requestId.toString()));
     return requestId;
   }
 

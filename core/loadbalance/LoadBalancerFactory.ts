@@ -6,11 +6,12 @@ import { ConsistentHashLoadBalancer } from "./impl/ConsistentHashLoadBalancer";
 import { MinimumResponseTimeLoadBalancer } from "./impl/MinimumResponseTimeLoadBalancer";
 import { ObjectWrapperFactory } from "../configuration/ObjectWrapperFactory";
 import { ObjectWrapperType, UnknownClass } from "../configuration/ObjectWrapperType";
-import { LoadBalancerError } from "../common/error/LoadBalancerError";
 import { InstanceFactory } from "noomi";
 import { RandomLoadBalancer } from "./impl/RandomLoadBalancer";
 import { WeightLoadBalancer } from "./impl/WeightLoadBalancer";
 import { WeightRobinLoadBalancer } from "./impl/WeightRobinLoadBalancer";
+import { NoomiRpcError } from "../common/error/NoomiRpcError";
+import { TipManager } from "../common/error/TipManager";
 
 /**
  * 负载均衡器工厂
@@ -98,9 +99,7 @@ export class LoadBalancerFactory {
       const loadBalancerObjectWrapper: ObjectWrapper<LoadBalancer> =
         this.LOADBALANCER_CACHE.get(loadBalancerTypeOrCode);
       if (!loadBalancerObjectWrapper) {
-        Logger.error(
-          `未找到您配置的${loadBalancerTypeOrCode}负载均衡器，默认选用1号RoundRobinLoadBalancer的负载均衡器。`
-        );
+        Logger.error(TipManager.getError("0600", loadBalancerTypeOrCode));
         return this.LOADBALANCER_CACHE.get("RoundRobinLoadBalancer");
       }
       return this.LOADBALANCER_CACHE.get(loadBalancerTypeOrCode);
@@ -109,16 +108,12 @@ export class LoadBalancerFactory {
       const loadBalancerObjectWrapper: ObjectWrapper<LoadBalancer> =
         this.LOADBALANCER_CACHE_CODE.get(loadBalancerTypeOrCode);
       if (!loadBalancerObjectWrapper) {
-        Logger.error(
-          `未找到您配置的编号为${loadBalancerTypeOrCode}负载均衡器，默认选用1号RoundRobinLoadBalancer的负载均衡器。`
-        );
+        Logger.error(TipManager.getError("0601", loadBalancerTypeOrCode));
         return this.LOADBALANCER_CACHE_CODE.get(1);
       }
       return this.LOADBALANCER_CACHE_CODE.get(loadBalancerTypeOrCode);
     }
-    Logger.error(
-      "不存在您所指定的负载均衡类型或负载均衡码，默认选用1号RoundRobinLoadBalancer的负载均衡器。"
-    );
+    Logger.error(TipManager.getError("0602"));
     return this.LOADBALANCER_CACHE_CODE.get(1);
   }
 
@@ -143,14 +138,10 @@ export class LoadBalancerFactory {
       return loadBalancerWrapper;
     }
     if (this.LOADBALANCER_CACHE_CODE.has(loadBalancerObjectWrapper.code)) {
-      throw new LoadBalancerError(
-        `编号为${loadBalancerObjectWrapper.code}的负载均衡器已存在，请使用其他编号。`
-      );
+      throw new NoomiRpcError("0603", loadBalancerObjectWrapper.code);
     }
     if (this.LOADBALANCER_CACHE.has(loadBalancerObjectWrapper.name)) {
-      throw new LoadBalancerError(
-        `名称为${loadBalancerObjectWrapper.name}的负载均衡器已存在，请使用其他名称。`
-      );
+      throw new NoomiRpcError("0604", loadBalancerObjectWrapper.name);
     }
     this.LOADBALANCER_CACHE.set(loadBalancerObjectWrapper.name, loadBalancerObjectWrapper);
     this.LOADBALANCER_CACHE_CODE.set(loadBalancerObjectWrapper.code, loadBalancerObjectWrapper);

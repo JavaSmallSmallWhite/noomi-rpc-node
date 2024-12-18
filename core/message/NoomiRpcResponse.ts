@@ -1,4 +1,6 @@
 import { ResponsePayload } from "./ResponsePayload";
+import { Logger } from "../common/logger/Logger";
+import { TipManager } from "../common/error/TipManager";
 
 /**
  * 响应的封装，服务提供方回复的响应
@@ -39,6 +41,10 @@ export class NoomiRpcResponse {
    * @private
    */
   private responseBody: ResponsePayload;
+
+  public constructor() {
+    Logger.debug(TipManager.getTip("0134"));
+  }
 
   /**
    * ------------------------------以下是属性的getter和setter方法----------------------------------------

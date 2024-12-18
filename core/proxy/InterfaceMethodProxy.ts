@@ -1,6 +1,7 @@
 import { Logger } from "../common/logger/Logger";
 import { NoomiRpcConsumerHandler } from "./handler/NoomiRpcConsumerHandler";
 import { InterfaceUtil } from "../common/utils/InterfaceUtil";
+import { TipManager } from "../common/error/TipManager";
 
 /**
  *  接口的代理
@@ -19,7 +20,7 @@ export class InterfaceMethodProxy<T extends NonNullable<unknown>> {
         continue;
       }
       interfaceObject[key] = this.createMethodProxy(interfaceObject, key, serviceName);
-      Logger.info(`接口对象${interfaceName}的${key}方法的代理对象创建成功。`);
+      Logger.info(TipManager.getTip("0135", interfaceName, key));
     }
     return new Proxy<T>(interfaceObject, {});
   }

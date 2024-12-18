@@ -13,9 +13,10 @@ import { SerializerFactory } from "../serialize/SerializerFactory";
 import { CompressorFactory } from "../compress/CompressorFactory";
 import { Compressor } from "../compress/Compressor";
 import { Serializer } from "../serialize/Serializer";
-import { ConfigError } from "../common/error/ConfigError";
 import { Application } from "../common/utils/ApplicationUtil";
 import { DBManager } from "noomi";
+import { NoomiRpcError } from "../common/error/NoomiRpcError";
+import { TipManager } from "../common/error/TipManager";
 
 /**
  * 配置管理类
@@ -32,6 +33,12 @@ export class Configuration {
    * @private
    */
   private _appName: string = "default";
+
+  /**
+   * 配置信息 --> 语言
+   * @private
+   */
+  private _language: string = "zh";
 
   /**
    * 配置信息 --> 日志
@@ -138,8 +145,17 @@ export class Configuration {
   }
 
   set port(value: number) {
-    Logger.info(`端口修改成功，端口为：${value}。`);
     this._port = value;
+    Logger.info(TipManager.getTip("0100", value));
+  }
+
+  get language(): string {
+    return this._language;
+  }
+
+  set language(value: string) {
+    this._language = value;
+    Logger.info(TipManager.getTip("0101", value));
   }
 
   get appName(): string {
@@ -147,8 +163,8 @@ export class Configuration {
   }
 
   set appName(value: string) {
-    Logger.info(`应用名称修改成功，应用名称为：${value}。`);
     this._appName = value;
+    Logger.info(TipManager.getTip("0102", value));
   }
 
   get log4jsConfiguration(): { configuration: Config; use: string } {
@@ -157,6 +173,7 @@ export class Configuration {
 
   set log4jsConfiguration(value: { configuration: Config; use: string }) {
     this._log4jsConfiguration = value;
+    // Logger.info(TipManager.getTip("0103", value.use));
   }
 
   get apiDir(): string | string[] {
@@ -165,6 +182,7 @@ export class Configuration {
 
   set apiDir(value: string | string[]) {
     this._apiDir = value;
+    Logger.info(TipManager.getTip("0104", value));
   }
 
   get starterPath(): string | string[] {
@@ -173,6 +191,7 @@ export class Configuration {
 
   set starterPath(value: string | string[]) {
     this._starterPath = value;
+    Logger.info(TipManager.getTip("0105", value));
   }
 
   get registryConfig(): RegistryConfig {
@@ -180,8 +199,8 @@ export class Configuration {
   }
 
   set registryConfig(value: RegistryConfig) {
-    Logger.info(`注册中心修改成功，注册中心为：${value.registryName}。`);
     this._registryConfig = value;
+    Logger.info(TipManager.getTip("0106", value.registryName));
   }
 
   get loadBalancerType(): string {
@@ -189,8 +208,8 @@ export class Configuration {
   }
 
   set loadBalancerType(value: string) {
-    Logger.info(`负载均衡策略修改成功，负载均衡策略为：${value}。`);
     this._loadBalancerType = value;
+    Logger.info(TipManager.getTip("0107", value));
   }
 
   get serializerType(): string {
@@ -198,8 +217,8 @@ export class Configuration {
   }
 
   set serializerType(value: string) {
-    Logger.info(`序列化器修改成功，序列化策略为：${value}。`);
     this._serializerType = value;
+    Logger.info(TipManager.getTip("0108", value));
   }
 
   get compressorType(): string {
@@ -207,8 +226,8 @@ export class Configuration {
   }
 
   set compressorType(value: string) {
-    Logger.info(`压缩器修改成功，压缩策略为：${value}。`);
     this._compressorType = value;
+    Logger.info(TipManager.getTip("0109", value));
   }
 
   get idGenerator(): IdGenerator {
@@ -216,8 +235,8 @@ export class Configuration {
   }
 
   set idGenerator(value: IdGenerator) {
-    Logger.info(`id发号器修改成功，id发号器为${InterfaceUtil.getInterfaceName(value)}。`);
     this._idGenerator = value;
+    Logger.info(TipManager.getTip("0110", InterfaceUtil.getInterfaceName(value)));
   }
 
   get circuitBreakerType(): string {
@@ -226,6 +245,7 @@ export class Configuration {
 
   set circuitBreakerType(value: string) {
     this._circuitBreakerType = value;
+    Logger.info(TipManager.getTip("0111", value));
   }
 
   get rateLimiterType(): string {
@@ -234,6 +254,7 @@ export class Configuration {
 
   set rateLimiterType(value: string) {
     this._rateLimiterType = value;
+    Logger.info(TipManager.getTip("0112", value));
   }
 
   get everyIpRateLimiter(): Map<string, RateLimiter> {
@@ -258,13 +279,13 @@ class JsonResolver {
       "utf-8"
     );
     if (jsonStr === null) {
-      throw new ConfigError("读取rpc.json配置文件失败。");
+      throw new NoomiRpcError(TipManager.getError("0100"));
     }
     let configObject: object = null;
     try {
       configObject = Application.json5.parse(jsonStr);
     } catch (error) {
-      throw new ConfigError("解析rpc.json文件内容的配置对象失败。");
+      throw new NoomiRpcError(TipManager.getError("0101"));
     }
     try {
       // 配置debug等级
@@ -273,69 +294,54 @@ class JsonResolver {
         configuration.log4jsConfiguration.configuration,
         configuration.log4jsConfiguration.use
       );
-      Logger.info(`日志信息设置成功，使用的日志信息为：${configuration.log4jsConfiguration.use}。`);
       // 配置端口
       configuration.port = configObject["port"];
-      Logger.info(`端口设置成功，端口为：${configuration.port}。`);
       // 配置应用名称
       configuration.appName = configObject["appName"];
-      Logger.info(`应用名称设置成功，应用名称为：${configuration.appName}。`);
+      // 配置语言
+      configuration.language = configObject["language"];
       // 配置接口目录
       configuration.apiDir = configObject["apiDir"];
-      Logger.info(`接口目录设置成功，接口目录为：${configuration.apiDir}。`);
       // 配置项目启动目录
       configuration.starterPath = configObject["starterPath"];
-      Logger.info(`启动目录设置成功，服务前缀为：${configuration.starterPath}。`);
       // 配置注册中心
       configuration.registryConfig = new RegistryConfig(
         configObject["registry"]["type"],
         configObject["registry"]["connectionConfig"]
       );
       GlobalCache.serviceConfiguration = configObject["registry"]["serviceConfig"];
-      Logger.info(`注册中心设置成功，注册中心为：${configuration.registryConfig.registryName}。`);
       // 配置负载均衡
       const loadBalanceWrapper: ObjectWrapper<LoadBalancer> = LoadBalancerFactory.addLoadBalancer(
         configObject["loadBalancerType"]
       );
       configuration.loadBalancerType = loadBalanceWrapper.name;
-      Logger.info(`负载均衡策略设置成功，负载均衡策略为：${loadBalanceWrapper.name}。`);
       // 配置序列化器
       const serializerWrapper: ObjectWrapper<Serializer> = SerializerFactory.addSerializer(
         configObject["serializerType"]
       );
       configuration.serializerType = serializerWrapper.name;
-      Logger.info(`序列化器设置成功，序列化策略为：${serializerWrapper.name}。`);
       // 配置压缩器
       const compressorWrapper: ObjectWrapper<Compressor> = CompressorFactory.addCompressor(
         configObject["compressorType"]
       );
       configuration.compressorType = compressorWrapper.name;
-      Logger.info(`压缩器设置成功，压缩策略为：${compressorWrapper.name}。`);
       // 配置id法号器
       configuration.idGenerator = new IdGenerator(
         BigInt(configObject["idGenerator"]["dataCenterId"]),
         BigInt(configObject["idGenerator"]["machineId"])
       );
-      Logger.info(
-        `id发号器配置成功，id发号器为${InterfaceUtil.getInterfaceName(
-          InterfaceUtil.getInterfaceName(configuration.idGenerator)
-        )}`
-      );
       // 配置熔断器类型
       configuration.circuitBreakerType = configObject["circuitBreaker"];
-      Logger.info(`熔断器类型配置成功，熔断器名称为：${configuration.circuitBreakerType}`);
       // 配置限流器类型
       configuration.rateLimiterType = configObject["rateLimiter"];
-      Logger.info(`限流器类型配置成功，限流器名称为：${configuration.rateLimiterType}`);
       // 数据库配置
       if (configObject["database"]) {
         DBManager.parseFile(Application.path.resolve("config", configObject["database"]));
       }
       // 新增的标签，往下修改
-      Logger.info("具体配置解析成功。");
+      Logger.info(TipManager.getTip("0113"));
     } catch (error) {
-      Logger.error(`具体配置设置异常：${error.message}`);
-      throw new ConfigError(error.message);
+      throw new NoomiRpcError(TipManager.getError("0102", error.message));
     }
   }
 }

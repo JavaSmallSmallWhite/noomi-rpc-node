@@ -1,7 +1,6 @@
 import { AbstractRegistry } from "../AbstractRegistry";
 import { ServiceConfig } from "../../ServiceConfig";
 import { NetUtil } from "../../common/utils/NetUtil";
-import { Host, NacosNamingClient } from "nacos";
 import { NacosUtil } from "../../common/utils/nacos/NacosUtil";
 import {
   NacosRegistryConnectConfig,
@@ -10,6 +9,7 @@ import {
 import { GlobalCache } from "../../cache/GlobalCache";
 import { Constant } from "../../common/utils/Constant";
 import { NoomiRpcStarter } from "../../NoomiRpcStarter";
+import { Host, NacosNamingClient } from "../../common/utils/TypesUtil";
 
 /**
  * nacos注册中心的服务注册与发现类

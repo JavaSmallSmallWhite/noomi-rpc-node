@@ -1,12 +1,12 @@
 import { Serializer } from "../Serializer";
 import { Logger } from "../../common/logger/Logger";
-import { SerializeError } from "../../common/error/SerializeError";
 import { Fury, Hps, TypeDescription } from "../../common/utils/TypesUtil";
 import { Application } from "../../common/utils/ApplicationUtil";
 import { ReferenceConfig } from "../../ReferenceConfig";
 import { ServiceConfig } from "../../ServiceConfig";
 import { GlobalCache } from "../../cache/GlobalCache";
 import { Type } from "@furyjs/fury";
+import { NoomiRpcError } from "../../common/error/NoomiRpcError";
 
 /**
  * hps
@@ -48,7 +48,7 @@ export class FurySerializer implements Serializer {
       return body;
     } catch (error) {
       Logger.error(`${buffer}流的fury反序列化操作失败。`);
-      throw new SerializeError(error.message);
+      throw new NoomiRpcError(error.message);
     }
   }
 
@@ -72,7 +72,7 @@ export class FurySerializer implements Serializer {
       return bodyBuffer;
     } catch (error) {
       Logger.error("fury序列化操作失败。");
-      throw new SerializeError(error.message);
+      throw new NoomiRpcError(error.message);
     }
   }
 

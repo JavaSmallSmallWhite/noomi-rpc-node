@@ -3,6 +3,7 @@ import { Selector } from "../Selector";
 import { Logger } from "../../common/logger/Logger";
 import { GlobalCache } from "../../cache/GlobalCache";
 import { Socket } from "../../common/utils/TypesUtil";
+import { TipManager } from "../../common/error/TipManager";
 
 /**
  * 最短响应时间负载均衡器
@@ -10,10 +11,9 @@ import { Socket } from "../../common/utils/TypesUtil";
 export class MinimumResponseTimeLoadBalancer extends AbstractLoadBalancer {
   /**
    * 获取最短响应时间负载均衡选择器
-   * @param serviceNodes 服务节点
    * @protected
    */
-  protected getSelector(serviceNodes: Array<string>): Selector {
+  protected getSelector(): Selector {
     return new this.minimumResponseTimeSelector();
   }
 
@@ -28,7 +28,7 @@ export class MinimumResponseTimeLoadBalancer extends AbstractLoadBalancer {
     public getNext(): string {
       const keys: bigint[] = Array.from(GlobalCache.ANSWER_TIME_CHANNEL_CACHE.keys()).sort();
       if (keys.length > 0) {
-        Logger.debug(`选取了响应时间为${keys[0]}ms的服务节点。`);
+        Logger.debug(TipManager.getTip("0132", keys[0]));
         const socketChannel: Socket = GlobalCache.ANSWER_TIME_CHANNEL_CACHE.get(keys[0]);
         return socketChannel.remoteAddress + ":" + socketChannel.remotePort;
       }

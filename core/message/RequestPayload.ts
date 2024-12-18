@@ -28,10 +28,6 @@ export class RequestPayload {
    */
   private token: string;
 
-  public constructor() {
-    Logger.debug("创建请求体成功。");
-  }
-
   /**
    * -----------------------------以下是属性的getter和setter方法----------------------------------------
    */

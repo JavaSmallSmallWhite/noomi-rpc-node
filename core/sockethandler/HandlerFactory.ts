@@ -6,11 +6,9 @@ import { NoomiRpcResponseDecoder } from "./handler/NoomiRpcResponseDecoder";
 import { ResultInBoundHandler } from "./handler/ResultInBoundHandler";
 import { MethodCallInBoundHandler } from "./handler/MethodCallInBoundHandler";
 import { NoomiRpcRequestDecoder } from "./handler/NoomiRpcRequestDecoder";
-import { HandlerError } from "../common/error/HandlerError";
 import { Logger } from "../common/logger/Logger";
 import { CircuitBreaker } from "../sentinel/circuitbreak/CircuitBreaker";
 import { RequestType } from "../code/RequestType";
-import { ProxyError } from "../common/error/ProxyError";
 import { GlobalCache } from "../cache/GlobalCache";
 import { AddressPort, NetUtil } from "../common/utils/NetUtil";
 import { LoadBalancerFactory } from "../loadbalance/LoadBalancerFactory";
@@ -18,6 +16,7 @@ import { NoomiRpcStarter } from "../NoomiRpcStarter";
 import { CircuitBreakerFactory } from "../sentinel/circuitbreak/CircuitBreakerFactory";
 import { Socket } from "../common/utils/TypesUtil";
 import { Application } from "../common/utils/ApplicationUtil";
+import { NoomiRpcError } from "../common/error/NoomiRpcError";
 
 /**
  * handler处理工厂
@@ -48,10 +47,10 @@ export class HandlerFactory {
    */
   private static addHandler(category: string, handler: Handler): void {
     if (!category) {
-      throw new HandlerError("handler处理器类别不合法");
+      throw new NoomiRpcError("handler处理器类别不合法");
     }
     if (!handler) {
-      throw new HandlerError("handler处理器不合法");
+      throw new NoomiRpcError("handler处理器不合法");
     }
     if (!this.handlerChain.has(category)) {
       this.handlerChain.set(category, [handler]);
@@ -108,7 +107,7 @@ export class HandlerFactory {
           circuitBreaker.isBreak()
         ) {
           Logger.error("当前断路器已经开启，无法发送请求。");
-          throw new ProxyError("当前断路器已经开启，无法发送请求。");
+          throw new NoomiRpcError("");
         }
         // 发送请求
         await this.execute(socketChannel, "ConsumerOutBound", noomiRpcRequest);
@@ -220,6 +219,6 @@ export class HandlerFactory {
         return result;
       }
     }
-    throw new HandlerError(`不存在${category}类别的handler处理器`);
+    throw new NoomiRpcError("");
   }
 }

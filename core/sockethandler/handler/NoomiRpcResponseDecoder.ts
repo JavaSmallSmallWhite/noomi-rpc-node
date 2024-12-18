@@ -2,7 +2,6 @@ import { BufferToMessageDecoderHandler } from "../BufferToMessageDecoderHandler"
 import { NoomiRpcResponse } from "../../message/NoomiRpcResponse";
 import { Logger } from "../../common/logger/Logger";
 import { MessageConstant } from "../../message/MessageConstant";
-import { PacketError } from "../../common/error/PacketError";
 import { Compressor } from "../../compress/Compressor";
 import { CompressorFactory } from "../../compress/CompressorFactory";
 import { Serializer } from "../../serialize/Serializer";
@@ -10,6 +9,7 @@ import { SerializerFactory } from "../../serialize/SerializerFactory";
 import { ResponsePayload } from "../../message/ResponsePayload";
 import { Socket } from "../../common/utils/TypesUtil";
 import { InterfaceUtil } from "../../common/utils/InterfaceUtil";
+import { NoomiRpcError } from "../../common/error/NoomiRpcError";
 
 /**
  * 响应解码器
@@ -35,14 +35,14 @@ export class NoomiRpcResponseDecoder extends BufferToMessageDecoderHandler<Noomi
       .toString();
     index += MessageConstant.MAGIC_FIELD_LENGTH;
     if (magic !== MessageConstant.MAGIC.toString()) {
-      throw new PacketError("获得的请求不合法。");
+      throw new NoomiRpcError("获得的请求不合法。");
     }
 
     // 解析版本
     const version: number = responseBuffer.readUInt8(index);
     index += MessageConstant.VERSION_FIELD_LENGTH;
     if (version > MessageConstant.VERSION) {
-      throw new PacketError("获得的请求版本不被支持。");
+      throw new NoomiRpcError("获得的请求版本不被支持。");
     }
 
     // 解析头部长度

@@ -1,10 +1,11 @@
 import { Constant } from "../Constant";
-import { ZookeeperError } from "../../error/ZookeeperError";
 import { ZookeeperNode } from "./ZookeeperNode";
 import { Logger } from "../../logger/Logger";
 import { ZookeeperConnectConfig } from "./ZookeeperConfig";
 import { Exception, Option, Stat, Zookeeper, Event } from "../TypesUtil";
 import { Application } from "../ApplicationUtil";
+import { NoomiRpcError } from "../../error/NoomiRpcError";
+import { TipManager } from "../../error/TipManager";
 
 /**
  * zookeeper工具类
@@ -18,7 +19,7 @@ export class ZookeeperUtil {
   public static createZookeeper(zookeeperConnectConfig?: ZookeeperConnectConfig): Zookeeper {
     // 没有连接配置则使用默认的
     if (!zookeeperConnectConfig) {
-      Logger.info("用户未设定zookeeper注册中心的连接配置，将使用默认的连接配置。");
+      Logger.info(TipManager.getTip("0114", "zookeeper"));
       // 定义连接数
       const connectString: string = Constant.DEFAULT_ZK_CONNECT_STRING;
       const connectConfig: ZookeeperConnectConfig = {
@@ -28,19 +29,17 @@ export class ZookeeperUtil {
       return this.createZookeeper(connectConfig);
     } else {
       if (!zookeeperConnectConfig.connectString) {
-        Logger.error("未设置zookeeper注册中心的连接地址。");
-        throw new ZookeeperError("未设置zookeeper注册中心的连接地址。");
+        throw new NoomiRpcError("0200", "zookeeper");
       }
       try {
         const connectString: string = zookeeperConnectConfig.connectString;
         const options: Partial<Option> = zookeeperConnectConfig.options;
         const client: Zookeeper = Application.zookeeper.createClient(connectString, options);
         client.connect();
-        Logger.debug("客户端已经连接zookeeper注册中心成功。");
+        Logger.debug(TipManager.getTip("0115", "zookeeper"));
         return client;
       } catch (error) {
-        Logger.error("创建zookeeper注册中心实例时发生异常：");
-        throw new ZookeeperError(error.message);
+        throw new NoomiRpcError("0201", "zookeeper", error.message);
       }
     }
   }
@@ -74,18 +73,17 @@ export class ZookeeperUtil {
           }
         );
       });
-      if (result instanceof Application.zookeeper.Exception) {
-        Logger.error(`创建${node.nodePath}时发生异常，异常信息为：${result.toString()}`);
-        throw new ZookeeperError(result.toString());
+      if (result instanceof Error || result instanceof Application.zookeeper.Exception) {
+        throw new NoomiRpcError(
+          "0206",
+          node.nodePath,
+          ("message" in result && result.message) || result.toString()
+        );
       }
-      if (result instanceof Error) {
-        Logger.error(`创建${node.nodePath}时发生异常，异常信息为：${result.message}`);
-        throw new ZookeeperError(result.toString());
-      }
-      Logger.info(`根节点${result}，成功创建`);
+      Logger.info(TipManager.getTip("0119", result));
       return true;
     } else {
-      Logger.info(`节点${node.nodePath}已经存在，无需创建`);
+      Logger.info(TipManager.getTip("0120", node.nodePath));
       return false;
     }
   }
@@ -115,13 +113,12 @@ export class ZookeeperUtil {
       });
     });
 
-    if (result instanceof Application.zookeeper.Exception) {
-      Logger.error(`${nodePath}节点判断出现异常，异常信息为：${result.toString()}`);
-      throw new ZookeeperError(result.toString());
-    }
-    if (result instanceof Error) {
-      Logger.error(`${nodePath}节点判断出现异常，异常信息为：${result.message}`);
-      throw new ZookeeperError(result.message);
+    if (result instanceof Error || result instanceof Application.zookeeper.Exception) {
+      throw new NoomiRpcError(
+        "0206",
+        nodePath,
+        ("message" in result && result.message) || result.toString()
+      );
     }
     return result;
   }
@@ -150,15 +147,14 @@ export class ZookeeperUtil {
       );
     });
 
-    if (result instanceof Application.zookeeper.Exception) {
-      Logger.error(`获取${serviceNode}节点的子节点发生异常，异常信息为：${result.toString()}`);
-      throw new ZookeeperError(result.toString());
+    if (result instanceof Error || result instanceof Application.zookeeper.Exception) {
+      throw new NoomiRpcError(
+        "0207",
+        serviceNode,
+        ("message" in result && result.message) || result.toString()
+      );
     }
-    if (result instanceof Error) {
-      Logger.error(`获取${serviceNode}节点的子节点发生异常，异常信息为：${result.message}`);
-      throw new ZookeeperError(result.message);
-    }
-    Logger.debug(`获取${serviceNode}的所有子节点成功。子节点为${result}。`);
+    Logger.debug(TipManager.getTip("0121", serviceNode, result.toString));
     return result;
   }
 
@@ -177,15 +173,14 @@ export class ZookeeperUtil {
       });
     });
 
-    if (result instanceof Application.zookeeper.Exception) {
-      Logger.error(`获取${nodePath}节点数据发生异常，异常信息为：${result.toString()}`);
-      throw new ZookeeperError(result.toString());
+    if (result instanceof Error || result instanceof Application.zookeeper.Exception) {
+      throw new NoomiRpcError(
+        "0208",
+        nodePath,
+        ("message" in result && result.message) || result.toString()
+      );
     }
-    if (result instanceof Error) {
-      Logger.error(`获取${nodePath}节点数据发生异常，异常信息为：${result.message}`);
-      throw new ZookeeperError(result.message);
-    }
-    Logger.debug(`获取${nodePath}节点数据成功。节点数据为：${result}。`);
+    Logger.debug(TipManager.getTip("0122", nodePath, result));
     return result;
   }
 
@@ -196,9 +191,9 @@ export class ZookeeperUtil {
   public static close(zookeeper: Zookeeper): void {
     try {
       zookeeper.close();
+      Logger.debug(TipManager.getTip("0123"));
     } catch (error) {
-      Logger.error("关闭zookeeper时发生问题。");
-      throw new ZookeeperError(error.message);
+      throw new NoomiRpcError("0209", error.message);
     }
   }
 }

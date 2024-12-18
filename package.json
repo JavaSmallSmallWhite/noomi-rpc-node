@@ -57,6 +57,8 @@
   "devDependencies": {
     "@types/node": "^20.10.5",
     "@types/node-zookeeper-client": "^0.2.13",
+    "mathjs": "^14.0.0",
+    "random-js": "^2.1.0",
     "ts-essentials": "^9.4.1"
   }
 }
