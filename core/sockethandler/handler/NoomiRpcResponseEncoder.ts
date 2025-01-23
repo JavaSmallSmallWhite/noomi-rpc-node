@@ -74,7 +74,7 @@ export class NoomiRpcResponseEncoder extends MessageToBufferEncoderHandler<Noomi
       // responseBodyBuffer = await SerializerFactory.payloadSerialize(
       //   serializer,
       //   responseBody,
-      //   "server",
+      //   "server.js",
       //   headerBuffer,
       //   index
       // );
@@ -104,10 +104,10 @@ export class NoomiRpcResponseEncoder extends MessageToBufferEncoderHandler<Noomi
       headerBuffer.writeUInt16BE(methodNameBuffer.length, index);
       responseBodyBuffer = Buffer.concat([serviceNameBuffer, methodNameBuffer, dataBuffer]);
       // 压缩响应体
-      const compressor: Compressor = CompressorFactory.getCompressor(
-        noomiRpcResponse.getCompressType()
-      ).impl;
-      responseBodyBuffer = await compressor.compress(responseBodyBuffer);
+      // const compressor: Compressor = CompressorFactory.getCompressor(
+      //   noomiRpcResponse.getCompressType()
+      // ).impl;
+      // responseBodyBuffer = await compressor.compress(responseBodyBuffer);
     }
 
     let responseBuffer: Buffer;

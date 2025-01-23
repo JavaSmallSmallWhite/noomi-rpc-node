@@ -23,7 +23,7 @@ export class NoomiRpcStarter {
    * 初始化配置对象
    * @private
    */
-  private configuration: Configuration;
+  private readonly configuration: Configuration;
 
   /**
    * 单例模式的懒汉式创建启动对象
@@ -186,6 +186,6 @@ export class NoomiRpcStarter {
   public async reference(reference: ReferenceConfig<NonNullable<unknown>>): Promise<void> {
     const serviceName: string = reference.serviceName;
     GlobalCache.REFERENCES_LIST.set(serviceName, reference);
-    HeartBeatDetector.detectHeartbeat(serviceName).then();
+    // HeartBeatDetector.detectHeartbeat(serviceName).then();
   }
 }

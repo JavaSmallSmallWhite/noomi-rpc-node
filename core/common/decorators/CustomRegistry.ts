@@ -32,7 +32,7 @@ interface RegistryOption {
  * @constructor
  */
 export function CustomRegistry(registryOption: RegistryOption) {
-  return (target: Function): void => {
+  return (target: (...args: unknown[]) => void): void => {
     const registryConfig: RegistryConfig = new RegistryConfig(
       registryOption.registryName,
       registryOption.registryConnectConfig

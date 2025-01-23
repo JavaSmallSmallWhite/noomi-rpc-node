@@ -10,5 +10,5 @@ class ConsulRegistry extends AbstractRegistry {
     return Promise.resolve(undefined);
   }
 
-  public register(serviceConfig: ServiceConfig<Object>): void {}
+  public register(serviceConfig: ServiceConfig<NonNullable<unknown>>): void {}
 }

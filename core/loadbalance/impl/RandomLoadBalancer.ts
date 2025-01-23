@@ -37,7 +37,6 @@ export class RandomLoadBalancer extends AbstractLoadBalancer {
      * 获取随机负载均衡算法下的一个服务节点
      */
     getNext(): string {
-      // [0, this.serviceNodes.length)向下取整
       const index: number = Math.floor(Math.random() * this.serviceNodes.length);
       return this.serviceNodes[index];
     }

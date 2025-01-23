@@ -114,7 +114,8 @@ export const NoomiRpcTip_zh: NoomiRpcTip = {
 
     "0152": "tcp服务器关闭",
     "0153": "tcp服务器启动成功，监听服务器地址为：${0}，监听端口为：${1}",
-    "0154": "接口对象${0}的代理对象创建成功"
+    "0154": "接口对象${0}的代理对象创建成功",
+    "0155": "服务调用成功"
   },
   //异常消息，前两位表示模块，后两位表示序号
   error: {
@@ -266,7 +267,7 @@ export const NoomiRpcTip_en: NoomiRpcTip = {
     "0129":
       "The specified compression type or compression code does not exist, defaulting to compressor 1 (gzip)",
 
-    "0130": "The response time with ${0} server is: ${1}",
+    "0130": "The response time with ${0} server.js is: ${1}",
 
     "0131": "Node with hash ${0} has been added to the hash ring",
     "0132": "Service node with response time ${0}ms has been selected",
@@ -296,8 +297,8 @@ export const NoomiRpcTip_en: NoomiRpcTip = {
     "0150": "Found request and response with ID ${0}, processing result",
     "0151": "Detected node up/down for service ${0}, will pull the service list again...",
 
-    "0152": "TCP server closed",
-    "0153": "TCP server started successfully, listening on address: ${0}, port: ${1}",
+    "0152": "TCP server.js closed",
+    "0153": "TCP server.js started successfully, listening on address: ${0}, port: ${1}",
     "0154": "Proxy object for interface object ${0} created successfully"
   },
   // Error messages, the first two digits represent module, the last two digits represent sequence
@@ -331,7 +332,7 @@ export const NoomiRpcTip_en: NoomiRpcTip = {
 
     "0300": "Invalid data center ID passed in!",
     "0301": "Invalid machine ID entered!",
-    "0302": "Your server performed a clock rollback!",
+    "0302": "Your server.js performed a clock rollback!",
 
     "0400": "Could not retrieve local IPv4 address!",
     "0401": "Exception occurred while connecting to host at ${0}:${1}, retrying ${2} times",
@@ -342,7 +343,7 @@ export const NoomiRpcTip_en: NoomiRpcTip = {
     "0406": "Received request version is not supported",
     "0407": "Illegal response",
     "0408": "Received response version is not supported",
-    "0409": "TCP server exception, exception message: ${0}",
+    "0409": "TCP server.js exception, exception message: ${0}",
 
     "0500": "Exception occurred while compressing byte array, exception message: ${0}",
     "0501": "Exception occurred while decompressing byte array, exception message: ${0}",
@@ -373,7 +374,7 @@ export const NoomiRpcTip_en: NoomiRpcTip = {
     "0708": "Request with ID ${0} limited, response code: ${1}",
     "0709": "Request with ID ${0} not found, response code: ${1}",
     "0710": "Request with ID ${0} returned error, response code: ${1}",
-    "0711": "Request with ID ${0} was denied, target server is shut down, response code: ${1}",
+    "0711": "Request with ID ${0} was denied, target server.js is shut down, response code: ${1}",
 
     "0800":
       "Buffer stream passed in for deserialization is empty, or target class for deserialization is empty",

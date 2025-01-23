@@ -90,29 +90,30 @@ export class HandlerFactory {
           GlobalCache.CHANNEL_CACHE.set(serviceNode, socketChannel);
         }
       }
-      try {
-        const everyIpCircuitBreaker: Map<string, CircuitBreaker> =
-          NoomiRpcStarter.getInstance().getConfiguration().everyIpCircuitBreaker;
-        const serviceNode: string = socketChannel.remoteAddress + ":" + socketChannel.remotePort;
-        circuitBreaker = everyIpCircuitBreaker.get(serviceNode);
-        if (!circuitBreaker) {
-          circuitBreaker = CircuitBreakerFactory.getCircuitBreaker(
-            NoomiRpcStarter.getInstance().getConfiguration().circuitBreakerType
-          );
-          everyIpCircuitBreaker.set(serviceNode, circuitBreaker);
-        }
+      const everyIpCircuitBreaker: Map<string, CircuitBreaker> =
+        NoomiRpcStarter.getInstance().getConfiguration().everyIpCircuitBreaker;
+      const serviceNode: string = socketChannel.remoteAddress + ":" + socketChannel.remotePort;
+      circuitBreaker = everyIpCircuitBreaker.get(serviceNode);
+      if (!circuitBreaker) {
+        circuitBreaker = CircuitBreakerFactory.getCircuitBreaker(
+          NoomiRpcStarter.getInstance().getConfiguration().circuitBreakerType
+        );
+        everyIpCircuitBreaker.set(serviceNode, circuitBreaker);
+      }
 
+      try {
         if (
           !(noomiRpcRequest.getRequestType() === RequestType.HEART_BEAT_REQUEST) &&
           circuitBreaker.isBreak()
         ) {
           throw new NoomiRpcError("0704");
         }
+        console.time("noomi-rpc-node执行请求响应时间");
         // 发送请求
-        await this.execute(socketChannel, "ConsumerOutBound", noomiRpcRequest);
+        this.execute(socketChannel, "ConsumerOutBound", noomiRpcRequest).then();
 
         // 监听请求
-        const result: unknown | Error = await new Promise<unknown>((resolve, reject): void => {
+        const result = await new Promise<unknown>((resolve, reject): void => {
           socketChannel.on("data", async (data: Buffer): Promise<void> => {
             try {
               const executeResult: unknown = await this.execute(
@@ -131,7 +132,7 @@ export class HandlerFactory {
             reject(error);
           });
         });
-
+        console.timeEnd("noomi-rpc-node执行请求响应时间");
         if (result instanceof Error) {
           throw result;
         }

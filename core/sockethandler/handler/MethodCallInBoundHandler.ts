@@ -86,12 +86,12 @@ export class MethodCallInBoundHandler extends InBoundHandler<NoomiRpcRequest, No
         returnValue = await WebAfterHandler.doChain(
           responsePayload.getServiceName(),
           returnValue,
-          noomiRpcResponse
+          noomiRpcResponse.getResponseBody()
         );
         responsePayload.setReturnValue(returnValue);
         noomiRpcResponse.setResponseType(ResponseType.SUCCESS_COMMON);
         noomiRpcResponse.setResponseBody(responsePayload);
-        Logger.debug(``);
+        Logger.debug(TipManager.getTip("0155"));
       } catch (error) {
         Logger.error(TipManager.getTip("0145", noomiRpcRequest.getRequestId()));
         noomiRpcResponse.setResponseType(ResponseType.FAIL);

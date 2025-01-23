@@ -33,12 +33,15 @@
   },
   "homepage": "https://gitee.com/javafirstfirst/noomi-rpc-node#readme",
   "dependencies": {
-    "@furyjs/fury": "^0.5.9-beta",
+    "@furyjs/fury": "^0.0.19",
+    "@grpc/grpc-js": "^1.12.5",
+    "@grpc/proto-loader": "^0.7.13",
     "@msgpack/msgpack": "3.0.0-beta2",
     "@types/consul": "^0.40.3",
     "@typescript-eslint/eslint-plugin": "6.11.0",
     "@typescript-eslint/parser": "6.11.0",
     "consul": "^1.2.0",
+    "diskusage": "^1.2.0",
     "eslint": "8.53.0",
     "eslint-config-prettier": "9.0.0",
     "eslint-plugin-prettier": "5.0.1",
@@ -52,6 +55,9 @@
     "noomi": "^1.0.0-beta7",
     "prettier": "3.3.0",
     "protobufjs": "^7.3.0",
+    "reflect-metadata": "^0.2.2",
+    "sofa-rpc-node": "^2.10.0",
+    "thrift": "^0.21.0",
     "typescript": "^5.4.5"
   },
   "devDependencies": {

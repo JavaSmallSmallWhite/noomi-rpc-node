@@ -1,6 +1,7 @@
 import { FilterOption } from "../common/utils/TypesUtil";
 import { InstanceFactory } from "noomi";
 import { NoomiRpcResponse } from "../message/NoomiRpcResponse";
+import { ResponsePayload } from "../message/ResponsePayload";
 
 /**
  * web后置处理，对web请求结果进行再处理
@@ -65,7 +66,7 @@ export class WebAfterHandler {
   public static async doChain(
     url: string,
     result: unknown,
-    response: NoomiRpcResponse
+    response: ResponsePayload
   ): Promise<unknown> {
     const arr: Array<FilterOption> = WebAfterHandler.getHandlerChain(url);
     if (arr.length === 0) {

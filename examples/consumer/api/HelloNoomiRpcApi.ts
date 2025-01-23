@@ -1,5 +1,5 @@
-import { Type } from "@furyjs/fury";
-
+import { Type, TypeDescription } from "@furyjs/fury";
+import { genDescription } from "../basic/Object";
 /**
  * 接口定义
  */
@@ -24,22 +24,16 @@ import { Type } from "@furyjs/fury";
 //         throw new Error("")
 //     }
 // }
-const baseDescription = {
-  errorMessage: Type.string(),
-  code: Type.int32()
-};
 
+const description = genDescription();
 export class HelloNoomiRpcDescription {
   sayHi() {
-    return [
-      Type.tuple([Type.string(), Type.int32()]),
-      Type.object("500", { number: Type.int32(), errorMessage: Type.string(), ...baseDescription })
-    ];
+    return [Type.array(description), description];
   }
 }
 
 export interface HelloNoomiRpcApi {
-  sayHi(msg: string, msg1?: number): Promise<{ number: number }>;
+  sayHi(msg: unknown): Promise<unknown>;
 
   sayHello(msg: string): Promise<string>;
 }

@@ -62,6 +62,7 @@ export class ConsulUtil {
    */
   public static async list(consul: ConsulConnection, serviceName: string): Promise<unknown> {
     try {
+      consul.health.node;
       const res = <Array<unknown>>await consul.health.service(serviceName);
       const newRes = res.map((item) => item["Service"]);
       Logger.debug(`获取${serviceName}下的所有服务节点实例成功。`);

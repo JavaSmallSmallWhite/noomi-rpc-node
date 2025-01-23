@@ -113,10 +113,10 @@ export class NoomiRpcRequestEncoder extends MessageToBufferEncoderHandler<NoomiR
       headerBuffer.writeUInt16BE(methodNameBuffer.length, index);
       requestPayloadBuffer = Buffer.concat([serviceNameBuffer, methodNameBuffer, dataBuffer]);
       // 压缩请求体
-      const compressor: Compressor = CompressorFactory.getCompressor(
-        noomiRpcRequest.getCompressType()
-      ).impl;
-      requestPayloadBuffer = await compressor.compress(requestPayloadBuffer);
+      // const compressor: Compressor = CompressorFactory.getCompressor(
+      //   noomiRpcRequest.getCompressType()
+      // ).impl;
+      // requestPayloadBuffer = await compressor.compress(requestPayloadBuffer);
     }
     let requestBuffer: Buffer;
     if (requestPayloadBuffer) {

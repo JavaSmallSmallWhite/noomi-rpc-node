@@ -23,14 +23,11 @@ interface ServiceConfiguration {
  */
 interface ServiceOption {
   /**
-   * 服务提供接口
-   */
-  interfaceProvider: Constructor;
-
-  /**
    * 服务名称
    */
   serviceName: string;
+
+  description: Constructor;
 
   /**
    * 服务配置
@@ -49,6 +46,7 @@ export function NoomiService<T extends NonNullable<unknown>>(
     const service: ServiceConfig<T> = new ServiceConfig<T>();
     service.interfaceProvider = target;
     service.serviceName = serviceOption["serviceName"];
+    service.descriptionClass = serviceOption.description;
     if (serviceOption.serviceConfiguration) {
       GlobalCache.serviceConfiguration = serviceOption.serviceConfiguration;
     }

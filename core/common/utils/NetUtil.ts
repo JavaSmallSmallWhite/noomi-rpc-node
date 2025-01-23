@@ -1,7 +1,5 @@
-import { Logger } from "../logger/Logger";
 import { Application } from "./ApplicationUtil";
 import { NoomiRpcError } from "../error/NoomiRpcError";
-import { TipManager } from "../error/TipManager";
 
 /**
  * 地址端口数组类型

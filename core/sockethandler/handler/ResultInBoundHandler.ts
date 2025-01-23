@@ -8,7 +8,6 @@ import { LoadBalancerFactory } from "../../loadbalance/LoadBalancerFactory";
 import { LoadBalancer } from "../../loadbalance/LoadBalancer";
 import { NoomiRpcStarter } from "../../NoomiRpcStarter";
 import { Socket } from "../../common/utils/TypesUtil";
-import { NoomiRpcError } from "../../common/error/NoomiRpcError";
 import { TipManager } from "../../common/error/TipManager";
 
 /**

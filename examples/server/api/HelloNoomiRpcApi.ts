@@ -17,17 +17,15 @@
 //   sayHello(msg: string): void;
 // }
 import { Type } from "@furyjs/fury";
-import { genDescription } from "../../consumer/basic/Object";
 
-const description = genDescription();
 export class HelloNoomiRpcDescription {
   sayHi() {
-    return [Type.array(description), description];
+    return [Type.array(Type.string()), Type.string()];
   }
 }
 
 export interface HelloNoomiRpcApi {
-  sayHi(msg: unknown): Promise<unknown>;
+  sayHi(msg: string): Promise<string>;
 
   sayHello(msg: string): Promise<string>;
 }

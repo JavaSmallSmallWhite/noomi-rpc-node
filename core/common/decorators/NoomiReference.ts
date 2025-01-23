@@ -1,20 +1,41 @@
 import { ReferenceConfig } from "../../ReferenceConfig";
 import { NoomiRpcStarter } from "../../NoomiRpcStarter";
 import { Constructor } from "../utils/TypesUtil";
+import { InterfaceUtil } from "../utils/InterfaceUtil";
 
 /**
  * 代理选项
  */
 interface ReferenceOption {
   /**
-   * 服务提供接口
+   * 接口名称
    */
-  interfaceProvider: Constructor;
+  interfaceName?: string;
 
   /**
-   * 服务前缀
+   * 接口与文件名称
    */
-  servicePrefix?: string;
+  interfaceFileName?: string;
+
+  /**
+   * 服务名称
+   */
+  serviceName: string;
+
+  /**
+   * Fury描述类
+   */
+  description?: Constructor;
+
+  /**
+   * proto文件路径
+   */
+  protoFile?: string;
+
+  /**
+   * proto服务名称
+   */
+  protoServiceName?: string;
 }
 
 /**
@@ -26,10 +47,10 @@ export function NoomiReference<T>(
 ): (target: NonNullable<unknown>, propertyKey: string | symbol) => void {
   return async (target: NonNullable<unknown>, propertyKey: string | symbol): Promise<void> => {
     const reference: ReferenceConfig<T> = new ReferenceConfig<T>();
-    reference.interfaceRef = referenceOption.interfaceProvider;
-    if (referenceOption.servicePrefix) {
-      reference.servicePrefix = referenceOption.servicePrefix;
-    }
+    const { interfaceName, interfaceFileName } = referenceOption;
+    reference.interfaceRef = InterfaceUtil.genInterfaceClass(interfaceFileName, interfaceName);
+    reference.serviceName = referenceOption.serviceName;
+    reference.descriptionClass = referenceOption.description || null;
     NoomiRpcStarter.getInstance().reference(reference).then();
     Object.defineProperty(target, propertyKey, {
       get: () => reference.get(),

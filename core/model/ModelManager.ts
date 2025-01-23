@@ -1,6 +1,7 @@
-import { CommonDataType, PropOption, UnknownClass, Util, Validator } from "noomi";
+import { CommonDataType, PropOption, UnknownClass, Util } from "noomi";
 import { TipManager } from "../common/error/TipManager";
 import { BaseService } from "../BaseService";
+import { Validator } from "./Validator";
 
 /**
  * model管理器
@@ -36,6 +37,18 @@ export class ModelManager {
    * ```
    */
   private static modelMap: Map<string, object> = new Map();
+  /**
+   * 增加null check
+   * @param className -   类名
+   * @param methodName -  方法名
+   * @param props -       检测数组
+   */
+  public static setNullCheck(className: string, methodName: string, props: string[]) {
+    const name = className + "." + methodName;
+    if (!this.nullCheckMap.has(name)) {
+      this.nullCheckMap.set(name, props);
+    }
+  }
 
   /**
    * 获取空校验属性数组
@@ -65,6 +78,22 @@ export class ModelManager {
       }
       //找父类
       clazz = clazz["__proto__"];
+    }
+  }
+
+  /**
+   * 设置属性
+   * @param className -   类名
+   * @param propName -    属性名
+   * @param cfg -         配置项，包含类型和校验器
+   */
+  public static setProp(className: string, propName: string, cfg: PropOption) {
+    if (!this.modelMap.has(className)) {
+      const obj = {};
+      obj[propName] = cfg;
+      this.modelMap.set(className, obj);
+    } else {
+      this.modelMap.get(className)[propName] = cfg;
     }
   }
 

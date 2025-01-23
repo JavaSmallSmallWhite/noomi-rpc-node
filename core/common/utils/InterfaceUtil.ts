@@ -54,7 +54,7 @@ export class InterfaceUtil {
     const interfaceCode = Application.fs.readFileSync(interfacePath, "utf-8");
 
     // 使用 TypeScript 创建源文件的 AST
-    const sourceFile = Application.typescript.createSourceFile(
+    const astTree = Application.typescript.createSourceFile(
       "temp.ts",
       interfaceCode,
       Application.typescript.ScriptTarget.Latest,
@@ -69,7 +69,7 @@ export class InterfaceUtil {
       // 遍历接口中的方法，生成代理类的相应方法
       interfaceNode.members.forEach((member) => {
         if (Application.typescript.isMethodSignature(member)) {
-          const methodName = member.name.getText(sourceFile);
+          const methodName = member.name.getText(astTree);
           const params = member.parameters.map((param) =>
             factory.createParameterDeclaration(
               undefined, // 修饰符
@@ -121,7 +121,7 @@ export class InterfaceUtil {
 
     // 遍历 AST，找到目标接口并生成代理类
     let proxyClassNode: ClassDeclaration | null = null;
-    Application.typescript.forEachChild(sourceFile, (node) => {
+    Application.typescript.forEachChild(astTree, (node) => {
       if (Application.typescript.isInterfaceDeclaration(node) && node.name.text === interfaceName) {
         proxyClassNode = createProxyClass(node);
       }
@@ -140,7 +140,7 @@ export class InterfaceUtil {
     const result = printer.printNode(
       Application.typescript.EmitHint.Unspecified,
       proxyClassNode,
-      sourceFile
+      astTree
     );
 
     // 返回生成的代理类代码

@@ -5,7 +5,6 @@ import { Logger } from "../common/logger/Logger";
 import { FurySerializer } from "./impl/FurySerializer";
 import { ObjectWrapperFactory } from "../configuration/ObjectWrapperFactory";
 import { ObjectWrapperType, UnknownClass } from "../configuration/ObjectWrapperType";
-import { Compressor } from "../compress/Compressor";
 import { InstanceFactory } from "noomi";
 import { ProtobufSerializer } from "./impl/ProtobufSerializer";
 import { MsgpackSerializer } from "./impl/MsgpackSerializer";
@@ -97,7 +96,7 @@ export class SerializerFactory {
     if (typeof serializerObjectWrapper === "string") {
       const serializerConfig: ObjectWrapperType =
         ObjectWrapperFactory.getObjectWrapperConfig(serializerObjectWrapper);
-      serializerConfig[2] = <Compressor>(
+      serializerConfig[2] = <Serializer>(
         InstanceFactory.getInstance(<UnknownClass>serializerConfig[2])
       );
       const serializerWrapper: ObjectWrapper<Serializer> = <ObjectWrapper<Serializer>>(
@@ -175,7 +174,7 @@ export class SerializerFactory {
     }
     if (data instanceof Set) {
       return {
-        type: Application.fury.InternalSerializerType.FURY_SET,
+        type: Application.fury.InternalSerializerType.SET,
         label: "set",
         options: {
           key: this.genDataDescription([...data.values()][0], tag)
@@ -212,7 +211,7 @@ export class SerializerFactory {
     }
     if (typeof data === "object") {
       return {
-        type: Application.fury.InternalSerializerType.FURY_TYPE_TAG,
+        type: Application.fury.InternalSerializerType.OBJECT,
         label: "object",
         options: {
           props: Object.fromEntries(
@@ -240,7 +239,7 @@ export class SerializerFactory {
   // public static async payloadSerialize(
   //   serializer: Serializer,
   //   payload: RequestPayload | ResponsePayload,
-  //   platformMark: "client" | "server",
+  //   platformMark: "client" | "server.js",
   //   headerBuffer: Buffer,
   //   index: number
   // ): Promise<Uint8Array> {
@@ -298,7 +297,7 @@ export class SerializerFactory {
   // public static async payloadDeserialize(
   //   serializer: Serializer,
   //   buffer: Uint8Array,
-  //   platformMark: "client" | "server",
+  //   platformMark: "client" | "server.js",
   //   serviceNameSize: number,
   //   methodNameSize: number,
   //   payload: RequestPayload | ResponsePayload
@@ -343,7 +342,7 @@ export class SerializerFactory {
    * @private
    */
   // private static getConfig(
-  //   platformMark: "client" | "server",
+  //   platformMark: "client" | "server.js",
   //   serviceName: string
   // ): ReferenceConfig<unknown> | ServiceConfig<unknown> {
   //   if (platformMark === "client") {

@@ -85,11 +85,11 @@ export class NoomiRpcRequestDecoder extends BufferToMessageDecoderHandler<NoomiR
     noomiRpcRequest.setSerializeType(serializeType);
     noomiRpcRequest.setCompressType(compressType);
 
-    let payloadBuffer: Uint8Array = noomiRpcRequestBuffer.subarray(index, fullLength);
+    const payloadBuffer: Uint8Array = noomiRpcRequestBuffer.subarray(index, fullLength);
     if (payloadBuffer !== null && payloadBuffer.length !== 0) {
       // 解压缩
-      const compressor: Compressor = CompressorFactory.getCompressor(compressType).impl;
-      payloadBuffer = await compressor.decompress(payloadBuffer);
+      // const compressor: Compressor = CompressorFactory.getCompressor(compressType).impl;
+      // payloadBuffer = await compressor.decompress(payloadBuffer);
 
       // 反序列化
       const serializer: Serializer = SerializerFactory.getSerializer(serializeType).impl;
@@ -97,7 +97,7 @@ export class NoomiRpcRequestDecoder extends BufferToMessageDecoderHandler<NoomiR
       //   await SerializerFactory.payloadDeserialize(
       //     serializer,
       //     payloadBuffer,
-      //     "server",
+      //     "server.js",
       //     serviceNameSize,
       //     methodNameSize,
       //     requestPayload

@@ -84,11 +84,11 @@ export class NoomiRpcResponseDecoder extends BufferToMessageDecoderHandler<Noomi
     noomiRpcResponse.setSerializeType(serializeType);
     noomiRpcResponse.setRequestId(requestId);
 
-    let bodyBuffer: Uint8Array = responseBuffer.subarray(index, fullLength);
+    const bodyBuffer: Uint8Array = responseBuffer.subarray(index, fullLength);
     if (bodyBuffer !== null && bodyBuffer.length !== 0) {
       // 解压缩
-      const compressor: Compressor = CompressorFactory.getCompressor(compressType).impl;
-      bodyBuffer = await compressor.decompress(bodyBuffer);
+      // const compressor: Compressor = CompressorFactory.getCompressor(compressType).impl;
+      // bodyBuffer = await compressor.decompress(bodyBuffer);
 
       // 反序列化
       const serializer: Serializer = SerializerFactory.getSerializer(serializeType).impl;
