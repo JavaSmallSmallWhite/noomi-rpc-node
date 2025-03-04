@@ -1,9 +1,10 @@
 {
   "port": 8777, // 启动端口号
   "appName": "NoomiRpcApplication", // 应用名称
+  "protocol": "tcp",// 协议
   "apiDir": ["/examples/client/api"], // 接口目录
-  "starterPath": ["/dist/examples/client/**/*.js"], // 项目启动目录,
-//  "starterPath": ["/dist/examples/consumer/**/*.js"], // 项目启动目录
+//  "starterPath": ["/dist/examples/client/**/*.js"], // 项目启动目录,
+  "starterPath": ["/dist/examples/client/**/*.js"], // 项目启动目录
   "validator": true,
   "log4js": { // 日志配置，具体参照npm log4js
     "configuration": {

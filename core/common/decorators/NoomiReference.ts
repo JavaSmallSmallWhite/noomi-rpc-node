@@ -2,6 +2,7 @@ import { ReferenceConfig } from "../../ReferenceConfig";
 import { NoomiRpcStarter } from "../../NoomiRpcStarter";
 import { Constructor } from "../utils/TypesUtil";
 import { InterfaceUtil } from "../utils/InterfaceUtil";
+import { GlobalCache } from "../../cache/GlobalCache";
 
 /**
  * 代理选项
@@ -46,11 +47,16 @@ export function NoomiReference<T>(
   referenceOption: ReferenceOption
 ): (target: NonNullable<unknown>, propertyKey: string | symbol) => void {
   return async (target: NonNullable<unknown>, propertyKey: string | symbol): Promise<void> => {
-    const reference: ReferenceConfig<T> = new ReferenceConfig<T>();
-    const { interfaceName, interfaceFileName } = referenceOption;
-    reference.interfaceRef = InterfaceUtil.genInterfaceClass(interfaceFileName, interfaceName);
-    reference.serviceName = referenceOption.serviceName;
-    reference.descriptionClass = referenceOption.description || null;
+    let reference: ReferenceConfig<T> = <ReferenceConfig<T>>(
+      GlobalCache.REFERENCES_LIST.get(referenceOption.serviceName)
+    );
+    if (!reference) {
+      reference = new ReferenceConfig<T>();
+      const { interfaceName, interfaceFileName } = referenceOption;
+      reference.interfaceRef = InterfaceUtil.genInterfaceClass(interfaceFileName, interfaceName);
+      reference.serviceName = referenceOption.serviceName;
+      reference.descriptionClass = referenceOption.description || null;
+    }
     NoomiRpcStarter.getInstance().reference(reference).then();
     Object.defineProperty(target, propertyKey, {
       get: () => reference.get(),

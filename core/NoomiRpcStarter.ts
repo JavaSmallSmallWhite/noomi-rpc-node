@@ -10,10 +10,11 @@ import { IdGenerator } from "./common/utils/IdGenerator";
 import { GlobalCache } from "./cache/GlobalCache";
 import { GraceFullyShutdownHook } from "./shutdown/GraceFullyShutdownHook";
 import { Application } from "./common/utils/ApplicationUtil";
-import { Socket } from "./common/utils/TypesUtil";
+import { Http2ServerRequest, Http2ServerResponse, Socket } from "./common/utils/TypesUtil";
 import { HeartBeatDetector } from "./heartbeat/HeartBeatDetector";
 import { NoomiRpcError } from "./common/error/NoomiRpcError";
 import { TipManager } from "./common/error/TipManager";
+import { HttpRequest, RequestQueue } from "noomi";
 
 /**
  * RPC框架启动类
@@ -160,19 +161,49 @@ export class NoomiRpcStarter {
   public start(): void {
     const port = NoomiRpcStarter.getInstance().getConfiguration().port;
     const address = NetUtil.getIpv4Address();
-    const server = Application.net.createServer();
-    server.on("close", function (): void {
-      Logger.info(TipManager.getTip("0152"));
-    });
-    server.on("error", function (error: Error): void {
-      Logger.error(TipManager.getError("0409", error.message));
-    });
-    server.on("connection", function (socketChannel: Socket): void {
-      HandlerFactory.handleProviderRequestAndResponse(socketChannel).then();
-    });
-    server.listen(port, function (): void {
-      Logger.info(TipManager.getTip("0153", address, port));
-    });
+    if (this.configuration.protocol === "tcp") {
+      // tcp服务器
+      const server = Application.net.createServer();
+      server.on("close", function (): void {
+        Logger.info(TipManager.getTip("0152"));
+      });
+      server.on("error", function (error: Error): void {
+        Logger.error(TipManager.getError("0409", error.message));
+      });
+      server.on("connection", function (socketChannel: Socket): void {
+        HandlerFactory.handleProviderRequestAndResponse(socketChannel).then();
+      });
+      server.listen(port, function (): void {
+        Logger.info(TipManager.getTip("0153", address, port));
+      });
+    } else {
+      // http2 服务器
+      const server = Application.http2
+        .createServer((request: Http2ServerRequest, response: Http2ServerResponse): void => {
+          RequestQueue.handle(new HttpRequest(<any>request, <any>response)).then();
+        })
+        .listen(port, () => {
+          // Noomi启动成功！
+          console.log(TipManager.getTip("0117"));
+          // Http服务器正在运行,监听端口 ${0}
+          console.log(TipManager.getTip("0121", port));
+          // 启动队列执行
+        })
+        .on("error", (err) => {
+          if (err.code === "EADDRINUSE") {
+            // 地址正被使用，重试中...
+            console.log(TipManager.getTip("0118"));
+            // 1秒后重试
+            setTimeout(() => {
+              server.close();
+              server.listen(port);
+            }, 1000);
+          }
+        })
+        .on("clientError", (_, socket) => {
+          socket.end("HTTP/2.0 400 Bad Request\r\n");
+        });
+    }
   }
 
   /**

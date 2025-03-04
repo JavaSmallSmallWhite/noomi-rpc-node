@@ -6,303 +6,318 @@ export class Application {
    * fs
    * @private
    */
-  private static _fs: typeof import("fs") | undefined;
+  static #fs: typeof import("fs") | undefined;
 
   /**
    * net
    * @private
    */
-  private static _net: typeof import("net") | undefined;
+  static #net: typeof import("net") | undefined;
 
   /**
    * url
    * @private
    */
-  private static _url: typeof import("url") | undefined;
+  static #url: typeof import("url") | undefined;
 
   /**
    * path
    * @private
    */
-  private static _path: typeof import("path") | undefined;
+  static #path: typeof import("path") | undefined;
 
   /**
    * os
    * @private
    */
-  private static _os: typeof import("os") | undefined;
+  static #os: typeof import("os") | undefined;
 
   /**
    * http2
    * @private
    */
-  private static _http2: typeof import("http2") | undefined;
+  static #http2: typeof import("http2") | undefined;
 
   /**
    * zlib
    * @private
    */
-  private static _zlib: typeof import("zlib") | undefined;
+  static #zlib: typeof import("zlib") | undefined;
 
   /**
    * crypto
    * @private
    */
-  private static _crypto: typeof import("crypto") | undefined;
+  static #crypto: typeof import("crypto") | undefined;
 
   /**
-   * async_hooks
+   * async#hooks
    * @private
    */
-  private static _asyncHooks: typeof import("async_hooks") | undefined;
+  static #asyncHooks: typeof import("async_hooks") | undefined;
 
   /**
    * json5
    * @private
    */
-  private static _json5: typeof import("json5") | undefined;
+  static #json5: typeof import("json5") | undefined;
 
   /**
    * nacos
    * @private
    */
-  private static _nacos: typeof import("nacos") | undefined;
+  static #nacos: typeof import("nacos") | undefined;
 
   /**
    * zookeeper
    * @private
    */
-  private static _zookeeper: typeof import("node-zookeeper-client") | undefined;
+  static #zookeeper: typeof import("node-zookeeper-client") | undefined;
 
   /**
    * consul
    * @private
    */
-  private static _consul: typeof import("consul") | undefined;
+  static #consul: typeof import("consul") | undefined;
 
   /**
    * etcd3
    * @private
    */
-  private static _etcd3: typeof import("etcd3") | undefined;
+  static #etcd3: typeof import("etcd3") | undefined;
 
   /**
    * fury
    * @private
    */
-  private static _fury: typeof import("@furyjs/fury") | undefined;
+  static #fury: typeof import("@furyjs/fury") | undefined;
 
   /**
    * log4js
    * @private
    */
-  private static _log4js: typeof import("log4js") | undefined;
+  static #log4js: typeof import("log4js") | undefined;
 
   /**
    * protobuf
    * @private
    */
-  private static _protobuf: typeof import("protobufjs") | undefined;
+  static #protobuf: typeof import("protobufjs") | undefined;
 
   /**
    * msgpack
    * @private
    */
-  private static _msgpack: typeof import("msgpackr") | undefined;
+  static #msgpack: typeof import("msgpackr") | undefined;
 
   /**
    * typescript
    * @private
    */
-  private static _typescript: typeof import("typescript") | undefined;
+  static #typescript: typeof import("typescript") | undefined;
 
+  /**
+   * events
+   * @private
+   */
+  static #events: typeof import("events") | undefined;
   /**
    * fs
    */
   public static get fs() {
-    if (!this._fs) {
-      this._fs = require("fs");
+    if (!this.#fs) {
+      this.#fs = require("fs");
     }
-    return this._fs;
+    return this.#fs;
   }
 
   /**
    * net
    */
   public static get net() {
-    if (!this._net) {
-      this._net = require("net");
+    if (!this.#net) {
+      this.#net = require("net");
     }
-    return this._net;
+    return this.#net;
   }
 
   /**
    * net
    */
   public static get url() {
-    if (!this._url) {
-      this._url = require("url");
+    if (!this.#url) {
+      this.#url = require("url");
     }
-    return this._url;
+    return this.#url;
   }
 
   /**
    * path
    */
   public static get path() {
-    if (!this._path) {
-      this._path = require("path");
+    if (!this.#path) {
+      this.#path = require("path");
     }
-    return this._path;
+    return this.#path;
   }
 
   /**
    * os
    */
   public static get os() {
-    if (!this._os) {
-      this._os = require("os");
+    if (!this.#os) {
+      this.#os = require("os");
     }
-    return this._os;
+    return this.#os;
   }
 
   /**
    * http2
    */
   public static get http2() {
-    if (!this._http2) {
-      this._http2 = require("http2");
+    if (!this.#http2) {
+      this.#http2 = require("http2");
     }
-    return this._http2;
+    return this.#http2;
   }
 
   /**
    * zlib
    */
   public static get zlib() {
-    if (!this._zlib) {
-      this._zlib = require("zlib");
+    if (!this.#zlib) {
+      this.#zlib = require("zlib");
     }
-    return this._zlib;
+    return this.#zlib;
   }
 
   /**
    * crypto
    */
   public static get crypto() {
-    if (!this._crypto) {
-      this._crypto = require("crypto");
+    if (!this.#crypto) {
+      this.#crypto = require("crypto");
     }
-    return this._crypto;
+    return this.#crypto;
   }
 
   /**
    * http2
    */
   public static get asyncHooks() {
-    if (!this._asyncHooks) {
-      this._asyncHooks = require("async_hooks");
+    if (!this.#asyncHooks) {
+      this.#asyncHooks = require("async#hooks");
     }
-    return this._asyncHooks;
+    return this.#asyncHooks;
   }
 
   /**
    * json5
    */
   public static get json5() {
-    if (!this._json5) {
-      this._json5 = require("json5");
+    if (!this.#json5) {
+      this.#json5 = require("json5");
     }
-    return this._json5;
+    return this.#json5;
   }
 
   /**
    * nacos
    */
   public static get nacos() {
-    if (!this._nacos) {
-      this._nacos = require("nacos");
+    if (!this.#nacos) {
+      this.#nacos = require("nacos");
     }
-    return this._nacos;
+    return this.#nacos;
   }
 
   /**
    * zookeeper
    */
   public static get zookeeper() {
-    if (!this._zookeeper) {
-      this._zookeeper = require("node-zookeeper-client");
+    if (!this.#zookeeper) {
+      this.#zookeeper = require("node-zookeeper-client");
     }
-    return this._zookeeper;
+    return this.#zookeeper;
   }
 
   /**
    * consul
    */
   public static get consul() {
-    if (!this._consul) {
-      this._consul = require("consul");
+    if (!this.#consul) {
+      this.#consul = require("consul");
     }
-    return this._consul;
+    return this.#consul;
   }
 
   /**
    * etcd3
    */
   public static get etcd3() {
-    if (!this._etcd3) {
-      this._etcd3 = require("etcd3");
+    if (!this.#etcd3) {
+      this.#etcd3 = require("etcd3");
     }
-    return this._etcd3;
+    return this.#etcd3;
   }
 
   /**
    * fury
    */
   public static get fury() {
-    if (!this._fury) {
-      this._fury = require("@furyjs/fury");
+    if (!this.#fury) {
+      this.#fury = require("@furyjs/fury");
     }
-    return this._fury;
+    return this.#fury;
   }
 
   /**
    * log4js
    */
   public static get log4js() {
-    if (!this._log4js) {
-      this._log4js = require("log4js");
+    if (!this.#log4js) {
+      this.#log4js = require("log4js");
     }
-    return this._log4js;
+    return this.#log4js;
   }
 
   /**
    * protobuf
    */
   public static get protobuf() {
-    if (!this._protobuf) {
-      this._protobuf = require("protobufjs");
+    if (!this.#protobuf) {
+      this.#protobuf = require("protobufjs");
     }
-    return this._protobuf;
+    return this.#protobuf;
   }
 
   /**
    * msgpack
    */
   public static get msgpack() {
-    if (!this._msgpack) {
-      this._msgpack = require("msgpackr");
+    if (!this.#msgpack) {
+      this.#msgpack = require("msgpackr");
     }
-    return this._msgpack;
+    return this.#msgpack;
   }
 
   /**
    * typescript
    */
   public static get typescript() {
-    if (!this._typescript) {
-      this._typescript = require("typescript");
+    if (!this.#typescript) {
+      this.#typescript = require("typescript");
     }
-    return this._typescript;
+    return this.#typescript;
+  }
+
+  /**
+   * events
+   */
+  public static get events() {
+    if (!this.#events) {
+      this.#events = require("events");
+    }
+    return this.#events;
   }
 }

@@ -79,5 +79,5 @@ export const sample = {
 };
 
 export function genDescription() {
-  return data2Description(sample, "test-noomi-rpc");
+  return data2Description(sample, "test.js-noomi-rpc");
 }

@@ -7,14 +7,14 @@ async function main(): Promise<void> {
   // 获取服务配置
   const service: ServiceConfig<HelloNoomiRpcApi> = new ServiceConfig<HelloNoomiRpcApi>();
   // 设置服务名称
-  service.serviceName = "com.nodejs.test.HelloNoomiRpc";
+  service.serviceName = "com.nodejs.test.js.HelloNoomiRpc";
   // 设置接口
   service.interfaceProvider = HelloNoomiRpc;
   // 设置description
   service.descriptionClass = HelloNoomiRpcDescription;
 
   // service.protoFile = process.cwd() + "/examples/provider/proto/hello.proto";
-  // service.protoServiceName = "com.node.test.Greeter";
+  // service.protoServiceName = "com.node.test.js.Greeter";
   // 配置NoomiRpcStarter的信息
   const starter: NoomiRpcStarter = NoomiRpcStarter.getInstance();
   // 下面这些自行配置，不配置，使用默认的，默认的参考core目录下的Configuration文件

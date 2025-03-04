@@ -29,6 +29,12 @@ export class Configuration {
   private _port: number = 8808;
 
   /**
+   * 配置信息 --> 协议
+   * @private
+   */
+  private _protocol: string = "soft";
+
+  /**
    * 配置信息 --> 应用名称
    * @private
    */
@@ -147,6 +153,15 @@ export class Configuration {
   set port(value: number) {
     this._port = value;
     Logger.info(TipManager.getTip("0100", value));
+  }
+
+  get protocol(): string {
+    return this._protocol;
+  }
+
+  set protocol(value: string) {
+    this._protocol = value;
+    Logger.info(TipManager.getTip("0156", value));
   }
 
   get language(): string {
@@ -279,13 +294,13 @@ class JsonResolver {
       "utf-8"
     );
     if (jsonStr === null) {
-      throw new NoomiRpcError(TipManager.getError("0100"));
+      throw new NoomiRpcError("配置文件异常！！");
     }
     let configObject: object = null;
     try {
       configObject = Application.json5.parse(jsonStr);
     } catch (error) {
-      throw new NoomiRpcError(TipManager.getError("0101"));
+      throw new NoomiRpcError("配置文件异常！！");
     }
     try {
       // 配置debug等级
@@ -296,6 +311,8 @@ class JsonResolver {
       );
       // 配置端口
       configuration.port = configObject["port"];
+      // 配置协议
+      configuration.protocol = configObject["protocol"];
       // 配置应用名称
       configuration.appName = configObject["appName"];
       // 配置语言

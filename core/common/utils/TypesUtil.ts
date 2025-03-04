@@ -56,10 +56,7 @@ export type Root = import("protobufjs").Root;
 /**
  * typescript
  */
-export type SourceFile = import("typescript").SourceFile;
-export type Node = import("typescript").Node;
 export type ClassElement = import("typescript").ClassElement;
-export type TransformationContext = import("typescript").TransformationContext;
 export type InterfaceDeclaration = import("typescript").InterfaceDeclaration;
 export type ClassDeclaration = import("typescript").ClassDeclaration;
 
@@ -68,3 +65,7 @@ export type Constructor = new (...args: unknown[]) => void;
 
 // noomi
 export type FilterOption = import("noomi").FilterOption;
+
+// http2
+export type Http2ServerRequest = import("http2").Http2ServerRequest;
+export type Http2ServerResponse = import("http2").Http2ServerResponse;
