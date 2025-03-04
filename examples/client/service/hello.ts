@@ -56,37 +56,4 @@ export class HelloRoute {
     console.timeEnd("noomi-rpc-node请求响应时间");
     return "ok";
   }
-
-  @Route("/message250")
-  public async getMessage250(): Promise<string> {
-    console.time("noomi-rpc-node请求响应时间");
-    for (let i = 0; i < 250; i++) {
-      const res = await this.helloNoomiRpcApi.sayHi("Hello World");
-      console.log(res);
-    }
-    console.timeEnd("noomi-rpc-node请求响应时间");
-    return "ok";
-  }
-
-  @Route("/message500")
-  public async getMessage500(): Promise<string> {
-    console.time("noomi-rpc-node请求响应时间");
-    for (let i = 0; i < 500; i++) {
-      const res = await this.helloNoomiRpcApi.sayHi("Hello World");
-      console.log(res);
-    }
-    console.timeEnd("noomi-rpc-node请求响应时间");
-    return "ok";
-  }
-
-  @Route("/message1000")
-  public async getMessage1000(): Promise<string> {
-    console.time("noomi-rpc-node请求响应时间");
-    for (let i = 0; i < 1000; i++) {
-      const res = await this.helloNoomiRpcApi.sayHi("Hello World");
-      console.log(res);
-    }
-    console.timeEnd("noomi-rpc-node请求响应时间");
-    return "ok";
-  }
 }
